@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>AttendTrack — Smart Attendance System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Firebase Compat SDK (no module needed) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d1117;--ink2:#3d4451;--ink3:#6b7280;
+  --paper:#f7f6f3;--card:#ffffff;
+  --green:#00c896;--blue:#0077ff;--red:#ff3b5c;--orange:#f59e0b;
+  --border:#e5e3de;
+  --body:'DM Sans',sans-serif;--mono:'Space Mono',monospace;
+  --r:12px;--r2:20px;
+  --sh:0 2px 12px rgba(0,0,0,.07);
+  --sh2:0 8px 40px rgba(0,0,0,.13);
+}
+html,body{height:100%;font-family:var(--body);background:var(--paper);color:var(--ink);font-size:15px}
+button{font-family:var(--body);cursor:pointer;border:none;outline:none}
+input,select{font-family:var(--body);outline:none}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+
+/* ── LANDING ── */
+#screen-landing{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;padding:40px 20px;
+  background:linear-gradient(145deg,#0d1117 0%,#1a2233 60%,#0d1117 100%);
+}
+.land-mono{font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--green);letter-spacing:4px;text-transform:uppercase;margin-bottom:14px}
+.land-h1{font-size:clamp(2rem,7vw,3.4rem);font-weight:700;color:#fff;text-align:center;line-height:1.1;margin-bottom:10px}
+.land-h1 span{color:var(--green)}
+.land-sub{color:#6b7280;text-align:center;font-size:.95rem;max-width:380px;margin-bottom:48px;line-height:1.6}
+.land-cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%;max-width:560px}
+.land-card{
+  flex:1;min-width:220px;max-width:260px;
+  background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);
+  border-radius:var(--r2);padding:30px 24px 26px;text-align:center;
+  cursor:pointer;transition:all .25s;
+}
+.land-card:hover{background:rgba(255,255,255,.09);border-color:var(--green);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,200,150,.15)}
+.land-card-icon{font-size:2.4rem;margin-bottom:12px}
+.land-card-title{color:#fff;font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.land-card-desc{color:#6b7280;font-size:.82rem;line-height:1.5}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(247,246,243,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;padding:14px 20px;
+}
+.tb-logo{font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--green);letter-spacing:2px}
+.tb-title{font-weight:700;font-size:1rem;flex:1}
+.tb-back{
+  background:transparent;border:1.5px solid var(--border);
+  border-radius:8px;padding:7px 14px;font-size:.82rem;font-weight:600;color:var(--ink2);transition:all .2s;
+}
+.tb-back:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.live-dot{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--green)}
+.live-dot::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+
+/* ── SHARED CARD ── */
+.card{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);padding:22px 20px;margin-bottom:16px;border:1px solid var(--border)}
+.card-lbl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--ink3);margin-bottom:14px}
+
+/* ── FIELD ── */
+.field{margin-bottom:14px}
+.field label{font-size:.82rem;font-weight:600;color:var(--ink2);display:block;margin-bottom:6px}
+.field input,.field select{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);
+  font-size:.95rem;background:#fafaf8;color:var(--ink);transition:border .2s,box-shadow .2s;
+}
+.field input:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,119,255,.1);background:#fff}
+.field select{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+}
+
+/* ── GPS BTN ── */
+.gps-btn{
+  width:100%;padding:12px;border-radius:var(--r);
+  background:#f0fdf4;border:1.5px dashed #86efac;
+  color:#15803d;font-size:.88rem;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;
+}
+.gps-btn:hover{background:#dcfce7}
+.gps-btn.checking{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8;border-style:solid}
+.gps-btn.ok{background:#f0fdf4;border-color:var(--green);border-style:solid;color:#15803d}
+.gps-btn.fail{background:#fef2f2;border-color:#fca5a5;border-style:solid;color:#b91c1c}
+
+/* ── PILLS ── */
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:30px;padding:7px 14px;font-size:.82rem;font-weight:600;margin-top:10px;width:100%;justify-content:center}
+.pill-info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.pill-ok{background:#f0fdf4;color:#15803d;border:1px solid #86efac}
+.pill-bad{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
+.pill-warn{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+
+/* ── ACTION BTNS ── */
+.act-btn{
+  width:100%;padding:15px;border-radius:14px;font-size:1rem;font-weight:700;color:#fff;
+  transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.act-btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-ci{background:linear-gradient(135deg,#00c896,#00a878)}
+.btn-ci:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,200,150,.35)}
+.btn-co{background:linear-gradient(135deg,#ff3b5c,#e02040)}
+.btn-co:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,59,92,.35)}
+
+/* ── CLOCK ── */
+.emp-clock{background:var(--ink);border-radius:var(--r2);padding:20px 24px;margin-bottom:20px;text-align:center}
+.emp-clock-time{font-family:var(--mono);font-size:2.5rem;font-weight:700;color:var(--green);letter-spacing:3px;line-height:1}
+.emp-clock-date{color:#6b7280;font-size:.82rem;margin-top:6px;letter-spacing:.5px}
+
+/* ── SESSION BADGE ── */
+.sess{background:linear-gradient(135deg,#0d1117,#1a2233);border-radius:var(--r2);padding:18px 20px;margin-bottom:16px}
+.sess-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sess-tag{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;border-radius:20px}
+.sess-in{background:rgba(0,200,150,.2);color:var(--green)}
+.sess-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.83rem}
+.sess-row:last-child{border:none}
+.sess-k{color:#6b7280}.sess-v{color:#e5e7eb;font-weight:600;font-family:var(--mono);font-size:.8rem}
+
+/* ── RESULT ROW ── */
+.res-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:.86rem}
+.res-row:last-child{border:none}
+.res-k{color:var(--ink3)}.res-v{font-weight:700}
+
+/* ── SETUP BANNER ── */
+.setup-ban{
+  background:linear-gradient(135deg,#fffbeb,#fef9c3);
+  border:1.5px solid #fde68a;border-radius:var(--r2);
+  padding:14px 18px;margin-bottom:18px;font-size:.84rem;color:#78350f;line-height:1.6;
+}
+.setup-ban strong{color:#92400e}
+.setup-ban code{background:#fef3c7;padding:1px 5px;border-radius:4px;font-size:.79rem;font-family:var(--mono)}
+
+/* ── ADMIN LOGIN ── */
+#screen-admin-login{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;background:var(--ink);padding:40px 20px;
+}
+.login-card{background:#1a2233;border:1px solid rgba(255,255,255,.08);border-radius:var(--r2);padding:36px 32px;width:100%;max-width:380px}
+.login-h{color:#fff;font-size:1.3rem;font-weight:700;margin-bottom:6px}
+.login-sub{color:#6b7280;font-size:.85rem;margin-bottom:28px}
+.lf{margin-bottom:16px}
+.lf label{color:#9ca3af;font-size:.82rem;font-weight:600;display:block;margin-bottom:6px}
+.lf input{width:100%;padding:11px 14px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--r);color:#fff;font-size:.95rem;font-family:var(--body)}
+.lf input:focus{border-color:var(--green);background:rgba(0,200,150,.06);outline:none}
+.login-btn{width:100%;padding:13px;background:var(--green);color:#0d1117;border-radius:var(--r);font-weight:800;font-size:1rem;transition:all .2s;font-family:var(--body)}
+.login-btn:hover{background:#00e5aa;transform:translateY(-1px)}
+.login-err{color:#ff3b5c;font-size:.82rem;margin-top:10px;text-align:center}
+
+/* ── DASHBOARD ── */
+.dash-wrap{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
+.stat{background:var(--card);border-radius:var(--r2);padding:18px 20px;border:1px solid var(--border);box-shadow:var(--sh)}
+.stat-n{font-size:2rem;font-weight:800;font-family:var(--mono);line-height:1}
+.stat-l{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-top:6px}
+.stat.g .stat-n{color:var(--green)}.stat.b .stat-n{color:var(--blue)}.stat.r .stat-n{color:var(--red)}.stat.o .stat-n{color:var(--orange)}
+
+.dash-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--card);border-radius:var(--r);padding:4px;border:1px solid var(--border);width:fit-content}
+.dash-tab{padding:7px 18px;border-radius:8px;font-size:.85rem;font-weight:600;color:var(--ink3);cursor:pointer;transition:all .2s}
+.dash-tab.on{background:var(--ink);color:#fff}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);border-radius:var(--r2);padding:14px 16px;margin-bottom:18px;border:1px solid var(--border);box-shadow:var(--sh)}
+.toolbar input,.toolbar select{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;background:#fafaf8;color:var(--ink);flex:1;min-width:110px;font-family:var(--body)}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--blue);outline:none}
+.tb-btn{padding:8px 16px;border-radius:8px;font-size:.83rem;font-weight:700;transition:all .2s;white-space:nowrap;font-family:var(--body)}
+.tb-pri{background:var(--ink);color:#fff}.tb-pri:hover{background:var(--blue)}
+.tb-out{background:transparent;border:1.5px solid var(--border);color:var(--ink2)}.tb-out:hover{border-color:var(--ink);background:var(--ink);color:#fff}
+
+.tbl-wrap{background:var(--card);border-radius:var(--r2);border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden}
+.tbl-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.tbl-hdr-t{font-weight:700;font-size:.95rem}
+.tbl-count{font-size:.78rem;color:var(--ink3);background:#f3f4f6;padding:3px 10px;border-radius:20px;font-family:var(--mono)}
+table{width:100%;border-collapse:collapse}
+th{padding:11px 16px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);background:#fafaf8;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 16px;font-size:.85rem;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafdf8}
+
+.bdg{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:.75rem;font-weight:700}
+.bdg-in{background:#f0fdf4;color:#15803d;border:1px solid #86efac}
+.bdg-out{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
+.bdg-late{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.bdg-ot{background:#fdf4ff;color:#7e22ce;border:1px solid #e9d5ff}
+
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:700;margin-right:8px;flex-shrink:0}
+.ec{display:flex;align-items:center}
+.en{font-weight:600;font-size:.9rem}
+.eid{font-size:.75rem;color:var(--ink3);font-family:var(--mono)}
+.map-lnk{color:var(--blue);font-size:.78rem;font-weight:600;display:inline-flex;align-items:center;gap:3px}
+.map-lnk:hover{color:var(--green)}
+.dur{font-family:var(--mono);font-size:.78rem;background:#f3f4f6;padding:2px 8px;border-radius:6px;color:var(--ink2)}
+
+/* Activity feed */
+.feed-item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border:none}
+.fd{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.fd-in{background:var(--green)}.fd-out{background:var(--red)}
+.fn{font-weight:600;font-size:.9rem}
+.fd2{font-size:.78rem;color:var(--ink3);margin-top:2px}
+.ft{font-family:var(--mono);font-size:.8rem;color:var(--ink2);font-weight:600}
+
+/* Empty */
+.empty{text-align:center;padding:60px 20px;color:var(--ink3)}
+.empty-icon{font-size:3rem;margin-bottom:12px}
+.empty-t{font-size:1rem;font-weight:700;color:var(--ink2);margin-bottom:6px}
+
+/* Spinner */
+.spin{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--ink);color:#fff;padding:12px 24px;border-radius:30px;
+  font-size:.9rem;font-weight:600;box-shadow:var(--sh2);
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:9999;white-space:nowrap;max-width:90vw;
+}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#toast.t-ok{background:linear-gradient(135deg,#00c896,#00a878)}
+#toast.t-err{background:linear-gradient(135deg,#ff3b5c,#e02040)}
+
+/* Employee container */
+.emp-wrap{max-width:480px;margin:0 auto;padding:20px 16px 60px}
+
+/* Setup guide */
+.guide-step{background:#f8fafc;border-radius:var(--r);padding:18px 20px;border:1px solid var(--border);margin-bottom:14px}
+.gs-title{font-weight:800;color:var(--ink);margin-bottom:10px;font-size:.95rem}
+.gs-body{font-size:.85rem;color:var(--ink2);line-height:1.8}
+.gs-body ol{padding-left:18px}
+.gs-body code{background:#e8edf3;padding:1px 6px;border-radius:4px;font-size:.79rem;font-family:var(--mono)}
+pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.78rem;margin-top:10px;overflow-x:auto;font-family:var(--mono);line-height:1.6}
+
+@media(max-width:768px){th:nth-child(n+7),td:nth-child(n+7){display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){th:nth-child(n+5),td:nth-child(n+5){display:none}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     LANDING
+══════════════════════════════════════════ -->
+<div id="screen-landing" class="screen active">
+  <div class="land-mono">⚡ AttendTrack</div>
+  <h1 class="land-h1">Smart Attendance<br><span>Made Simple</span></h1>
+  <p class="land-sub">GPS-verified check-ins, live employer dashboard, and real-time tracking — all from a single link.</p>
+  <div class="land-cards">
+    <div class="land-card" onclick="showScreen('employee')">
+      <div class="land-card-icon">📲</div>
+      <div class="land-card-title">Employee</div>
+      <div class="land-card-desc">Check in &amp; out with GPS location verification</div>
+    </div>
+    <div class="land-card" onclick="showScreen('admin-login')">
+      <div class="land-card-icon">📊</div>
+      <div class="land-card-title">Employer Dashboard</div>
+      <div class="land-card-desc">Track all staff in real-time, view reports &amp; history</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ADMIN LOGIN
+══════════════════════════════════════════ -->
+<div id="screen-admin-login" class="screen">
+  <div class="login-card">
+    <div class="login-h">Dashboard Login</div>
+    <div class="login-sub">Enter your employer credentials</div>
+    <div class="lf"><label>Username</label><input type="text" id="adminUser" placeholder="admin" autocomplete="off"/></div>
+    <div class="lf"><label>Password</label><input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="login-btn" onclick="doLogin()">Access Dashboard →</button>
+    <div class="login-err" id="loginErr"></div>
+    <div style="text-align:center;margin-top:20px">
+      <button style="background:none;color:#6b7280;font-size:.82rem;cursor:pointer;font-family:var(--body)" onclick="showScreen('landing')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     EMPLOYEE APP
+══════════════════════════════════════════ -->
+<div id="screen-employee" class="screen">
+  <div class="topbar">
+    <span class="tb-logo">AT</span>
+    <span class="tb-title">Check Attendance</span>
+    <button class="tb-back" onclick="showScreen('landing')">← Back</button>
+  </div>
+  <div class="emp-wrap">
+
+    <div class="setup-ban" id="empBanner">
+      ⚠️ <strong>Demo mode.</strong> Firebase not configured yet — records saved locally. See <strong>Setup Guide</strong> in the dashboard to connect a database.
+    </div>
+
+    <!-- Clock -->
+    <div class="emp-clock">
+      <div class="emp-clock-time" id="empTime">--:--:--</div>
+      <div class="emp-clock-date" id="empDate">Loading…</div>
+    </div>
+
+    <!-- Active session badge -->
+    <div class="sess" id="sessBadge" style="display:none">
+      <div class="sess-hdr">
+        <span style="color:#9ca3af;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px">Active Session</span>
+        <span class="sess-tag sess-in">✅ CHECKED IN</span>
+      </div>
+      <div class="sess-row"><span class="sess-k">Employee</span><span class="sess-v" id="sb-emp">—</span></div>
+      <div class="sess-row"><span class="sess-k">Site</span><span class="sess-v" id="sb-site">—</span></div>
+      <div class="sess-row"><span class="sess-k">Checked in at</span><span class="sess-v" id="sb-cin">—</span></div>
+      <div class="sess-row"><span class="sess-k">Duration</span><span class="sess-v" id="sb-dur">—</span></div>
+    </div>
+
+    <!-- Check-in form -->
+    <div id="ciForm">
+      <div class="card">
+        <div class="card-lbl">Employee Details</div>
+        <div class="field"><label>Employee ID</label><input type="text" id="empId" placeholder="e.g. EMP001" oninput="chkBtn()"/></div>
+        <div class="field"><label>Full Name</label><input type="text" id="empName" placeholder="e.g. Ahmad Bin Ali" oninput="chkBtn()"/></div>
+        <div class="field"><label>Work Site</label>
+          <select id="empSite" onchange="chkBtn();resetGps('in')">
+            <option value="">— Select your work site —</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">📍 Location Verification</div>
+        <button class="gps-btn" id="gpsCiBtn" onclick="verifyGps('in')">
+          <span id="gpsCiIcon">🔍</span> <span id="gpsCiTxt">Tap to Verify My Location</span>
+        </button>
+        <div id="gpsCiStatus"></div>
+      </div>
+      <button class="act-btn btn-ci" id="ciBtn" disabled onclick="doCheckin()">
+        ✅ Check In
+      </button>
+    </div>
+
+    <!-- Check-out section -->
+    <div id="coSection" style="display:none">
+      <div class="card">
+        <div class="card-lbl">🚪 Ready to Leave?</div>
+        <p style="font-size:.84rem;color:var(--ink3);margin-bottom:14px">Verify your location to check out.</p>
+        <button class="gps-btn" id="gpsCoBtnEl" onclick="verifyGps('out')">
+          <span id="gpsCoIcon">🔍</span> <span id="gpsCoTxt">Tap to Verify My Location</span>
+        </button>
+        <div id="gpsCoStatus"></div>
+      </div>
+      <button class="act-btn btn-co" id="coBtn" disabled onclick="doCheckout()">
+        🔴 Check Out
+      </button>
+    </div>
+
+    <!-- Result card -->
+    <div class="card" id="resultCard" style="display:none;margin-top:8px">
+      <div class="card-lbl" id="resultTitle">Record</div>
+      <div id="resultBody"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     DASHBOARD
+══════════════════════════════════════════ -->
+<div id="screen-dashboard" class="screen">
+  <div class="topbar">
+    <span class="tb-logo">AT</span>
+    <span class="tb-title">Employer Dashboard</span>
+    <span class="live-dot" style="margin-left:4px">LIVE</span>
+    <button class="tb-back" onclick="showScreen('landing')" style="margin-left:auto">Sign Out</button>
+  </div>
+  <div class="dash-wrap">
+
+    <div class="setup-ban" id="dashBanner">
+      ⚙️ <strong>Setup needed:</strong> Replace <code>FIREBASE_CONFIG</code> in the script with your Firebase credentials for live data. Click <strong>Setup Guide</strong> tab below for instructions.
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat g"><div class="stat-n" id="s-in">0</div><div class="stat-l">Checked In</div></div>
+      <div class="stat r"><div class="stat-n" id="s-out">0</div><div class="stat-l">Checked Out</div></div>
+      <div class="stat o"><div class="stat-n" id="s-today">0</div><div class="stat-l">Today Total</div></div>
+      <div class="stat b"><div class="stat-n" id="s-all">0</div><div class="stat-l">All Records</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="dash-tabs">
+      <div class="dash-tab on" onclick="dTab('live',this)">Live Status</div>
+      <div class="dash-tab" onclick="dTab('feed',this)">Activity Feed</div>
+      <div class="dash-tab" onclick="dTab('setup',this)">⚙️ Setup Guide</div>
+    </div>
+
+    <!-- LIVE TAB -->
+    <div id="dTab-live">
+      <div class="toolbar">
+        <input type="text" id="fSearch" placeholder="Search name / ID…" oninput="renderTable()"/>
+        <select id="fSite" onchange="renderTable()"><option value="">All Sites</option></select>
+        <select id="fStatus" onchange="renderTable()">
+          <option value="">All Status</option>
+          <option value="in">Checked In</option>
+          <option value="out">Checked Out</option>
+        </select>
+        <input type="date" id="fDate" onchange="renderTable()"/>
+        <button class="tb-btn tb-pri" onclick="exportCSV()">⬇ CSV</button>
+        <button class="tb-btn tb-out" onclick="refreshDash()">↻</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-hdr">
+          <span class="tbl-hdr-t">Attendance Records</span>
+          <span class="tbl-count" id="tblCount">0 records</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr>
+              <th>Employee</th><th>Site</th><th>Status</th>
+              <th>Check-In</th><th>Check-Out</th><th>Duration</th>
+              <th>GPS In</th><th>GPS Out</th><th>Date</th>
+            </tr></thead>
+            <tbody id="tblBody"></tbody>
+          </table>
+        </div>
+        <div id="tblEmpty" class="empty" style="display:none">
+          <div class="empty-icon">📋</div>
+          <div class="empty-t">No records yet</div>
+          <div>Records appear here in real time once employees check in</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEED TAB -->
+    <div id="dTab-feed" style="display:none">
+      <div class="tbl-wrap" style="padding:20px">
+        <div class="card-lbl" style="margin-bottom:16px">Recent Activity</div>
+        <div id="feedList"><div class="empty"><div class="empty-icon">⏳</div><div class="empty-t">No activity yet</div></div></div>
+      </div>
+    </div>
+
+    <!-- SETUP TAB -->
+    <div id="dTab-setup" style="display:none">
+      <div class="tbl-wrap" style="padding:28px">
+        <h2 style="font-size:1.2rem;margin-bottom:20px">⚙️ Setup Guide — Connect Firebase (Free)</h2>
+
+        <div class="guide-step">
+          <div class="gs-title">Step 1 — Create a Free Firebase Project</div>
+          <div class="gs-body"><ol>
+            <li>Open <strong>console.firebase.google.com</strong> in your browser</li>
+            <li>Sign in with your Google account</li>
+            <li>Click <strong>"Add project"</strong> → name it <strong>AttendTrack</strong></li>
+            <li>Disable Google Analytics → click <strong>"Create project"</strong></li>
+            <li>Wait ~30 seconds for it to be ready, then click <strong>"Continue"</strong></li>
+          </ol></div>
+        </div>
+
+        <div class="guide-step">
+          <div class="gs-title">Step 2 — Enable Firestore Database</div>
+          <div class="gs-body"><ol>
+            <li>In the left sidebar, click <strong>"Firestore Database"</strong></li>
+            <li>Click <strong>"Create database"</strong></li>
+            <li>Choose <strong>"Start in test mode"</strong> (allows read/write for 30 days)</li>
+            <li>Select your nearest region (e.g. <code>asia-southeast1</code> for Singapore) → click <strong>"Enable"</strong></li>
+          </ol></div>
+        </div>
+
+        <div class="guide-step">
+          <div class="gs-title">Step 3 — Get Your Config Keys</div>
+          <div class="gs-body"><ol>
+            <li>Click the ⚙️ gear icon (top-left) → <strong>"Project settings"</strong></li>
+            <li>Scroll down to <strong>"Your apps"</strong> section</li>
+            <li>Click the <strong>&lt;/&gt; Web</strong> icon → type any app name → click <strong>"Register app"</strong></li>
+            <li>You'll see a <code>firebaseConfig</code> block — copy the whole object</li>
+          </ol></div>
+        </div>
+
+        <div class="guide-step">
+          <div class="gs-title">Step 4 — Paste Config Into This File</div>
+          <div class="gs-body">
+            <p>Open <code>attendance_system.html</code> in Notepad (or any text editor). Find this section near the bottom of the file:</p>
+            <pre>const FIREBASE_CONFIG = {
+ 	apiKey: "AIzaSyA95l3GQUnPI1-gw9k4RQhh5ecPB78npuA",
+  	authDomain: "attendtrack-94b96.firebaseapp.com",
+  	projectId: "attendtrack-94b96",
+  	storageBucket: "attendtrack-94b96.firebasestorage.app",
+  	messagingSenderId: "190906997661",
+  	appId: "1:190906997661:web:1729577b9ea5f5e18e2d74"
+};</pre>
+            <p style="margin-top:10px">Replace each <code>"YOUR_..."</code> value with the values from your Firebase config. Save the file.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="gs-title">Step 5 — Update Your Work Sites</div>
+          <div class="gs-body">
+            <p>In the same file, find <code>const WORK_SITES = [...]</code> and edit each entry with your actual site names and GPS coordinates.</p>
+            <p style="margin-top:6px">To get GPS coordinates: open <strong>Google Maps</strong> → right-click on your site location → the first line shown is <code>latitude, longitude</code>.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="gs-title">Step 6 — Change Admin Password</div>
+          <div class="gs-body">
+            <p>Find <code>const ADMIN_USER = "admin"</code> and <code>const ADMIN_PASS = "admin"</code> and change them to your own credentials.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="gs-title">Step 7 — Host for Free (Get a Shareable URL)</div>
+          <div class="gs-body"><ol>
+            <li>Go to <strong>app.netlify.com/drop</strong></li>
+            <li>Drag and drop your <code>attendance_system.html</code> file onto the page</li>
+            <li>Wait 10 seconds — you'll get a free URL like <code>https://amazing-name-123.netlify.app</code></li>
+            <li>Share that URL with all your employees!</li>
+          </ol>
+          <p style="margin-top:10px;color:#15803d;font-weight:600">✅ That's it! No coding skills needed. Completely free.</p>
+          </div>
+        </div>
+
+        <div style="background:#fffbeb;border-radius:var(--r);padding:16px 18px;border:1px solid #fde68a;font-size:.84rem;color:#78350f">
+          <strong>Firebase Free Tier limits</strong> (Spark plan — always free):<br>
+          1 GB storage · 50,000 reads/day · 20,000 writes/day — more than enough for 100 employees.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     SCRIPT  (plain script tag — no module)
+══════════════════════════════════════════ -->
+<script>
+// ╔══════════════════════════════════════════════╗
+// ║  CONFIGURATION — edit these values           ║
+// ╚══════════════════════════════════════════════╝
+var FIREBASE_CONFIG = {
+
+apiKey: "AIzaSyA95l3GQUnPI1-gw9k4RQhh5ecPB78npuA",
+ 	authDomain: "attendtrack-94b96.firebaseapp.com",
+  	projectId: "attendtrack-94b96",
+  	storageBucket: "attendtrack-94b96.firebasestorage.app",
+  	messagingSenderId: "190906997661",
+  	appId: "1:190906997661:web:1729577b9ea5f5e18e2d74"
+};
+
+var ADMIN_USER = "admin";
+var ADMIN_PASS = "admin";   // ← CHANGE THIS
+
+var WORK_HOUR_LATE = 20;          // hour (24h) considered "late" arrival
+var MAX_HOURS_OT   = 20;         // hours before overtime flag
+
+var WORK_SITES = [
+  { name:"HQ - Main Office",           lat:1.3521,  lng:103.8198 },
+  { name:"Site A - NUH",    lat:1.2941060351075837, lng:103.78314248180223 },
+  { name:"Site B - Changi Warehouse",  lat:1.3644,  lng:103.9915 },
+  { name:"Site C - Woodlands Depot",   lat:1.4382,  lng:103.7890 },
+  { name:"Site D - Tuas Plant",        lat:1.3180,  lng:103.6360 },
+  { name:"Site E - Tampines Hub",      lat:1.3545,  lng:103.9445 },
+  { name:"Site F - Sengkang Office",   lat:1.3916,  lng:103.8954 },
+  { name:"Site G - Buona Vista",       lat:1.3071,  lng:103.7903 },
+  { name:"Site H - Ang Mo Kio",        lat:1.3691,  lng:103.8454 },
+  { name:"Site I - Queenstown",        lat:1.2942,  lng:103.8060 },
+  { name:"Site J - Paya Lebar",        lat:1.3178,  lng:103.8920 }
+];
+
+var GEOFENCE_M = 500;
+// ╔══════════════════════════════════════════════╗
+// ║  END CONFIGURATION                           ║
+// ╚══════════════════════════════════════════════╝
+
+// ── Firebase ──────────────────────────────────────
+var db = null;
+var fbOk = false;
+
+function initFirebase() {
+  if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY") return;
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    fbOk = true;
+    document.getElementById("empBanner").style.display = "none";
+    document.getElementById("dashBanner").style.display = "none";
+  } catch(e) { console.warn("Firebase init:", e); }
+}
+
+// ── Local fallback ─────────────────────────────────
+var localRecs = JSON.parse(localStorage.getItem("at_recs") || "[]");
+function saveLocal(r) { localRecs.push(r); localStorage.setItem("at_recs", JSON.stringify(localRecs)); }
+
+// ── Screen router ──────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); s.style.display="none"; });
+  var el = document.getElementById("screen-" + id);
+  if (!el) return;
+  el.style.display = "block";
+  el.classList.add("active");
+  if (id === "employee") initEmp();
+  if (id === "dashboard") initDash();
+}
+
+// ── Clock ──────────────────────────────────────────
+function tick() {
+  var now = new Date();
+  var te = document.getElementById("empTime"), de = document.getElementById("empDate");
+  if (te) te.textContent = now.toLocaleTimeString("en-SG",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  if (de) de.textContent = now.toLocaleDateString("en-SG",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  updateDur();
+}
+setInterval(tick, 1000); tick();
+
+// ── Haversine ──────────────────────────────────────
+function haversine(la1,lo1,la2,lo2) {
+  var R=6371000, r=Math.PI/180;
+  var dLa=(la2-la1)*r, dLo=(lo2-lo1)*r;
+  var a=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)*Math.sin(dLo/2);
+  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+
+// ── GPS state ──────────────────────────────────────
+var GPS = { in: null, out: null };
+
+function resetGps(dir) {
+  GPS[dir] = null;
+  var btnId = dir==="in" ? "gpsCiBtn" : "gpsCoBtnEl";
+  var iconId = dir==="in" ? "gpsCiIcon" : "gpsCoIcon";
+  var txtId  = dir==="in" ? "gpsCiTxt"  : "gpsCoTxt";
+  var statId = dir==="in" ? "gpsCiStatus" : "gpsCoStatus";
+  var btn = document.getElementById(btnId);
+  if (btn) btn.className = "gps-btn";
+  var ic = document.getElementById(iconId); if (ic) ic.textContent="🔍";
+  var tx = document.getElementById(txtId);  if (tx) tx.textContent="Tap to Verify My Location";
+  var st = document.getElementById(statId); if (st) st.innerHTML="";
+  chkBtn();
+}
+
+function verifyGps(dir) {
+  var siteIdx = document.getElementById("empSite").value;
+  if (dir==="in" && siteIdx==="") { toast("Please select a work site first","t-err"); return; }
+
+  var btnId  = dir==="in" ? "gpsCiBtn"    : "gpsCoBtnEl";
+  var iconId = dir==="in" ? "gpsCiIcon"   : "gpsCoIcon";
+  var txtId  = dir==="in" ? "gpsCiTxt"    : "gpsCoTxt";
+  var statId = dir==="in" ? "gpsCiStatus" : "gpsCoStatus";
+
+  var btn = document.getElementById(btnId);
+  btn.className = "gps-btn checking";
+  document.getElementById(iconId).textContent = "⏳";
+  document.getElementById(txtId).textContent  = "Detecting location…";
+  document.getElementById(statId).innerHTML   = "";
+  GPS[dir] = null;
+  chkBtn();
+
+  if (!navigator.geolocation) {
+    setGpsUI(dir,"error","Geolocation not supported by this browser.",null); return;
+  }
+
+  var site;
+  if (dir==="in") { site = WORK_SITES[parseInt(siteIdx)]; }
+  else {
+    var sess = getSess();
+    site = sess ? WORK_SITES.find(function(s){ return s.name===sess.site; }) : null;
+    if (!site) { setGpsUI(dir,"error","Session site not found.",null); return; }
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      var lat=pos.coords.latitude, lng=pos.coords.longitude, acc=Math.round(pos.coords.accuracy);
+      var dist = haversine(lat,lng,site.lat,site.lng);
+      var ok = dist <= GEOFENCE_M;
+      GPS[dir] = { lat:lat, lng:lng, accuracy:acc, dist:dist, ok:ok };
+      setGpsUI(dir, ok?"ok":"fail", site.name, dist);
+      chkBtn();
+    },
+    function(err) {
+      var msgs = {1:"Permission denied. Enable location in your browser.",2:"Location unavailable.",3:"Request timed out."};
+      setGpsUI(dir,"error", msgs[err.code]||"Location error.", null);
+    },
+    { enableHighAccuracy:true, timeout:20000, maximumAge:0 }
+  );
+}
+
+function setGpsUI(dir, state, name, dist) {
+  var btnId  = dir==="in" ? "gpsCiBtn"    : "gpsCoBtnEl";
+  var iconId = dir==="in" ? "gpsCiIcon"   : "gpsCoIcon";
+  var txtId  = dir==="in" ? "gpsCiTxt"    : "gpsCoTxt";
+  var statId = dir==="in" ? "gpsCiStatus" : "gpsCoStatus";
+
+  var btn = document.getElementById(btnId);
+  var ic  = document.getElementById(iconId);
+  var tx  = document.getElementById(txtId);
+  var st  = document.getElementById(statId);
+
+  if (state==="ok") {
+    btn.className="gps-btn ok";
+    ic.textContent="✅"; tx.textContent="Verified — "+dist+"m from "+name;
+    st.innerHTML='<div class="pill pill-ok">✅ Within range · '+dist+'m from site</div>';
+  } else if (state==="fail") {
+    btn.className="gps-btn fail";
+    ic.textContent="🚫"; tx.textContent="Out of range — "+dist+"m (max "+GEOFENCE_M+"m)";
+    st.innerHTML='<div class="pill pill-bad">🚫 Too far from '+name+' · You are '+dist+'m away. Must be within '+GEOFENCE_M+'m.</div>';
+  } else {
+    btn.className="gps-btn fail";
+    ic.textContent="❌"; tx.textContent="Try again";
+    st.innerHTML='<div class="pill pill-bad">❌ '+name+'</div>';
+  }
+}
+
+// ── Session helpers ────────────────────────────────
+function getSess() { try { return JSON.parse(localStorage.getItem("at_sess")||"null"); } catch(e){ return null; } }
+function setSess(d) { localStorage.setItem("at_sess", d ? JSON.stringify(d) : "null"); }
+function getSessDocId() { return localStorage.getItem("at_sess_doc") || null; }
+function setSessDocId(id) { if(id) localStorage.setItem("at_sess_doc",id); else localStorage.removeItem("at_sess_doc"); }
+
+// ── Enable/disable buttons ─────────────────────────
+function chkBtn() {
+  var id   = (document.getElementById("empId")   ||{}).value||"";
+  var name = (document.getElementById("empName") ||{}).value||"";
+  var site = (document.getElementById("empSite") ||{}).value||"";
+  var ci = document.getElementById("ciBtn");
+  if (ci) ci.disabled = !(id.trim() && name.trim() && site && GPS.in && GPS.in.ok);
+  var co = document.getElementById("coBtn");
+  if (co) co.disabled = !(GPS.out && GPS.out.ok);
+}
+
+// ── Init employee screen ───────────────────────────
+function initEmp() {
+  // Populate site dropdown
+  var sel = document.getElementById("empSite");
+  sel.innerHTML = '<option value="">— Select your work site —</option>';
+  WORK_SITES.forEach(function(s,i){ var o=document.createElement("option"); o.value=i; o.textContent=s.name; sel.appendChild(o); });
+
+  var sess = getSess();
+  if (sess && sess.checkinTimestamp && !sess.checkoutTimestamp) {
+    // Already checked in — show checkout mode
+    document.getElementById("ciForm").style.display   = "none";
+    document.getElementById("coSection").style.display = "block";
+    document.getElementById("sessBadge").style.display = "block";
+    document.getElementById("sb-emp").textContent  = sess.empName+" ("+sess.empId+")";
+    document.getElementById("sb-site").textContent = sess.site;
+    document.getElementById("sb-cin").textContent  = sess.checkinTime;
+    updateDur();
+  } else {
+    document.getElementById("ciForm").style.display    = "block";
+    document.getElementById("coSection").style.display = "none";
+    document.getElementById("sessBadge").style.display = "none";
+    document.getElementById("resultCard").style.display= "none";
+  }
+}
+
+function updateDur() {
+  var sess = getSess();
+  var el = document.getElementById("sb-dur"); if(!el) return;
+  if (!sess || !sess.checkinTimestamp) return;
+  var diff = Math.floor((Date.now()-sess.checkinTimestamp)/1000);
+  el.textContent = pad(Math.floor(diff/3600))+":"+pad(Math.floor((diff%3600)/60))+":"+pad(diff%60);
+}
+function pad(n){ return String(n).padStart(2,"0"); }
+
+// ── Check-in ───────────────────────────────────────
+function doCheckin() {
+  var empId   = document.getElementById("empId").value.trim();
+  var empName = document.getElementById("empName").value.trim();
+  var siteIdx = document.getElementById("empSite").value;
+  var site    = WORK_SITES[parseInt(siteIdx)];
+  var gps     = GPS.in;
+  var now     = new Date();
+  var isLate  = now.getHours() >= WORK_HOUR_LATE + 1;
+
+  var rec = {
+    empId:empId, empName:empName, site:site.name,
+    checkinTime:now.toLocaleTimeString("en-SG"),
+    checkinDate:now.toLocaleDateString("en-SG"),
+    checkinISO:now.toISOString(),
+    checkinTimestamp:now.getTime(),
+    checkinLat:gps.lat, checkinLng:gps.lng, checkinDist:gps.dist, checkinAcc:gps.accuracy,
+    checkoutTime:null, checkoutTimestamp:null,
+    checkoutLat:null, checkoutLng:null, checkoutDist:null,
+    status:"in", isLate:isLate, isOvertime:false, duration:null
+  };
+
+  var btn = document.getElementById("ciBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Saving…';
+
+  function onSaved(docId) {
+    setSess(rec); setSessDocId(docId);
+    btn.innerHTML = "✅ Check In";
+    showResult("ci", rec, isLate, false);
+    toast("✅ Checked in successfully!", "t-ok");
+    setTimeout(function(){
+      document.getElementById("ciForm").style.display    = "none";
+      document.getElementById("coSection").style.display = "block";
+      document.getElementById("sessBadge").style.display = "block";
+      document.getElementById("sb-emp").textContent  = rec.empName+" ("+rec.empId+")";
+      document.getElementById("sb-site").textContent = rec.site;
+      document.getElementById("sb-cin").textContent  = rec.checkinTime;
+    }, 1600);
+  }
+
+  if (fbOk && db) {
+    db.collection("attendance").add(rec)
+      .then(function(ref){ onSaved(ref.id); })
+      .catch(function(e){ console.warn(e); saveLocal(rec); onSaved(null); });
+  } else {
+    saveLocal(rec); onSaved(null);
+  }
+}
+
+// ── Check-out ──────────────────────────────────────
+function doCheckout() {
+  var gps  = GPS.out;
+  var sess = getSess();
+  if (!sess) { toast("No active session found","t-err"); return; }
+
+  var now  = new Date();
+  var ms   = now.getTime() - sess.checkinTimestamp;
+  var h    = Math.floor(ms/3600000);
+  var m    = Math.floor((ms%3600000)/60000);
+  var dur  = h+"h "+m+"m";
+  var isOT = h >= MAX_HOURS_OT;
+
+  var updates = {
+    checkoutTime:now.toLocaleTimeString("en-SG"),
+    checkoutISO:now.toISOString(),
+    checkoutTimestamp:now.getTime(),
+    checkoutLat:gps.lat, checkoutLng:gps.lng, checkoutDist:gps.dist, checkoutAcc:gps.accuracy,
+    status:"out", duration:dur, isOvertime:isOT
+  };
+
+  var btn = document.getElementById("coBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Saving…';
+
+  function onSaved() {
+    setSess(null); setSessDocId(null);
+    btn.innerHTML = "🔴 Check Out";
+    showResult("co", Object.assign({},sess,updates), false, isOT);
+    toast("👋 Checked out! Have a great day.", "t-ok");
+    document.getElementById("sessBadge").style.display = "none";
+    document.getElementById("coSection").style.display = "none";
+  }
+
+  var docId = getSessDocId();
+  if (fbOk && db && docId) {
+    db.collection("attendance").doc(docId).update(updates)
+      .then(function(){ onSaved(); })
+      .catch(function(e){ console.warn(e); onSaved(); });
+  } else {
+    var idx = localRecs.findIndex(function(r){ return r.empId===sess.empId && r.checkinTimestamp===sess.checkinTimestamp; });
+    if (idx>-1){ localRecs[idx]=Object.assign({},localRecs[idx],updates); localStorage.setItem("at_recs",JSON.stringify(localRecs)); }
+    onSaved();
+  }
+}
+
+function showResult(type, rec, isLate, isOT) {
+  var rc = document.getElementById("resultCard");
+  rc.style.display = "block";
+  document.getElementById("resultTitle").textContent =
+    type==="ci" ? (isLate?"⚠️ Checked In (Late Arrival)":"✅ Check-In Recorded")
+                : (isOT ?"⏰ Checked Out (Overtime)":"🔴 Check-Out Recorded");
+  var html = '';
+  if (type==="ci") {
+    html  = row("Employee", rec.empName+" · "+rec.empId);
+    html += row("Site", rec.site);
+    html += row("Time", '<span style="font-family:var(--mono)">'+rec.checkinTime+'</span>');
+    html += row("Date", rec.checkinDate);
+    html += row("GPS Distance", rec.checkinDist+"m from site ✅");
+    if (isLate) html += '<div class="pill pill-warn" style="margin-top:10px">⚠️ Late arrival recorded</div>';
+  } else {
+    html  = row("Check-Out Time", '<span style="font-family:var(--mono)">'+rec.checkoutTime+'</span>');
+    html += row("Duration", rec.duration);
+    html += row("GPS Distance", rec.checkoutDist+"m from site ✅");
+    if (isOT) html += '<div class="pill pill-warn" style="margin-top:10px">⏰ Overtime flagged ('+rec.duration+')</div>';
+  }
+  document.getElementById("resultBody").innerHTML = html;
+}
+function row(k,v){ return '<div class="res-row"><span class="res-k">'+k+'</span><span class="res-v">'+v+'</span></div>'; }
+
+// ── Admin login ────────────────────────────────────
+function doLogin() {
+  var u = document.getElementById("adminUser").value;
+  var p = document.getElementById("adminPass").value;
+  if (u===ADMIN_USER && p===ADMIN_PASS) {
+    document.getElementById("loginErr").textContent="";
+    showScreen("dashboard");
+  } else {
+    document.getElementById("loginErr").textContent="Incorrect username or password.";
+  }
+}
+
+// ── Dashboard ──────────────────────────────────────
+var allRecs = [];
+var fbUnsub = null;
+
+function initDash() {
+  // set today's date in filter
+  var fd = document.getElementById("fDate");
+  if (fd && !fd.value) fd.value = new Date().toISOString().split("T")[0];
+
+  // populate site filter
+  var fs = document.getElementById("fSite");
+  fs.innerHTML = '<option value="">All Sites</option>';
+  WORK_SITES.forEach(function(s){ var o=document.createElement("option"); o.value=s.name; o.textContent=s.name; fs.appendChild(o); });
+
+  if (fbOk && db) {
+    if (fbUnsub) fbUnsub();
+    fbUnsub = db.collection("attendance").orderBy("checkinTimestamp","desc")
+      .onSnapshot(function(snap){
+        allRecs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+        renderAll();
+      });
+  } else {
+    allRecs = localRecs.slice().reverse();
+    renderAll();
+  }
+}
+
+function renderAll() { renderTable(); renderFeed(); updateStats(); }
+
+function filtered() {
+  var q = (document.getElementById("fSearch")||{}).value||"";
+  var s = (document.getElementById("fSite")||{}).value||"";
+  var st= (document.getElementById("fStatus")||{}).value||"";
+  var d = (document.getElementById("fDate")||{}).value||"";
+  q = q.toLowerCase();
+  return allRecs.filter(function(r){
+    if (q && !((r.empId||"").toLowerCase().includes(q)||(r.empName||"").toLowerCase().includes(q))) return false;
+    if (s && r.site!==s) return false;
+    if (st==="in" && r.status!=="in") return false;
+    if (st==="out" && r.status!=="out") return false;
+    if (d) { var rd=new Date(r.checkinTimestamp).toISOString().split("T")[0]; if(rd!==d) return false; }
+    return true;
+  });
+}
+
+function renderTable() {
+  var rows = filtered();
+  var body = document.getElementById("tblBody");
+  var empty= document.getElementById("tblEmpty");
+  document.getElementById("tblCount").textContent = rows.length+" record"+(rows.length!==1?"s":"");
+  if (!rows.length) { body.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  body.innerHTML = rows.map(function(r){
+    var ini = (r.empName||"?").split(" ").map(function(w){return w[0]||"";}).slice(0,2).join("").toUpperCase();
+    var stat = r.status==="in"?'<span class="bdg bdg-in">● In</span>':'<span class="bdg bdg-out">● Out</span>';
+    if (r.isLate) stat += ' <span class="bdg bdg-late">Late</span>';
+    if (r.isOvertime) stat += ' <span class="bdg bdg-ot">OT</span>';
+    var mapIn  = r.checkinLat  ? '<a class="map-lnk" href="https://maps.google.com/?q='+r.checkinLat+','+r.checkinLng+'" target="_blank">📍 '+r.checkinDist+'m</a>' : "—";
+    var mapOut = r.checkoutLat ? '<a class="map-lnk" href="https://maps.google.com/?q='+r.checkoutLat+','+r.checkoutLng+'" target="_blank">📍 '+r.checkoutDist+'m</a>' : "—";
+    return '<tr>'
+      +'<td><div class="ec"><div class="av">'+ini+'</div><div><div class="en">'+(r.empName||"—")+'</div><div class="eid">'+(r.empId||"—")+'</div></div></div></td>'
+      +'<td style="font-size:.82rem;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.site||"—")+'</td>'
+      +'<td>'+stat+'</td>'
+      +'<td><span class="dur">'+(r.checkinTime||"—")+'</span></td>'
+      +'<td><span class="dur">'+(r.checkoutTime||"—")+'</span></td>'
+      +'<td><span class="dur">'+(r.duration||"—")+'</span></td>'
+      +'<td>'+mapIn+'</td>'
+      +'<td>'+mapOut+'</td>'
+      +'<td style="font-size:.78rem;color:var(--ink3)">'+(r.checkinDate||"—")+'</td>'
+      +'</tr>';
+  }).join("");
+}
+
+function renderFeed() {
+  var feed = document.getElementById("feedList"); if(!feed) return;
+  if (!allRecs.length) { feed.innerHTML='<div class="empty"><div class="empty-icon">⏳</div><div class="empty-t">No activity yet</div></div>'; return; }
+  var evs = [];
+  allRecs.forEach(function(r){
+    if (r.checkinTimestamp)  evs.push({type:"in", r:r,  ts:r.checkinTimestamp});
+    if (r.checkoutTimestamp) evs.push({type:"out", r:r, ts:r.checkoutTimestamp});
+  });
+  evs.sort(function(a,b){ return b.ts-a.ts; });
+  feed.innerHTML = evs.slice(0,60).map(function(e){
+    var t = new Date(e.ts).toLocaleTimeString("en-SG",{hour:"2-digit",minute:"2-digit"});
+    var d = new Date(e.ts).toLocaleDateString("en-SG",{month:"short",day:"numeric"});
+    return '<div class="feed-item">'
+      +'<div class="fd '+(e.type==="in"?"fd-in":"fd-out")+'"></div>'
+      +'<div style="flex:1"><div class="fn">'+(e.r.empName||"Unknown")+' <span style="font-size:.75rem;color:var(--ink3);font-weight:400">('+e.r.empId+')</span></div>'
+      +'<div class="fd2">'+(e.type==="in"?"✅ Checked in at":"🔴 Checked out from")+' <strong>'+(e.r.site||"Unknown site")+'</strong></div></div>'
+      +'<div><div class="ft">'+t+'</div><div style="font-size:.72rem;color:var(--ink3);text-align:right">'+d+'</div></div>'
+      +'</div>';
+  }).join("");
+}
+
+function updateStats() {
+  var today = new Date().toLocaleDateString("en-SG");
+  var tod = allRecs.filter(function(r){ return r.checkinDate===today; });
+  document.getElementById("s-in").textContent    = tod.filter(function(r){ return r.status==="in"; }).length;
+  document.getElementById("s-out").textContent   = tod.filter(function(r){ return r.status==="out"; }).length;
+  document.getElementById("s-today").textContent = tod.length;
+  document.getElementById("s-all").textContent   = allRecs.length;
+}
+
+function refreshDash() {
+  if (!fbOk){ allRecs=localRecs.slice().reverse(); renderAll(); }
+  toast("Refreshed","t-ok");
+}
+
+// ── Dashboard tabs ─────────────────────────────────
+function dTab(id, el) {
+  ["live","feed","setup"].forEach(function(t){
+    var p = document.getElementById("dTab-"+t); if(p) p.style.display = t===id?"block":"none";
+  });
+  document.querySelectorAll(".dash-tab").forEach(function(e){ e.classList.remove("on"); });
+  if (el) el.classList.add("on");
+}
+
+// ── CSV export ─────────────────────────────────────
+function exportCSV() {
+  var rows = filtered();
+  var hdr = ["Employee ID","Name","Site","Date","Check-In","Check-Out","Duration","Status","Late","Overtime","Lat In","Lng In","Dist In","Lat Out","Lng Out","Dist Out"].join(",");
+  var lines = [hdr].concat(rows.map(function(r){
+    return [r.empId,r.empName,'"'+(r.site||"")+'"',r.checkinDate,r.checkinTime,r.checkoutTime||"",r.duration||"",r.status,r.isLate?"Yes":"No",r.isOvertime?"Yes":"No",r.checkinLat,r.checkinLng,r.checkinDist,r.checkoutLat||"",r.checkoutLng||"",r.checkoutDist||""].join(",");
+  }));
+  var blob = new Blob([lines.join("\n")],{type:"text/csv"});
+  var a = document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="attendance_"+new Date().toISOString().split("T")[0]+".csv"; a.click();
+  toast("CSV exported","t-ok");
+}
+
+// ── Toast ──────────────────────────────────────────
+function toast(msg, cls) {
+  var t = document.getElementById("toast");
+  t.textContent = msg; t.className = "show "+(cls||"");
+  clearTimeout(window._tt);
+  window._tt = setTimeout(function(){ t.className = cls||""; }, 3500);
+}
+
+// ── Init ───────────────────────────────────────────
+initFirebase();
+</script>
+</body>
+</html>
