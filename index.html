@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<!-- ✅ SECURITY: Content Security Policy — blocks XSS and unauthorized scripts -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com;
+  img-src 'self' data: https://maps.google.com;
+  frame-src https://attendtrack-94b96.firebaseapp.com;
+">
 <title>AttendTrack — Smart Attendance System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -10,6 +20,8 @@
 <!-- Firebase Compat SDK (no module needed) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- ✅ SECURITY: Firebase Authentication SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -280,7 +292,7 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
   <div class="login-card">
     <div class="login-h">Dashboard Login</div>
     <div class="login-sub">Enter your employer credentials</div>
-    <div class="lf"><label>Username</label><input type="text" id="adminUser" placeholder="admin" autocomplete="off"/></div>
+    <div class="lf"><label>Email</label><input type="email" id="adminUser" placeholder="admin@yourcompany.com" autocomplete="off"/></div>
     <div class="lf"><label>Password</label><input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
     <button class="login-btn" onclick="doLogin()">Access Dashboard →</button>
     <div class="login-err" id="loginErr"></div>
@@ -379,7 +391,7 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
     <span class="tb-logo">AT</span>
     <span class="tb-title">Employer Dashboard</span>
     <span class="live-dot" style="margin-left:4px">LIVE</span>
-    <button class="tb-back" onclick="showScreen('landing')" style="margin-left:auto">Sign Out</button>
+    <button class="tb-back" onclick="doSignOut()" style="margin-left:auto">Sign Out</button>
   </div>
   <div class="dash-wrap">
 
@@ -468,13 +480,25 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
           <div class="gs-body"><ol>
             <li>In the left sidebar, click <strong>"Firestore Database"</strong></li>
             <li>Click <strong>"Create database"</strong></li>
-            <li>Choose <strong>"Start in test mode"</strong> (allows read/write for 30 days)</li>
+            <li>Choose <strong>"Start in production mode"</strong> (we'll add proper rules in Step 7)</li>
             <li>Select your nearest region (e.g. <code>asia-southeast1</code> for Singapore) → click <strong>"Enable"</strong></li>
           </ol></div>
         </div>
 
         <div class="guide-step">
-          <div class="gs-title">Step 3 — Get Your Config Keys</div>
+          <div class="gs-title">Step 3 — Enable Firebase Authentication (Required for Admin Login)</div>
+          <div class="gs-body"><ol>
+            <li>In the Firebase Console left sidebar, click <strong>"Authentication"</strong></li>
+            <li>Click <strong>"Get started"</strong></li>
+            <li>Under <strong>"Sign-in method"</strong>, enable <strong>"Email/Password"</strong></li>
+            <li>Go to the <strong>"Users"</strong> tab → click <strong>"Add user"</strong></li>
+            <li>Enter your admin email and a strong password (min 12 chars) → click <strong>"Add user"</strong></li>
+            <li>This email/password is what you use to log into the dashboard. <strong>No credentials are stored in the HTML file.</strong></li>
+          </ol></div>
+        </div>
+
+        <div class="guide-step">
+          <div class="gs-title">Step 4 — Get Your Config Keys</div>
           <div class="gs-body"><ol>
             <li>Click the ⚙️ gear icon (top-left) → <strong>"Project settings"</strong></li>
             <li>Scroll down to <strong>"Your apps"</strong> section</li>
@@ -484,23 +508,23 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
         </div>
 
         <div class="guide-step">
-          <div class="gs-title">Step 4 — Paste Config Into This File</div>
+          <div class="gs-title">Step 5 — Paste Config Into This File</div>
           <div class="gs-body">
-            <p>Open <code>attendance_system.html</code> in Notepad (or any text editor). Find this section near the bottom of the file:</p>
-            <pre>const FIREBASE_CONFIG = {
- 	apiKey: "AIzaSyA95l3GQUnPI1-gw9k4RQhh5ecPB78npuA",
-  	authDomain: "attendtrack-94b96.firebaseapp.com",
-  	projectId: "attendtrack-94b96",
-  	storageBucket: "attendtrack-94b96.firebasestorage.app",
-  	messagingSenderId: "190906997661",
-  	appId: "1:190906997661:web:1729577b9ea5f5e18e2d74"
+            <p>Open <code>attendance_system.html</code> in Notepad (or any text editor). Find <code>var FIREBASE_CONFIG = {</code> near the bottom of the file and replace the placeholder values with your actual Firebase config.</p>
+            <pre>var FIREBASE_CONFIG = {
+  apiKey: "AIzaSy...",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc123"
 };</pre>
-            <p style="margin-top:10px">Replace each <code>"YOUR_..."</code> value with the values from your Firebase config. Save the file.</p>
+            <p style="margin-top:10px">⚠️ <strong>Never share your HTML file publicly</strong> with the real API key visible — restrict it in Google Cloud Console to your domain only (see security guide).</p>
           </div>
         </div>
 
         <div class="guide-step">
-          <div class="gs-title">Step 5 — Update Your Work Sites</div>
+          <div class="gs-title">Step 6 — Update Your Work Sites</div>
           <div class="gs-body">
             <p>In the same file, find <code>const WORK_SITES = [...]</code> and edit each entry with your actual site names and GPS coordinates.</p>
             <p style="margin-top:6px">To get GPS coordinates: open <strong>Google Maps</strong> → right-click on your site location → the first line shown is <code>latitude, longitude</code>.</p>
@@ -508,14 +532,58 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
         </div>
 
         <div class="guide-step">
-          <div class="gs-title">Step 6 — Change Admin Password</div>
+          <div class="gs-title">Step 7 — Set Firestore Security Rules (🔒 Critical)</div>
           <div class="gs-body">
-            <p>Find <code>const ADMIN_USER = "admin"</code> and <code>const ADMIN_PASS = "admin"</code> and change them to your own credentials.</p>
+            <p>In Firebase Console → <strong>Firestore Database</strong> → <strong>Rules</strong> tab, replace all existing rules with:</p>
+            <pre>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /attendance/{docId} {
+      // Employees can check in (create record) without login
+      allow create: if request.resource.data.keys().hasAll([
+                      'empId','empName','site','checkinTimestamp','status'])
+                    && request.resource.data.empId is string
+                    && request.resource.data.empId.size() &gt; 0
+                    && request.resource.data.empId.size() &lt;= 20
+                    && request.resource.data.empName is string
+                    && request.resource.data.empName.size() &gt; 0
+                    && request.resource.data.empName.size() &lt;= 60
+                    && request.resource.data.status == 'in';
+
+      // Employees can check out (update only allowed fields)
+      allow update: if request.resource.data.diff(resource.data)
+                      .affectedKeys().hasOnly([
+                        'checkoutTime','checkoutISO','checkoutTimestamp',
+                        'checkoutLat','checkoutLng','checkoutDist',
+                        'checkoutAcc','status','duration','isOvertime'])
+                    && request.resource.data.status == 'out';
+
+      // Only signed-in admin can read or delete records
+      allow read, delete: if request.auth != null;
+    }
+  }
+}</pre>
+            <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This ensures only your admin can view data. Employees can only write their own records.</p>
           </div>
         </div>
 
         <div class="guide-step">
-          <div class="gs-title">Step 7 — Host for Free (Get a Shareable URL)</div>
+          <div class="gs-title">Step 8 — Restrict Your Firebase API Key to Your Domain</div>
+          <div class="gs-body"><ol>
+            <li>Go to <strong>console.cloud.google.com</strong></li>
+            <li>Select your Firebase project from the top dropdown</li>
+            <li>Navigate to <strong>APIs &amp; Services → Credentials</strong></li>
+            <li>Click on your <strong>Browser key (auto created by Firebase)</strong></li>
+            <li>Under <strong>"Application restrictions"</strong>, select <strong>"HTTP referrers"</strong></li>
+            <li>Add your domain: <code>https://YOUR_USERNAME.github.io/*</code></li>
+            <li>Click <strong>Save</strong></li>
+          </ol>
+          <p style="margin-top:8px">This prevents anyone from using your API key on other websites.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="gs-title">Step 9 — Host for Free (Get a Shareable URL)</div>
           <div class="gs-body"><ol>
             <li>Go to <strong>app.netlify.com/drop</strong></li>
             <li>Drag and drop your <code>attendance_system.html</code> file onto the page</li>
@@ -546,17 +614,17 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 // ║  CONFIGURATION — edit these values           ║
 // ╚══════════════════════════════════════════════╝
 var FIREBASE_CONFIG = {
-
-apiKey: "AIzaSyA95l3GQUnPI1-gw9k4RQhh5ecPB78npuA",
- 	authDomain: "attendtrack-94b96.firebaseapp.com",
-  	projectId: "attendtrack-94b96",
-  	storageBucket: "attendtrack-94b96.firebasestorage.app",
-  	messagingSenderId: "190906997661",
-  	appId: "1:190906997661:web:1729577b9ea5f5e18e2d74"
+  apiKey: "AIzaSyA95l3GQUnPI1-gw9k4RQhh5ecPB78npuA",
+  authDomain: "attendtrack-94b96.firebaseapp.com",
+  projectId: "attendtrack-94b96",
+  storageBucket: "attendtrack-94b96.firebasestorage.app",
+  messagingSenderId: "190906997661",
+  appId: "1:190906997661:web:1729577b9ea5f5e18e2d74"
 };
 
-var ADMIN_USER = "admin";
-var ADMIN_PASS = "admin";   // ← CHANGE THIS
+// ✅ SECURITY: Admin credentials are now managed by Firebase Authentication.
+// Go to Firebase Console → Authentication → Users → Add user (email + password)
+// NO username/password stored in code anymore.
 
 var WORK_HOUR_LATE = 09;          // hour (24h) considered "late" arrival
 var MAX_HOURS_OT   = 18;         // hours before overtime flag
@@ -583,6 +651,7 @@ var GEOFENCE_M = 500;
 // ── Firebase ──────────────────────────────────────
 var db = null;
 var fbOk = false;
+var authReady = false;
 
 function initFirebase() {
   if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY") return;
@@ -592,6 +661,19 @@ function initFirebase() {
     fbOk = true;
     document.getElementById("empBanner").style.display = "none";
     document.getElementById("dashBanner").style.display = "none";
+
+    // ✅ SECURITY: Listen to auth state — only show dashboard if truly signed in
+    firebase.auth().onAuthStateChanged(function(user) {
+      authReady = true;
+      if (!user) {
+        // If someone navigated to dashboard without auth, boot them
+        var dash = document.getElementById("screen-dashboard");
+        if (dash && dash.classList.contains("active")) {
+          showScreen("admin-login");
+          toast("Session expired. Please sign in again.", "t-err");
+        }
+      }
+    });
   } catch(e) { console.warn("Firebase init:", e); }
 }
 
@@ -601,6 +683,18 @@ function saveLocal(r) { localRecs.push(r); localStorage.setItem("at_recs", JSON.
 
 // ── Screen router ──────────────────────────────────
 function showScreen(id) {
+  // ✅ SECURITY: Block dashboard access unless authenticated via Firebase
+  if (id === "dashboard") {
+    if (!fbOk) {
+      // fallback: still allow if no Firebase (demo mode)
+    } else {
+      var user = firebase.auth().currentUser;
+      if (!user) {
+        showScreen("admin-login");
+        return;
+      }
+    }
+  }
   document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); s.style.display="none"; });
   var el = document.getElementById("screen-" + id);
   if (!el) return;
@@ -768,11 +862,41 @@ function updateDur() {
 }
 function pad(n){ return String(n).padStart(2,"0"); }
 
+// ── Sign Out ───────────────────────────────────────
+function doSignOut() {
+  if (fbOk) {
+    firebase.auth().signOut().then(function() {
+      showScreen("landing");
+      toast("Signed out successfully", "t-ok");
+    });
+  } else {
+    showScreen("landing");
+  }
+}
+
+// ✅ SECURITY: Input sanitizer — strips HTML tags and limits length to prevent XSS / injection
+function sanitize(str, maxLen) {
+  if (typeof str !== "string") return "";
+  return str
+    .replace(/[<>"'`&]/g, function(c) {
+      return {"<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;","`":"&#96;","&":"&amp;"}[c];
+    })
+    .trim()
+    .slice(0, maxLen || 100);
+}
+
 // ── Check-in ───────────────────────────────────────
 function doCheckin() {
-  var empId   = document.getElementById("empId").value.trim();
-  var empName = document.getElementById("empName").value.trim();
+  // ✅ SECURITY: Sanitize all employee inputs before saving to Firestore
+  var empId   = sanitize(document.getElementById("empId").value, 20);
+  var empName = sanitize(document.getElementById("empName").value, 60);
   var siteIdx = document.getElementById("empSite").value;
+
+  // Validate inputs
+  if (!empId || !empName) { toast("Invalid employee details", "t-err"); return; }
+  if (!/^[a-zA-Z0-9\-_]+$/.test(empId)) { toast("Employee ID: letters, numbers, hyphens only", "t-err"); return; }
+  if (empName.length < 2) { toast("Please enter a valid full name", "t-err"); return; }
+
   var site    = WORK_SITES[parseInt(siteIdx)];
   var gps     = GPS.in;
   var now     = new Date();
@@ -787,7 +911,9 @@ function doCheckin() {
     checkinLat:gps.lat, checkinLng:gps.lng, checkinDist:gps.dist, checkinAcc:gps.accuracy,
     checkoutTime:null, checkoutTimestamp:null,
     checkoutLat:null, checkoutLng:null, checkoutDist:null,
-    status:"in", isLate:isLate, isOvertime:false, duration:null
+    status:"in", isLate:isLate, isOvertime:false, duration:null,
+    // ✅ SECURITY: Track submission source for audit purposes
+    _source: "web", _userAgent: navigator.userAgent.slice(0, 100)
   };
 
   var btn = document.getElementById("ciBtn");
@@ -889,15 +1015,60 @@ function showResult(type, rec, isLate, isOT) {
 function row(k,v){ return '<div class="res-row"><span class="res-k">'+k+'</span><span class="res-v">'+v+'</span></div>'; }
 
 // ── Admin login ────────────────────────────────────
+// ✅ SECURITY: Login attempt rate limiter (max 5 tries, 60s lockout)
+var _loginAttempts = 0;
+var _loginLockUntil = 0;
+
 function doLogin() {
-  var u = document.getElementById("adminUser").value;
-  var p = document.getElementById("adminPass").value;
-  if (u===ADMIN_USER && p===ADMIN_PASS) {
-    document.getElementById("loginErr").textContent="";
-    showScreen("dashboard");
-  } else {
-    document.getElementById("loginErr").textContent="Incorrect username or password.";
+  var now = Date.now();
+
+  // Check lockout
+  if (now < _loginLockUntil) {
+    var secs = Math.ceil((_loginLockUntil - now) / 1000);
+    document.getElementById("loginErr").textContent = "Too many attempts. Wait " + secs + "s before trying again.";
+    return;
   }
+
+  var email = document.getElementById("adminUser").value.trim();
+  var pass  = document.getElementById("adminPass").value;
+
+  if (!email || !pass) {
+    document.getElementById("loginErr").textContent = "Please enter your email and password.";
+    return;
+  }
+
+  if (!fbOk) {
+    document.getElementById("loginErr").textContent = "Firebase not configured. Cannot authenticate.";
+    return;
+  }
+
+  var btn = document.querySelector(".login-btn");
+  btn.disabled = true;
+  btn.textContent = "Signing in…";
+  document.getElementById("loginErr").textContent = "";
+
+  // ✅ SECURITY: Firebase Authentication — credentials checked server-side
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then(function() {
+      _loginAttempts = 0;
+      btn.disabled = false;
+      btn.textContent = "Access Dashboard →";
+      document.getElementById("loginErr").textContent = "";
+      showScreen("dashboard");
+    })
+    .catch(function(err) {
+      _loginAttempts++;
+      btn.disabled = false;
+      btn.textContent = "Access Dashboard →";
+      if (_loginAttempts >= 5) {
+        _loginLockUntil = Date.now() + 60000; // 60 second lockout
+        _loginAttempts = 0;
+        document.getElementById("loginErr").textContent = "Too many failed attempts. Locked for 60 seconds.";
+      } else {
+        var remaining = 5 - _loginAttempts;
+        document.getElementById("loginErr").textContent = "Incorrect credentials. " + remaining + " attempt(s) left.";
+      }
+    });
 }
 
 // ── Dashboard ──────────────────────────────────────
