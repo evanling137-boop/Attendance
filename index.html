@@ -596,6 +596,17 @@ service cloud.firestore {
       // Only signed-in admin can read or delete records
       allow read, delete: if request.auth != null;
     }
+
+    // ✅ ANTI-BUDDY-PUNCH: Device registry — permanently binds devices to employees
+    match /devices/{deviceId} {
+      // Anyone can read their own device record (to check if it's registered)
+      allow read: if true;
+      // Anyone can register a new device, but cannot overwrite an existing one
+      allow create: if request.resource.data.empId is string
+                    && request.resource.data.empId.size() &gt; 0;
+      // Once registered, device record cannot be changed (prevents tampering)
+      allow update, delete: if request.auth != null;
+    }
   }
 }</pre>
             <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This ensures only your admin can view data. Employees can only write their own records.</p>
@@ -677,11 +688,11 @@ var WORK_SITES = [
   { name:"Site B - NTFGH",  lat:1.3340183111776367,  lng:103.74533785581737 },
   { name:"Site C - TTSH",   lat:1.3215956826375057,  lng:103.84600588650957 },
   { name:"Site D - WH",     lat:1.4255730640948574, lng:103.79358640285662 },
-  { name:"Site E - NSC",    lat:1.3221829783973038, lng:103.84933935706384 },
-  { name:"Site F - Bizit Office",   lat:1.3529846010135893, lng:103.84316689510088 },
-  { name:"Site G - Bishan MRT",       lat:1.351292939593891, lng:103.84870003652243 },
-  { name:"Site H - Orchard Central",        lat:1.3010213243802298, lng:103.83972359419455 },
-  { name:"Site I - Ronald Home",        lat:1.4247928457305246, lng:103.83180977959292 },
+  { name:"Site E - SEM",    lat:1.44826669629572,   lng:103.82301872883652 },
+  { name:"Site F - Tengah Poly",   lat:1.3606737598088592, lng:103.73895821534613 },
+  { name:"Site G - Buona Vista",       lat:1.3071,  lng:103.7903 },
+  { name:"Site H - Ang Mo Kio",        lat:1.3691,  lng:103.8454 },
+  { name:"Site I - Queenstown",        lat:1.2942,  lng:103.8060 },
   { name:"Site J - Evan Home",        lat:1.3069090997407309, lng:103.79446133317231 }
 ];
 
@@ -1019,30 +1030,113 @@ function showSelfie(recordId) {
 }
 
 // ── Device fingerprint (anti-buddy-punch) ──────────
-function getDeviceId() {
-  var id = localStorage.getItem("_at_device");
-  if (!id) {
-    id = "dev_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem("_at_device", id);
+// Generates a stable fingerprint from hardware/browser signals
+// Survives localStorage clears — based on device characteristics
+function getDeviceFingerprint() {
+  var nav = navigator;
+  var parts = [
+    nav.userAgent,
+    nav.language,
+    nav.hardwareConcurrency || "",
+    nav.deviceMemory || "",
+    screen.width + "x" + screen.height,
+    screen.colorDepth,
+    new Date().getTimezoneOffset(),
+    nav.platform || ""
+  ];
+
+  // Canvas fingerprint — unique per GPU/driver combination
+  try {
+    var c = document.createElement("canvas");
+    var ctx = c.getContext("2d");
+    ctx.textBaseline = "top";
+    ctx.font = "14px Arial";
+    ctx.fillStyle = "#f00";
+    ctx.fillText("AttendTrack🔒", 2, 2);
+    parts.push(c.toDataURL().slice(-40));
+  } catch(e) {}
+
+  // Hash the combined string into a short ID
+  var str = parts.join("|");
+  var hash = 0;
+  for (var i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
   }
-  return id;
+  var fp = "fp_" + Math.abs(hash).toString(36);
+
+  // Also store in localStorage as fallback, but fp is primary
+  localStorage.setItem("_at_device", fp);
+  return fp;
 }
 
-// Check if this device already checked in someone today
-function deviceAlreadyCheckedIn(empId) {
+var _deviceId = null;
+function getDeviceId() {
+  if (!_deviceId) _deviceId = getDeviceFingerprint();
+  return _deviceId;
+}
+
+// Check Firestore if this device is already registered to a different employee
+function checkDeviceRegistration(empId, callback) {
+  if (!fbOk || !db) {
+    // No Firebase — fall back to localStorage-only check
+    var localBound = localStorage.getItem("_at_bound_emp");
+    if (localBound && localBound !== empId) {
+      callback({ blocked: true, boundTo: localBound, source: "local" });
+    } else {
+      callback({ blocked: false });
+    }
+    return;
+  }
+
+  var devId = getDeviceId();
+  db.collection("devices").doc(devId).get()
+    .then(function(doc) {
+      if (doc.exists) {
+        var data = doc.data();
+        if (data.empId && data.empId !== empId) {
+          // This device is permanently registered to a different employee
+          callback({ blocked: true, boundTo: data.empId, boundName: data.empName, source: "firestore" });
+        } else {
+          callback({ blocked: false });
+        }
+      } else {
+        callback({ blocked: false }); // New device, not registered yet
+      }
+    })
+    .catch(function(err) {
+      console.warn("Device check failed:", err);
+      callback({ blocked: false }); // Fail open — don't block on network error
+    });
+}
+
+// Permanently register this device to an employee in Firestore
+function registerDevice(empId, empName) {
+  var devId = getDeviceId();
+  localStorage.setItem("_at_bound_emp", empId);
+  if (!fbOk || !db) return;
+  db.collection("devices").doc(devId).set({
+    empId: empId,
+    empName: empName,
+    deviceId: devId,
+    userAgent: navigator.userAgent.slice(0, 150),
+    registeredAt: Date.now(),
+    registeredDate: new Date().toISOString()
+  }).catch(function(e){ console.warn("Device register failed:", e); });
+}
+
+// Check if this device already checked in someone today (local fast-check)
+function deviceAlreadyCheckedInToday(empId) {
   var today = new Date().toLocaleDateString("en-SG");
   var key = "_at_ci_" + today;
   var existing = localStorage.getItem(key);
-  if (existing && existing !== empId) {
-    return existing; // returns the empId that already used this device
-  }
+  if (existing && existing !== empId) return existing;
   return null;
 }
 
 function recordDeviceCheckin(empId) {
   var today = new Date().toLocaleDateString("en-SG");
-  var key = "_at_ci_" + today;
-  localStorage.setItem(key, empId);
+  localStorage.setItem("_at_ci_" + today, empId);
 }
 
 // ── Check-in ───────────────────────────────────────
@@ -1060,66 +1154,80 @@ function doCheckin() {
   // ✅ ANTI-BUDDY-PUNCH: Require selfie photo
   if (!selfieData) { toast("📷 Please take a selfie first", "t-err"); return; }
 
-  // ✅ ANTI-BUDDY-PUNCH: Block if this device already checked in a different person today
-  var alreadyCheckedIn = deviceAlreadyCheckedIn(empId);
-  if (alreadyCheckedIn) {
-    toast("⛔ This device already checked in " + alreadyCheckedIn + " today", "t-err");
-    document.getElementById("ciBtn").disabled = true;
+  // ✅ ANTI-BUDDY-PUNCH: Quick local check first (fast)
+  var todayConflict = deviceAlreadyCheckedInToday(empId);
+  if (todayConflict) {
+    toast("⛔ This device already checked in " + todayConflict + " today", "t-err");
     setTimeout(function(){
-      alert("⛔ Buddy Punching Detected!\n\nThis device was already used to check in employee: " + alreadyCheckedIn + "\n\nEach employee must check in from their own phone.");
+      alert("⛔ Buddy Punching Detected!\n\nThis device was already used to check in: " + todayConflict + "\n\nEach employee must use their own phone.");
     }, 300);
     return;
   }
+
+  // ✅ ANTI-BUDDY-PUNCH: Firestore device registration check (permanent, can't be cleared)
+  var btn = document.getElementById("ciBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Verifying device…';
 
   var site    = WORK_SITES[parseInt(siteIdx)];
   var gps     = GPS.in;
   var now     = new Date();
   var isLate  = now.getHours() >= WORK_HOUR_LATE + 1;
 
-  var rec = {
-    empId:empId, empName:empName, site:site.name,
-    checkinTime:now.toLocaleTimeString("en-SG"),
-    checkinDate:now.toLocaleDateString("en-SG"),
-    checkinISO:now.toISOString(),
-    checkinTimestamp:now.getTime(),
-    checkinLat:gps.lat, checkinLng:gps.lng, checkinDist:gps.dist, checkinAcc:gps.accuracy,
-    checkoutTime:null, checkoutTimestamp:null,
-    checkoutLat:null, checkoutLng:null, checkoutDist:null,
-    status:"in", isLate:isLate, isOvertime:false, duration:null,
-    // ✅ ANTI-BUDDY-PUNCH: Store selfie photo and device ID
-    selfiePhoto: selfieData,
-    deviceId: getDeviceId(),
-    // ✅ SECURITY: Track submission source for audit purposes
-    _source: "web", _userAgent: navigator.userAgent.slice(0, 100)
-  };
+  checkDeviceRegistration(empId, function(result) {
+    if (result.blocked) {
+      btn.disabled = false;
+      btn.innerHTML = "✅ Check In";
+      toast("⛔ Device registered to another employee", "t-err");
+      setTimeout(function(){
+        alert("⛔ Device Already Registered!\n\nThis phone/browser is permanently linked to:\n• Employee: " + (result.boundName || result.boundTo) + "\n\nIt cannot be used to check in a different employee.\nEach person must use their own device.");
+      }, 300);
+      return;
+    }
 
-  var btn = document.getElementById("ciBtn");
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span> Saving…';
+    // ✅ Device is clear — build record and save
+    var rec = {
+      empId:empId, empName:empName, site:site.name,
+      checkinTime:now.toLocaleTimeString("en-SG"),
+      checkinDate:now.toLocaleDateString("en-SG"),
+      checkinISO:now.toISOString(),
+      checkinTimestamp:now.getTime(),
+      checkinLat:gps.lat, checkinLng:gps.lng, checkinDist:gps.dist, checkinAcc:gps.accuracy,
+      checkoutTime:null, checkoutTimestamp:null,
+      checkoutLat:null, checkoutLng:null, checkoutDist:null,
+      status:"in", isLate:isLate, isOvertime:false, duration:null,
+      selfiePhoto: selfieData,
+      deviceId: getDeviceId(),
+      _source: "web", _userAgent: navigator.userAgent.slice(0, 100)
+    };
 
-  function onSaved(docId) {
-    recordDeviceCheckin(empId); // ✅ ANTI-BUDDY-PUNCH: mark this device as used today
-    setSess(rec); setSessDocId(docId);
-    btn.innerHTML = "✅ Check In";
-    showResult("ci", rec, isLate, false);
-    toast("✅ Checked in successfully!", "t-ok");
-    setTimeout(function(){
-      document.getElementById("ciForm").style.display    = "none";
-      document.getElementById("coSection").style.display = "block";
-      document.getElementById("sessBadge").style.display = "block";
-      document.getElementById("sb-emp").textContent  = rec.empName+" ("+rec.empId+")";
-      document.getElementById("sb-site").textContent = rec.site;
-      document.getElementById("sb-cin").textContent  = rec.checkinTime;
-    }, 1600);
-  }
+    btn.innerHTML = '<span class="spin"></span> Saving…';
 
-  if (fbOk && db) {
-    db.collection("attendance").add(rec)
-      .then(function(ref){ onSaved(ref.id); })
-      .catch(function(e){ console.warn(e); saveLocal(rec); onSaved(null); });
-  } else {
-    saveLocal(rec); onSaved(null);
-  }
+    function onSaved(docId) {
+      recordDeviceCheckin(empId);
+      registerDevice(empId, empName); // ✅ ANTI-BUDDY-PUNCH: bind device to this employee in Firestore
+      setSess(rec); setSessDocId(docId);
+      btn.innerHTML = "✅ Check In";
+      showResult("ci", rec, isLate, false);
+      toast("✅ Checked in successfully!", "t-ok");
+      setTimeout(function(){
+        document.getElementById("ciForm").style.display    = "none";
+        document.getElementById("coSection").style.display = "block";
+        document.getElementById("sessBadge").style.display = "block";
+        document.getElementById("sb-emp").textContent  = rec.empName+" ("+rec.empId+")";
+        document.getElementById("sb-site").textContent = rec.site;
+        document.getElementById("sb-cin").textContent  = rec.checkinTime;
+      }, 1600);
+    }
+
+    if (fbOk && db) {
+      db.collection("attendance").add(rec)
+        .then(function(ref){ onSaved(ref.id); })
+        .catch(function(e){ console.warn(e); saveLocal(rec); onSaved(null); });
+    } else {
+      saveLocal(rec); onSaved(null);
+    }
+  });
 }
 
 // ── Check-out ──────────────────────────────────────
