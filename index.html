@@ -1057,17 +1057,39 @@ function doLogin() {
       showScreen("dashboard");
     })
     .catch(function(err) {
-      _loginAttempts++;
       btn.disabled = false;
-      btn.textContent = "Access Dashboard →";
-      if (_loginAttempts >= 5) {
-        _loginLockUntil = Date.now() + 60000; // 60 second lockout
-        _loginAttempts = 0;
-        document.getElementById("loginErr").textContent = "Too many failed attempts. Locked for 60 seconds.";
-      } else {
-        var remaining = 5 - _loginAttempts;
-        document.getElementById("loginErr").textContent = "Incorrect credentials. " + remaining + " attempt(s) left.";
+      btn.textContent = "Access Dashboard u2192";
+      var msg;
+      switch(err.code) {
+        case "auth/wrong-password":
+        case "auth/invalid-credential":
+        case "auth/user-not-found":
+          _loginAttempts++;
+          if (_loginAttempts >= 5) {
+            _loginLockUntil = Date.now() + 60000;
+            _loginAttempts = 0;
+            msg = "Too many failed attempts. Locked for 60 seconds.";
+          } else {
+            msg = "Wrong email or password. " + (5 - _loginAttempts) + " attempt(s) left.";
+          }
+          break;
+        case "auth/unauthorized-domain":
+          msg = "u274c Domain not authorized in Firebase. Go to Firebase Console u2192 Authentication u2192 Settings u2192 Authorized Domains u2192 add this site domain.";
+          break;
+        case "auth/network-request-failed":
+          msg = "u274c Network error. Check your internet and try again.";
+          break;
+        case "auth/too-many-requests":
+          msg = "u274c Firebase locked this account due to too many attempts. Wait a few minutes or reset your password.";
+          break;
+        case "auth/api-key-not-valid":
+        case "auth/invalid-api-key":
+          msg = "u274c Firebase API key invalid or restricted. Check FIREBASE_CONFIG.";
+          break;
+        default:
+          msg = "u274c Error [" + (err.code || "unknown") + "]: " + err.message;
       }
+      document.getElementById("loginErr").textContent = msg;
     });
 }
 
