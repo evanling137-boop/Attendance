@@ -250,6 +250,22 @@ tr:hover td{background:#fafdf8}
 /* Employee container */
 .emp-wrap{max-width:480px;margin:0 auto;padding:20px 16px 60px}
 
+/* ── SELFIE ── */
+.selfie-wrap{position:relative;width:100%;background:#0d1117;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.selfie-wrap video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.selfie-wrap canvas{display:none}
+.selfie-placeholder{color:#4b5563;font-size:.9rem;text-align:center;padding:20px}
+.selfie-preview{width:100%;border-radius:var(--r);transform:scaleX(-1);display:none}
+.selfie-actions{display:flex;gap:8px;margin-top:10px}
+.selfie-btn{flex:1;padding:10px;border-radius:var(--r);font-size:.85rem;font-weight:700;transition:all .2s;font-family:var(--body)}
+.selfie-btn-cam{background:var(--blue);color:#fff}
+.selfie-btn-cam:hover{background:#0066dd}
+.selfie-btn-snap{background:var(--green);color:#0d1117}
+.selfie-btn-snap:hover{background:#00e5aa}
+.selfie-btn-retake{background:transparent;border:1.5px solid var(--border);color:var(--ink2)}
+.selfie-btn-retake:hover{background:var(--ink);color:#fff}
+.selfie-thumb{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--green);transform:scaleX(-1)}
+
 /* Setup guide */
 .guide-step{background:#f8fafc;border-radius:var(--r);padding:18px 20px;border:1px solid var(--border);margin-bottom:14px}
 .gs-title{font-weight:800;color:var(--ink);margin-bottom:10px;font-size:.95rem}
@@ -258,8 +274,8 @@ tr:hover td{background:#fafdf8}
 .gs-body code{background:#e8edf3;padding:1px 6px;border-radius:4px;font-size:.79rem;font-family:var(--mono)}
 pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.78rem;margin-top:10px;overflow-x:auto;font-family:var(--mono);line-height:1.6}
 
-@media(max-width:768px){th:nth-child(n+7),td:nth-child(n+7){display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:500px){th:nth-child(n+5),td:nth-child(n+5){display:none}}
+@media(max-width:768px){th:nth-child(n+8),td:nth-child(n+8){display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){th:nth-child(n+6),td:nth-child(n+6){display:none}}
 </style>
 </head>
 <body>
@@ -354,6 +370,25 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
         </button>
         <div id="gpsCiStatus"></div>
       </div>
+
+      <!-- Selfie verification card -->
+      <div class="card">
+        <div class="card-lbl">🤳 Identity Selfie <span style="color:var(--red);font-size:.75rem;font-weight:800">REQUIRED</span></div>
+        <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">Take a clear selfie of your face to verify your identity. Admin will review all photos.</p>
+        <div class="selfie-wrap" id="selfieWrap">
+          <div class="selfie-placeholder" id="selfiePlaceholder">📷<br><br>Tap "Open Camera" below</div>
+          <video id="selfieVideo" autoplay playsinline style="display:none"></video>
+          <canvas id="selfieCanvas"></canvas>
+        </div>
+        <img id="selfiePreview" class="selfie-preview" alt="Your selfie"/>
+        <div class="selfie-actions">
+          <button class="selfie-btn selfie-btn-cam" id="selfieCamBtn" onclick="startCamera()">📷 Open Camera</button>
+          <button class="selfie-btn selfie-btn-snap" id="selfieSnapBtn" onclick="takeSelfie()" style="display:none">📸 Take Photo</button>
+          <button class="selfie-btn selfie-btn-retake" id="selfieRetakeBtn" onclick="retakeSelfie()" style="display:none">🔄 Retake</button>
+        </div>
+        <div id="selfieStatus"></div>
+      </div>
+
       <button class="act-btn btn-ci" id="ciBtn" disabled onclick="doCheckin()">
         ✅ Check In
       </button>
@@ -436,7 +471,7 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
         <div style="overflow-x:auto">
           <table>
             <thead><tr>
-              <th>Employee</th><th>Site</th><th>Status</th>
+              <th>Employee</th><th>Selfie</th><th>Site</th><th>Status</th>
               <th>Check-In</th><th>Check-Out</th><th>Duration</th>
               <th>GPS In</th><th>GPS Out</th><th>Date</th>
             </tr></thead>
@@ -603,6 +638,13 @@ service cloud.firestore {
   </div>
 </div>
 
+<!-- Selfie lightbox -->
+<div id="selfieLightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9998;align-items:center;justify-content:center;flex-direction:column;gap:16px" onclick="this.style.display='none'">
+  <img id="lightboxImg" style="max-width:90vw;max-height:80vh;border-radius:16px;transform:scaleX(-1)" alt="Selfie"/>
+  <div id="lightboxInfo" style="color:#fff;font-size:.9rem;text-align:center"></div>
+  <button onclick="document.getElementById('selfieLightbox').style.display='none'" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:10px 28px;border-radius:30px;font-size:.9rem;cursor:pointer">✕ Close</button>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -637,9 +679,9 @@ var WORK_SITES = [
   { name:"Site D - WH",     lat:1.4255730640948574, lng:103.79358640285662 },
   { name:"Site E - SEM",    lat:1.44826669629572,   lng:103.82301872883652 },
   { name:"Site F - Tengah Poly",   lat:1.3606737598088592, lng:103.73895821534613 },
-  { name:"Site G - Bishan MRT",       lat:1.351292939593891, lng:103.84870003652243 },
-  { name:"Site H - Orchard Central",        lat:1.3010213243802298, lng:103.83972359419455 },
-  { name:"Site I - Ronald Home",        lat:1.4247928457305246, lng:103.83180977959292 },
+  { name:"Site G - Buona Vista",       lat:1.3071,  lng:103.7903 },
+  { name:"Site H - Ang Mo Kio",        lat:1.3691,  lng:103.8454 },
+  { name:"Site I - Queenstown",        lat:1.2942,  lng:103.8060 },
   { name:"Site J - Evan Home",        lat:1.3069090997407309, lng:103.79446133317231 }
 ];
 
@@ -823,7 +865,8 @@ function chkBtn() {
   var name = (document.getElementById("empName") ||{}).value||"";
   var site = (document.getElementById("empSite") ||{}).value||"";
   var ci = document.getElementById("ciBtn");
-  if (ci) ci.disabled = !(id.trim() && name.trim() && site && GPS.in && GPS.in.ok);
+  // ✅ ANTI-BUDDY-PUNCH: selfie is now required to enable check-in
+  if (ci) ci.disabled = !(id.trim() && name.trim() && site && GPS.in && GPS.in.ok && selfieData);
   var co = document.getElementById("coBtn");
   if (co) co.disabled = !(GPS.out && GPS.out.ok);
 }
@@ -834,6 +877,24 @@ function initEmp() {
   var sel = document.getElementById("empSite");
   sel.innerHTML = '<option value="">— Select your work site —</option>';
   WORK_SITES.forEach(function(s,i){ var o=document.createElement("option"); o.value=i; o.textContent=s.name; sel.appendChild(o); });
+
+  // Reset selfie state
+  selfieData = null;
+  if (selfieStream) { selfieStream.getTracks().forEach(function(t){ t.stop(); }); selfieStream = null; }
+  var preview = document.getElementById("selfiePreview");
+  if (preview) { preview.src=""; preview.style.display="none"; }
+  var vid = document.getElementById("selfieVideo");
+  if (vid) vid.style.display="none";
+  var ph = document.getElementById("selfiePlaceholder");
+  if (ph) ph.style.display="block";
+  var camBtn = document.getElementById("selfieCamBtn");
+  if (camBtn) { camBtn.style.display="flex"; }
+  var snapBtn = document.getElementById("selfieSnapBtn");
+  if (snapBtn) snapBtn.style.display="none";
+  var retakeBtn = document.getElementById("selfieRetakeBtn");
+  if (retakeBtn) retakeBtn.style.display="none";
+  var statEl = document.getElementById("selfieStatus");
+  if (statEl) statEl.innerHTML="";
 
   var sess = getSess();
   if (sess && sess.checkinTimestamp && !sess.checkoutTimestamp) {
@@ -885,6 +946,105 @@ function sanitize(str, maxLen) {
     .slice(0, maxLen || 100);
 }
 
+// ── Selfie camera ──────────────────────────────────
+var selfieStream = null;
+var selfieData = null; // base64 JPEG
+
+function startCamera() {
+  var constraints = { video: { facingMode: "user", width: 320, height: 240 }, audio: false };
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(stream) {
+      selfieStream = stream;
+      var video = document.getElementById("selfieVideo");
+      var placeholder = document.getElementById("selfiePlaceholder");
+      video.srcObject = stream;
+      video.style.display = "block";
+      placeholder.style.display = "none";
+      document.getElementById("selfiePreview").style.display = "none";
+      document.getElementById("selfieCamBtn").style.display = "none";
+      document.getElementById("selfieSnapBtn").style.display = "flex";
+      document.getElementById("selfieRetakeBtn").style.display = "none";
+      document.getElementById("selfieStatus").innerHTML = '<div class="pill pill-info" style="margin-top:8px">📷 Camera active — look straight at the camera</div>';
+      selfieData = null;
+      chkBtn();
+    })
+    .catch(function(err) {
+      document.getElementById("selfieStatus").innerHTML = '<div class="pill pill-bad" style="margin-top:8px">❌ Camera access denied. Please allow camera and try again.</div>';
+    });
+}
+
+function takeSelfie() {
+  var video = document.getElementById("selfieVideo");
+  var canvas = document.getElementById("selfieCanvas");
+  canvas.width = 320; canvas.height = 240;
+  var ctx = canvas.getContext("2d");
+  // Mirror horizontally to match preview
+  ctx.translate(320, 0); ctx.scale(-1, 1);
+  ctx.drawImage(video, 0, 0, 320, 240);
+  selfieData = canvas.toDataURL("image/jpeg", 0.6); // ~15-25KB compressed
+
+  // Stop camera stream
+  if (selfieStream) { selfieStream.getTracks().forEach(function(t){ t.stop(); }); selfieStream = null; }
+
+  // Show preview
+  var preview = document.getElementById("selfiePreview");
+  preview.src = selfieData;
+  preview.style.display = "block";
+  document.getElementById("selfieVideo").style.display = "none";
+  document.getElementById("selfieSnapBtn").style.display = "none";
+  document.getElementById("selfieRetakeBtn").style.display = "flex";
+  document.getElementById("selfieCamBtn").style.display = "none";
+  document.getElementById("selfieStatus").innerHTML = '<div class="pill pill-ok" style="margin-top:8px">✅ Selfie captured — make sure your face is clearly visible</div>';
+  chkBtn();
+}
+
+function retakeSelfie() {
+  selfieData = null;
+  document.getElementById("selfiePreview").style.display = "none";
+  document.getElementById("selfieRetakeBtn").style.display = "none";
+  document.getElementById("selfieCamBtn").style.display = "flex";
+  document.getElementById("selfieStatus").innerHTML = "";
+  chkBtn();
+  startCamera();
+}
+
+// ── Selfie lightbox (admin) ────────────────────────
+function showSelfie(recordId) {
+  var rec = allRecs.find(function(r){ return r.id === recordId; });
+  if (!rec || !rec.selfiePhoto) return;
+  var lb = document.getElementById("selfieLightbox");
+  document.getElementById("lightboxImg").src = rec.selfiePhoto;
+  document.getElementById("lightboxInfo").textContent = (rec.empName||"") + " · " + (rec.empId||"") + " · " + (rec.checkinDate||"") + " " + (rec.checkinTime||"");
+  lb.style.display = "flex";
+}
+
+// ── Device fingerprint (anti-buddy-punch) ──────────
+function getDeviceId() {
+  var id = localStorage.getItem("_at_device");
+  if (!id) {
+    id = "dev_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem("_at_device", id);
+  }
+  return id;
+}
+
+// Check if this device already checked in someone today
+function deviceAlreadyCheckedIn(empId) {
+  var today = new Date().toLocaleDateString("en-SG");
+  var key = "_at_ci_" + today;
+  var existing = localStorage.getItem(key);
+  if (existing && existing !== empId) {
+    return existing; // returns the empId that already used this device
+  }
+  return null;
+}
+
+function recordDeviceCheckin(empId) {
+  var today = new Date().toLocaleDateString("en-SG");
+  var key = "_at_ci_" + today;
+  localStorage.setItem(key, empId);
+}
+
 // ── Check-in ───────────────────────────────────────
 function doCheckin() {
   // ✅ SECURITY: Sanitize all employee inputs before saving to Firestore
@@ -896,6 +1056,20 @@ function doCheckin() {
   if (!empId || !empName) { toast("Invalid employee details", "t-err"); return; }
   if (!/^[a-zA-Z0-9\-_]+$/.test(empId)) { toast("Employee ID: letters, numbers, hyphens only", "t-err"); return; }
   if (empName.length < 2) { toast("Please enter a valid full name", "t-err"); return; }
+
+  // ✅ ANTI-BUDDY-PUNCH: Require selfie photo
+  if (!selfieData) { toast("📷 Please take a selfie first", "t-err"); return; }
+
+  // ✅ ANTI-BUDDY-PUNCH: Block if this device already checked in a different person today
+  var alreadyCheckedIn = deviceAlreadyCheckedIn(empId);
+  if (alreadyCheckedIn) {
+    toast("⛔ This device already checked in " + alreadyCheckedIn + " today", "t-err");
+    document.getElementById("ciBtn").disabled = true;
+    setTimeout(function(){
+      alert("⛔ Buddy Punching Detected!\n\nThis device was already used to check in employee: " + alreadyCheckedIn + "\n\nEach employee must check in from their own phone.");
+    }, 300);
+    return;
+  }
 
   var site    = WORK_SITES[parseInt(siteIdx)];
   var gps     = GPS.in;
@@ -912,6 +1086,9 @@ function doCheckin() {
     checkoutTime:null, checkoutTimestamp:null,
     checkoutLat:null, checkoutLng:null, checkoutDist:null,
     status:"in", isLate:isLate, isOvertime:false, duration:null,
+    // ✅ ANTI-BUDDY-PUNCH: Store selfie photo and device ID
+    selfiePhoto: selfieData,
+    deviceId: getDeviceId(),
     // ✅ SECURITY: Track submission source for audit purposes
     _source: "web", _userAgent: navigator.userAgent.slice(0, 100)
   };
@@ -921,6 +1098,7 @@ function doCheckin() {
   btn.innerHTML = '<span class="spin"></span> Saving…';
 
   function onSaved(docId) {
+    recordDeviceCheckin(empId); // ✅ ANTI-BUDDY-PUNCH: mark this device as used today
     setSess(rec); setSessDocId(docId);
     btn.innerHTML = "✅ Check In";
     showResult("ci", rec, isLate, false);
@@ -1057,39 +1235,17 @@ function doLogin() {
       showScreen("dashboard");
     })
     .catch(function(err) {
+      _loginAttempts++;
       btn.disabled = false;
-      btn.textContent = "Access Dashboard u2192";
-      var msg;
-      switch(err.code) {
-        case "auth/wrong-password":
-        case "auth/invalid-credential":
-        case "auth/user-not-found":
-          _loginAttempts++;
-          if (_loginAttempts >= 5) {
-            _loginLockUntil = Date.now() + 60000;
-            _loginAttempts = 0;
-            msg = "Too many failed attempts. Locked for 60 seconds.";
-          } else {
-            msg = "Wrong email or password. " + (5 - _loginAttempts) + " attempt(s) left.";
-          }
-          break;
-        case "auth/unauthorized-domain":
-          msg = "u274c Domain not authorized in Firebase. Go to Firebase Console u2192 Authentication u2192 Settings u2192 Authorized Domains u2192 add this site domain.";
-          break;
-        case "auth/network-request-failed":
-          msg = "u274c Network error. Check your internet and try again.";
-          break;
-        case "auth/too-many-requests":
-          msg = "u274c Firebase locked this account due to too many attempts. Wait a few minutes or reset your password.";
-          break;
-        case "auth/api-key-not-valid":
-        case "auth/invalid-api-key":
-          msg = "u274c Firebase API key invalid or restricted. Check FIREBASE_CONFIG.";
-          break;
-        default:
-          msg = "u274c Error [" + (err.code || "unknown") + "]: " + err.message;
+      btn.textContent = "Access Dashboard →";
+      if (_loginAttempts >= 5) {
+        _loginLockUntil = Date.now() + 60000; // 60 second lockout
+        _loginAttempts = 0;
+        document.getElementById("loginErr").textContent = "Too many failed attempts. Locked for 60 seconds.";
+      } else {
+        var remaining = 5 - _loginAttempts;
+        document.getElementById("loginErr").textContent = "Incorrect credentials. " + remaining + " attempt(s) left.";
       }
-      document.getElementById("loginErr").textContent = msg;
     });
 }
 
@@ -1152,8 +1308,12 @@ function renderTable() {
     if (r.isOvertime) stat += ' <span class="bdg bdg-ot">OT</span>';
     var mapIn  = r.checkinLat  ? '<a class="map-lnk" href="https://maps.google.com/?q='+r.checkinLat+','+r.checkinLng+'" target="_blank">📍 '+r.checkinDist+'m</a>' : "—";
     var mapOut = r.checkoutLat ? '<a class="map-lnk" href="https://maps.google.com/?q='+r.checkoutLat+','+r.checkoutLng+'" target="_blank">📍 '+r.checkoutDist+'m</a>' : "—";
+    var selfieCell = r.selfiePhoto
+      ? '<img src="'+r.selfiePhoto+'" class="selfie-thumb" title="Click to enlarge" onclick="showSelfie(\''+r.id+'\')" style="cursor:pointer"/>'
+      : '<span style="font-size:.75rem;color:var(--red);font-weight:700">⚠ No photo</span>';
     return '<tr>'
       +'<td><div class="ec"><div class="av">'+ini+'</div><div><div class="en">'+(r.empName||"—")+'</div><div class="eid">'+(r.empId||"—")+'</div></div></div></td>'
+      +'<td>'+selfieCell+'</td>'
       +'<td style="font-size:.82rem;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.site||"—")+'</td>'
       +'<td>'+stat+'</td>'
       +'<td><span class="dur">'+(r.checkinTime||"—")+'</span></td>'
