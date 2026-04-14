@@ -393,6 +393,66 @@ tr.on-leave-row td{background:#f0f9ff!important}
 /* Leave info card (employee — pending applications) */
 .leave-info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.83rem}
 .leave-info-row:last-child{border:none}
+
+/* ── LEAVE STATUS NOTIFICATION POPUP ───────────── */
+.lsn-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);
+  z-index:9996;display:none;align-items:center;justify-content:center;padding:20px;
+}
+.lsn-overlay.open{display:flex}
+.lsn-box{
+  background:#fff;border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.25);
+  width:100%;max-width:420px;overflow:hidden;position:relative;
+  animation:lsnPop .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes lsnPop{from{transform:scale(.85) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.lsn-header{padding:28px 28px 18px;text-align:center}
+.lsn-icon{font-size:3.2rem;margin-bottom:10px;line-height:1}
+.lsn-title{font-size:1.25rem;font-weight:800;line-height:1.2;margin-bottom:4px}
+.lsn-sub{font-size:.85rem;opacity:.75;line-height:1.5}
+.lsn-body{padding:0 22px 22px}
+.lsn-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 12px;border-radius:10px;margin-bottom:4px;font-size:.84rem}
+.lsn-row:nth-child(odd){background:rgba(0,0,0,.04)}
+.lsn-k{color:#6b7280;font-weight:500;flex-shrink:0;margin-right:12px}
+.lsn-v{font-weight:700;text-align:right;word-break:break-word}
+.lsn-reason{background:#fef2f2;border-radius:10px;padding:10px 14px;font-size:.83rem;color:#b91c1c;line-height:1.6;margin:10px 0;border-left:3px solid #fca5a5}
+.lsn-footer{padding:0 22px 22px;display:flex;flex-direction:column;gap:8px}
+.lsn-btn-primary{
+  width:100%;padding:13px;border-radius:12px;font-size:.95rem;font-weight:700;
+  border:none;cursor:pointer;font-family:var(--body);transition:all .2s;
+}
+.lsn-btn-secondary{
+  width:100%;padding:10px;border-radius:10px;font-size:.88rem;font-weight:600;
+  border:1.5px solid rgba(0,0,0,.12);cursor:pointer;background:transparent;
+  font-family:var(--body);color:#374151;transition:all .2s;
+}
+.lsn-btn-secondary:hover{background:rgba(0,0,0,.06)}
+
+/* Approved skin */
+.lsn-approved .lsn-header{background:linear-gradient(145deg,#00c896,#00a878)}
+.lsn-approved .lsn-title,.lsn-approved .lsn-sub{color:#fff}
+.lsn-approved .lsn-btn-primary{background:linear-gradient(135deg,#00c896,#00a878);color:#0d1117}
+.lsn-approved .lsn-btn-primary:hover{box-shadow:0 6px 20px rgba(0,200,150,.4)}
+
+/* Rejected skin */
+.lsn-rejected .lsn-header{background:linear-gradient(145deg,#ff3b5c,#e02040)}
+.lsn-rejected .lsn-title,.lsn-rejected .lsn-sub{color:#fff}
+.lsn-rejected .lsn-btn-primary{background:linear-gradient(135deg,#ff3b5c,#e02040);color:#fff}
+.lsn-rejected .lsn-btn-primary:hover{box-shadow:0 6px 20px rgba(255,59,92,.4)}
+
+/* Pending skin */
+.lsn-pending .lsn-header{background:linear-gradient(145deg,#f59e0b,#d97706)}
+.lsn-pending .lsn-title,.lsn-pending .lsn-sub{color:#fff}
+.lsn-pending .lsn-btn-primary{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
+
+/* Multiple notices — list mode */
+.lsn-list-item{
+  border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .2s;
+}
+.lsn-list-item:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);transform:translateY(-1px)}
+.lsn-list-item.approved{border-color:#86efac;background:#f0fdf4}
+.lsn-list-item.rejected{border-color:#fca5a5;background:#fef2f2}
+.lsn-list-item.pending {border-color:#fde68a;background:#fffbeb}
 </style>
 </head>
 <body>
@@ -519,9 +579,9 @@ tr.on-leave-row td{background:#f0f9ff!important}
       </div>
 
       <div class="card">
-        <div class="card-lbl">📎 Supporting Documents</div>
-        <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">Upload a photo or screenshot of your physical leave application form (max 2MB — JPG, PNG, or PDF).</p>
-        <div class="file-upload-wrap">
+        <div class="card-lbl">📎 Supporting Documents <span style="color:var(--red);font-size:.75rem;font-weight:800">REQUIRED</span></div>
+        <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">Upload a photo or screenshot of your physical leave application form / MC slip. <strong style="color:var(--red)">This is mandatory</strong> — leave applications without an attachment will not be accepted. (Max 700 KB — JPG, PNG, or PDF)</p>
+        <div class="file-upload-wrap" id="leaveAttWrap">
           <div class="fu-icon">📄</div>
           <div class="fu-txt">Tap to upload<br><strong>Leave Form / MC / Supporting Document</strong></div>
           <input type="file" id="leaveAttachment" accept="image/*,.pdf" onchange="handleLeaveAttachment(this)"/>
@@ -948,6 +1008,13 @@ service cloud.firestore {
   <img id="lightboxImg" style="max-width:90vw;max-height:80vh;border-radius:16px;transform:scaleX(-1)" alt="Selfie"/>
   <div id="lightboxInfo" style="color:#fff;font-size:.9rem;text-align:center"></div>
   <button onclick="document.getElementById('selfieLightbox').style.display='none'" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:10px 28px;border-radius:30px;font-size:.9rem;cursor:pointer">✕ Close</button>
+</div>
+
+<!-- ══ LEAVE STATUS NOTIFICATION POPUP ══════════════ -->
+<div id="leaveStatusPopup" class="lsn-overlay">
+  <div class="lsn-box" id="lsnBox">
+    <!-- injected dynamically -->
+  </div>
 </div>
 
 <!-- Toast -->
@@ -1472,6 +1539,8 @@ function doCheckin() {
     btn.innerHTML = "✅ Check In";
     showResult("ci", rec, isLate, false);
     toast("✅ Checked in successfully!", "t-ok");
+    // Check if this employee has any leave decisions to show
+    setTimeout(function(){ checkApprovedLeaveForEmp(empId); }, 1800);
     setTimeout(function(){
       document.getElementById("ciForm").style.display    = "none";
       document.getElementById("coSection").style.display = "block";
@@ -1523,6 +1592,8 @@ function doCheckout() {
     toast("👋 Checked out! Have a great day.", "t-ok");
     document.getElementById("sessBadge").style.display = "none";
     document.getElementById("coSection").style.display = "none";
+    // Show any pending leave decisions for this employee
+    setTimeout(function(){ checkApprovedLeaveForEmp(sess.empId); }, 1200);
   }
 
   var docId = getSessDocId();
@@ -1779,9 +1850,9 @@ function toast(msg, cls) {
 // ╚══════════════════════════════════════════════════════╝
 
 // ── Leave Configuration (edit these) ───────────────
-var EMAILJS_KEY = "yxC8TJWihgmxvyKSq";     // from emailjs.com → Account → Public Key
-var EMAILJS_SVC = "service_ryrixv6";     // EmailJS Service ID
-var EMAILJS_TPL = "template_fzayj6m";    // EmailJS Template ID
+var EMAILJS_KEY = "YOUR_EMAILJS_PUBLIC_KEY";     // from emailjs.com → Account → Public Key
+var EMAILJS_SVC = "YOUR_EMAILJS_SERVICE_ID";     // EmailJS Service ID
+var EMAILJS_TPL = "YOUR_EMAILJS_TEMPLATE_ID";    // EmailJS Template ID
 var emailjsReady = false;
 
 var LEAVE_TYPES = [
@@ -1877,21 +1948,65 @@ function calcLeaveDays() {
 // ── Handle Attachment Upload ────────────────────────
 function handleLeaveAttachment(input) {
   var file = input.files[0]; if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    toast("File too large — max 2MB", "t-err"); input.value = ""; return;
+  var MAX_BYTES = 700 * 1024; // 700 KB raw → ~940 KB base64, safe under Firestore 1MB limit
+  var wrap = document.getElementById("leaveAttWrap");
+  if (file.size > MAX_BYTES) {
+    var an = document.getElementById("leaveAttName");
+    if (an) an.innerHTML = '<span style="color:var(--red)">❌ File too large ('
+      + Math.round(file.size/1024) + ' KB). Max 700 KB.<br>'
+      + 'Compress at <a href="https://tinypng.com" target="_blank" style="color:var(--blue)">tinypng.com</a> then try again.</span>';
+    if (wrap) { wrap.style.borderColor="var(--red)"; wrap.style.background="#fef2f2"; }
+    input.value=""; leaveAttachment=null; return;
   }
+  if (wrap) { wrap.style.borderColor=""; wrap.style.background=""; }
   var reader = new FileReader();
   reader.onload = function(e) {
     leaveAttachment = { name: file.name, type: file.type, base64: e.target.result };
     var an = document.getElementById("leaveAttName");
-    if (an) an.innerHTML = '✅ <strong>' + file.name + '</strong> ready';
+    if (an) an.innerHTML = '✅ <strong>' + file.name + '</strong> ('
+      + Math.round(file.size/1024) + ' KB) — ready to upload';
     toast("📎 Attachment ready", "t-ok");
   };
   reader.readAsDataURL(file);
 }
 
+// ── Translate Firebase error codes to plain English ─
+function fbErrMsg(e) {
+  var code = (e && e.code) || "";
+  var msgs = {
+    "permission-denied": "🔒 Permission denied — Firestore rules are blocking this.\n\nFIX: Go to Firebase Console → Firestore → Rules and add the leaveApplications rules from Setup Guide → Step 10.",
+    "not-found": "🔍 Firestore database not found.\n\nFIX: Confirm your FIREBASE_CONFIG has the correct projectId.",
+    "unavailable": "📡 Firestore is temporarily unavailable.\n\nFIX: Check your internet connection and try again.",
+    "resource-exhausted": "📊 Firestore daily quota exceeded.\n\nFIX: Wait until tomorrow or upgrade your Firebase plan.",
+    "invalid-argument": "📦 Document rejected — attachment is probably too large.\n\nFIX: Use a smaller/compressed image (try tinypng.com) or submit without attachment.",
+    "unauthenticated": "🔐 Firestore rules require authentication for this action.\n\nFIX: Update leaveApplications rules to allow unauthenticated creates (Setup Guide Step 10).",
+    "failed-precondition": "⚠️ Firestore query needs an index that hasn't been created yet.\n\nFIX: Check the browser console (F12) for a link to auto-create the index.",
+    "deadline-exceeded": "⏱️ Request timed out.\n\nFIX: Check your internet connection. If the attachment is large, try compressing it."
+  };
+  return msgs[code] || ("Firebase error [" + (code||"unknown") + "]: " + (e&&e.message||String(e)));
+}
+
+// ── Inline error display inside leave form ──────────
+function showLeaveError(msg) {
+  var box = document.getElementById("leaveErrorBox");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "leaveErrorBox";
+    box.style.cssText = "background:#fef2f2;border:1.5px solid #fca5a5;border-radius:12px;padding:14px 16px;"
+      + "margin-bottom:14px;font-size:.83rem;color:#b91c1c;line-height:1.7;white-space:pre-wrap;word-break:break-word";
+    var btn = document.getElementById("leaveSubmitBtn");
+    if (btn) btn.parentNode.insertBefore(box, btn);
+  }
+  box.innerHTML = "<strong>❌ Cannot submit — please fix the issue below:</strong><br><br>" + msg.replace(/\n/g,"<br>");
+  box.scrollIntoView({ behavior:"smooth", block:"nearest" });
+}
+function clearLeaveError() {
+  var box = document.getElementById("leaveErrorBox"); if (box) box.remove();
+}
+
 // ── Submit Leave Application ────────────────────────
 function submitLeave() {
+  clearLeaveError();
   var empId    = sanitize((document.getElementById("leaveEmpId")||{}).value||"", 20);
   var empName  = sanitize((document.getElementById("leaveEmpName")||{}).value||"", 60);
   var empEmail = ((document.getElementById("leaveEmail")||{}).value||"").trim();
@@ -1901,66 +2016,99 @@ function submitLeave() {
   var toDate   = (document.getElementById("leaveTo")||{}).value||"";
   var reason   = sanitize((document.getElementById("leaveReason")||{}).value||"", 500);
 
-  if (!empId || !empName) { toast("Please enter your Employee ID and Name", "t-err"); return; }
-  if (!empEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(empEmail)) { toast("Please enter a valid email address", "t-err"); return; }
-  if (!site) { toast("Please select your work site", "t-err"); return; }
-  if (!leaveType) { toast("Please select a leave type", "t-err"); return; }
-  if (!fromDate || !toDate) { toast("Please select leave dates", "t-err"); return; }
-  if (toDate < fromDate) { toast("End date must be on or after start date", "t-err"); return; }
+  if (!empId)   { showLeaveError("Employee ID is required."); return; }
+  if (!empName) { showLeaveError("Full Name is required."); return; }
+  if (!empEmail){ showLeaveError("Email address is required — the decision will be sent here."); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(empEmail)) { showLeaveError("Email format is invalid. Example: john@company.com"); return; }
+  if (!site)     { showLeaveError("Please select your Work Site."); return; }
+  if (!leaveType){ showLeaveError("Please select a Leave Type."); return; }
+  if (!fromDate) { showLeaveError("Please select the From Date."); return; }
+  if (!toDate)   { showLeaveError("Please select the To Date."); return; }
+  if (toDate < fromDate) { showLeaveError("To Date cannot be earlier than From Date."); return; }
 
-  var numDays = Math.round((new Date(toDate) - new Date(fromDate)) / (1000*60*60*24)) + 1;
+  // ── Attachment is MANDATORY ──────────────────────
+  if (!leaveAttachment || !leaveAttachment.base64) {
+    var wrap = document.getElementById("leaveAttWrap");
+    if (wrap) { wrap.style.borderColor="var(--red)"; wrap.style.background="#fef2f2"; setTimeout(function(){ wrap.style.borderColor=""; wrap.style.background=""; },3000); }
+    showLeaveError("📎 Supporting document is required.\n\nPlease upload your leave form, MC slip, or any supporting document.\n\nTip: You can photograph your physical form with your phone camera.");
+    return;
+  }
+
+  // ── Firestore document size pre-check ───────────
+  var approxBytes = Math.round(leaveAttachment.base64.length * 0.75);
+  if (approxBytes > 900 * 1024) {
+    showLeaveError("📦 Attachment too large after encoding ("
+      + Math.round(approxBytes/1024) + " KB).\n\nFirestore has a 1 MB document limit.\n"
+      + "Fix: Compress at tinypng.com or take a lower-resolution photo.");
+    return;
+  }
+
+  var numDays = Math.round((new Date(toDate)-new Date(fromDate))/(1000*60*60*24))+1;
   var now = new Date();
 
+  // ── No Firebase: save locally ────────────────────
+  if (!fbOk || !db) {
+    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+    var localRec = {
+      id:"local_"+Date.now(), empId:empId, empName:empName, empEmail:empEmail, site:site,
+      leaveType:leaveType, fromDate:fromDate, toDate:toDate, numDays:numDays, reason:reason,
+      attachmentName:leaveAttachment.name, attachmentBase64:leaveAttachment.base64,
+      status:"pending", appliedAt:now.getTime(),
+      appliedDate:now.toLocaleDateString("en-SG"), appliedISO:now.toISOString(),
+      decidedAt:null,decidedDate:null,decidedBy:null,rejectReason:null
+    };
+    ll.push(localRec); localStorage.setItem("at_leaves", JSON.stringify(ll));
+    showLeaveSection(false); toast("⚠️ Saved locally (Firebase not connected)", "t-ok");
+    var rc2=document.getElementById("resultCard");
+    if(rc2){
+      rc2.style.display="block";
+      document.getElementById("resultTitle").textContent="📋 Leave Saved Locally";
+      document.getElementById("resultBody").innerHTML=
+        row("Employee",empName+" · "+empId)+row("Leave Type",leaveType)+
+        row("From",fromDate)+row("To",toDate)+row("Days",numDays+"d")+
+        '<div class="pill pill-warn" style="margin-top:10px">⚠️ Firebase not configured — stored locally only.</div>';
+    }
+    return;
+  }
+
   var leaveRec = {
-    empId: empId, empName: empName, empEmail: empEmail, site: site,
-    leaveType: leaveType, fromDate: fromDate, toDate: toDate, numDays: numDays,
-    reason: reason,
-    attachmentName: leaveAttachment ? leaveAttachment.name : null,
-    attachmentBase64: leaveAttachment ? leaveAttachment.base64 : null,
-    status: "pending",
-    appliedAt: now.getTime(),
-    appliedDate: now.toLocaleDateString("en-SG"),
-    appliedISO: now.toISOString(),
-    decidedAt: null, decidedDate: null, decidedBy: null, rejectReason: null
+    empId:empId, empName:empName, empEmail:empEmail, site:site,
+    leaveType:leaveType, fromDate:fromDate, toDate:toDate, numDays:numDays,
+    reason:reason,
+    attachmentName:leaveAttachment.name, attachmentBase64:leaveAttachment.base64,
+    status:"pending",
+    appliedAt:now.getTime(), appliedDate:now.toLocaleDateString("en-SG"), appliedISO:now.toISOString(),
+    decidedAt:null, decidedDate:null, decidedBy:null, rejectReason:null
   };
 
   var btn = document.getElementById("leaveSubmitBtn");
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Submitting…'; }
+  if (btn) { btn.disabled=true; btn.innerHTML='<span class="spin"></span> Submitting…'; }
 
-  function onSaved() {
-    if (btn) { btn.disabled = false; btn.innerHTML = "📩 Submit Leave Application"; }
-    toast("✅ Leave application submitted!", "t-ok");
-    showLeaveSection(false);
-    var rc = document.getElementById("resultCard");
-    if (rc) {
-      rc.style.display = "block";
-      document.getElementById("resultTitle").textContent = "📋 Leave Application Submitted";
-      document.getElementById("resultBody").innerHTML =
-        row("Employee",  empName + " · " + empId) +
-        row("Leave Type", leaveType) +
-        row("From Date",  fromDate) +
-        row("To Date",    toDate) +
-        row("Total Days", numDays + " day" + (numDays!==1?"s":"")) +
-        row("Submitted",  now.toLocaleString("en-SG")) +
-        '<div class="pill pill-info" style="margin-top:10px">⏳ Pending review — you will be notified by email once admin approves or rejects.</div>';
-    }
-  }
-
-  if (fbOk && db) {
-    db.collection("leaveApplications").add(leaveRec)
-      .then(function() { onSaved(); })
-      .catch(function(e) {
-        console.warn("Leave submit error:", e);
-        toast("Error submitting. Check connection and try again.", "t-err");
-        if (btn) { btn.disabled = false; btn.innerHTML = "📩 Submit Leave Application"; }
-      });
-  } else {
-    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
-    leaveRec.id = "local_" + Date.now();
-    ll.push(leaveRec);
-    localStorage.setItem("at_leaves", JSON.stringify(ll));
-    onSaved();
-  }
+  db.collection("leaveApplications").add(leaveRec)
+    .then(function(){
+      clearLeaveError();
+      if (btn) { btn.disabled=false; btn.innerHTML="📩 Submit Leave Application"; }
+      toast("✅ Leave application submitted!", "t-ok");
+      showLeaveSection(false);
+      var rc=document.getElementById("resultCard");
+      if(rc){
+        rc.style.display="block";
+        document.getElementById("resultTitle").textContent="📋 Leave Application Submitted";
+        document.getElementById("resultBody").innerHTML=
+          row("Employee",empName+" · "+empId)+
+          row("Leave Type",leaveType)+
+          row("From Date",fromDate)+row("To Date",toDate)+
+          row("Total Days",numDays+" day"+(numDays!==1?"s":""))+
+          row("Submitted",now.toLocaleString("en-SG"))+
+          '<div class="pill pill-info" style="margin-top:10px">⏳ Pending — you\'ll receive an email at <strong>'+empEmail+'</strong> once admin decides.</div>';
+      }
+    })
+    .catch(function(e){
+      console.error("🔴 Leave submit error:", e);
+      if (btn) { btn.disabled=false; btn.innerHTML="📩 Submit Leave Application"; }
+      showLeaveError(fbErrMsg(e));
+      toast("❌ Submission failed — see error above", "t-err");
+    });
 }
 
 // ── Admin: Load Leave Applications ──────────────────
@@ -1974,13 +2122,20 @@ function loadLeaves() {
 
   if (fbOk && db) {
     if (fbLeaveUnsub) fbLeaveUnsub();
-    fbLeaveUnsub = db.collection("leaveApplications").orderBy("appliedAt","desc")
+    // No orderBy — avoids requiring a Firestore composite index. Sort client-side.
+    fbLeaveUnsub = db.collection("leaveApplications")
       .onSnapshot(function(snap){
-        leaveRecs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+        leaveRecs = snap.docs
+          .map(function(d){ return Object.assign({id:d.id},d.data()); })
+          .sort(function(a,b){ return (b.appliedAt||0)-(a.appliedAt||0); });
         renderLeaveTable(); updateLeaveStats();
+      }, function(e){
+        console.error("loadLeaves error:", e);
+        toast("❌ Could not load leaves: " + fbErrMsg(e).split("\n")[0], "t-err");
       });
   } else {
-    leaveRecs = JSON.parse(localStorage.getItem("at_leaves")||"[]").reverse();
+    leaveRecs = JSON.parse(localStorage.getItem("at_leaves")||"[]")
+      .sort(function(a,b){ return (b.appliedAt||0)-(a.appliedAt||0); });
     renderLeaveTable(); updateLeaveStats();
   }
 }
@@ -2271,45 +2426,180 @@ function viewLeaveAtt(id) {
   if (modal) modal.classList.add("open");
 }
 
-// ── Check Approved Leave for Employee (today) ───────
+// ── Check ALL Leave Status for Employee ─────────────
+// Called when employee types their ID — shows a popup for any
+// approved, rejected, or pending applications so they know instantly.
 function checkApprovedLeaveForEmp(empId) {
-  var today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  if (!empId) return;
+  var today = new Date().toISOString().split("T")[0];
+
+  function processLeaves(recs) {
+    // Sort: most recently applied first
+    recs.sort(function(a,b){ return (b.appliedAt||0)-(a.appliedAt||0); });
+
+    // Check if on approved leave today → show banner + block check-in
+    var onLeaveToday = recs.find(function(r){
+      return r.status==="approved" && today>=r.fromDate && today<=r.toDate;
+    });
+    if (onLeaveToday) showLeaveBanner(onLeaveToday);
+
+    // Show popup for any decisions the employee may not have seen yet
+    // (approved or rejected within last 30 days, plus any pending)
+    var thirtyDaysAgo = Date.now() - 30*24*60*60*1000;
+    var notable = recs.filter(function(r){
+      if (r.status==="approved" || r.status==="rejected") {
+        return (r.decidedAt||r.appliedAt||0) > thirtyDaysAgo;
+      }
+      return r.status==="pending"; // always show pending so they know it's waiting
+    });
+
+    if (notable.length === 0) return;
+    if (notable.length === 1) {
+      showLsnSingle(notable[0], today);
+    } else {
+      showLsnMultiple(notable, today);
+    }
+  }
+
   if (fbOk && db) {
     db.collection("leaveApplications")
       .where("empId","==",empId)
-      .where("status","==","approved")
       .get()
       .then(function(snap){
-        snap.docs.forEach(function(d){
-          var r = d.data();
-          if (today >= r.fromDate && today <= r.toDate) {
-            showLeaveBanner(r);
-          }
-        });
-      }).catch(function(e){ console.warn("Leave check:", e); });
+        var recs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+        processLeaves(recs);
+      })
+      .catch(function(e){ console.warn("Leave status check:", e); });
   } else {
     var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
-    ll.forEach(function(r){
-      if (r.empId===empId && r.status==="approved" && today>=r.fromDate && today<=r.toDate) {
-        showLeaveBanner(r);
-      }
-    });
+    processLeaves(ll.filter(function(r){ return r.empId===empId; }));
   }
 }
 
+// ── Leave active banner (on-leave today, blocks check-in) ─
 function showLeaveBanner(r) {
   var banner = document.getElementById("leaveActiveBanner");
   if (!banner) return;
-  var title = document.getElementById("leaveBannerTitle");
+  var title  = document.getElementById("leaveBannerTitle");
   var detail = document.getElementById("leaveBannerDetail");
   if (title) title.textContent = "🌴 You are on " + r.leaveType + " today";
   if (detail) detail.innerHTML =
-    "Your <strong>" + r.leaveType + "</strong> from <strong>" + r.fromDate + "</strong> to <strong>" + r.toDate + "</strong> (" + r.numDays + " day" + (r.numDays!==1?"s":"") + ") has been approved.<br>"
-    + "You do <strong>not</strong> need to check in. Your attendance is automatically recorded as <strong>" + r.leaveType + "</strong>.";
+    "Your <strong>" + r.leaveType + "</strong> from <strong>" + r.fromDate
+    + "</strong> to <strong>" + r.toDate + "</strong> (" + r.numDays
+    + " day" + (r.numDays!==1?"s":"") + ") has been <strong>approved</strong>.<br>"
+    + "You do <strong>not</strong> need to check in. Your attendance is automatically recorded as <strong>"
+    + r.leaveType + "</strong>.";
   banner.style.display = "block";
-  // Hide check-in form
   var ci = document.getElementById("ciForm"); if(ci) ci.style.display="none";
   var ab = document.getElementById("applyLeaveBtn"); if(ab) ab.style.display="none";
+}
+
+// ── Leave Status Popup — single application ─────────
+function showLsnSingle(r, today) {
+  var popup = document.getElementById("leaveStatusPopup");
+  var box   = document.getElementById("lsnBox");
+  if (!popup || !box) return;
+
+  var skin, icon, title, sub;
+  if (r.status==="approved") {
+    skin = "lsn-approved"; icon = "✅"; title = "Leave Approved!";
+    var isCurrent = today>=r.fromDate && today<=r.toDate;
+    var isUpcoming = r.fromDate > today;
+    sub  = isCurrent  ? "You are currently on approved leave — no check-in needed today."
+         : isUpcoming ? "Your upcoming leave has been approved."
+         : "Your leave application was approved.";
+  } else if (r.status==="rejected") {
+    skin = "lsn-rejected"; icon = "❌"; title = "Leave Not Approved";
+    sub  = "Your leave application was not approved. Please check in as normal.";
+  } else {
+    skin = "lsn-pending"; icon = "⏳"; title = "Leave Pending Review";
+    sub  = "Your leave application is waiting for admin approval.";
+  }
+
+  var bodyRows = lsnRow("Leave Type", r.leaveType)
+    + lsnRow("Period", r.fromDate + " → " + r.toDate)
+    + lsnRow("Days", r.numDays + " day" + (r.numDays!==1?"s":""))
+    + lsnRow("Applied", r.appliedDate||"—");
+  if (r.decidedBy) bodyRows += lsnRow("Decided By", r.decidedBy);
+  if (r.decidedDate) bodyRows += lsnRow("Decision Date", r.decidedDate);
+
+  var extraHtml = "";
+  if (r.status==="rejected" && r.rejectReason) {
+    extraHtml = '<div class="lsn-reason"><strong>📋 Reason:</strong> ' + r.rejectReason + '</div>';
+  }
+
+  var primaryLabel = r.status==="approved" ? "✅ Got it, thank you!"
+                   : r.status==="rejected" ? "❌ Understood, I'll check in"
+                   : "⏳ OK, I'll wait for the decision";
+
+  box.className = "lsn-box " + skin;
+  box.innerHTML =
+    '<div class="lsn-header">'
+    + '<div class="lsn-icon">' + icon + '</div>'
+    + '<div class="lsn-title">' + title + '</div>'
+    + '<div class="lsn-sub">' + sub + '</div>'
+    + '</div>'
+    + '<div class="lsn-body">' + bodyRows + extraHtml + '</div>'
+    + '<div class="lsn-footer">'
+    + '<button class="lsn-btn-primary" onclick="closeLsnPopup()">' + primaryLabel + '</button>'
+    + '</div>';
+
+  popup.classList.add("open");
+}
+
+// ── Leave Status Popup — multiple applications ───────
+function showLsnMultiple(recs, today) {
+  var popup = document.getElementById("leaveStatusPopup");
+  var box   = document.getElementById("lsnBox");
+  if (!popup || !box) return;
+
+  var items = recs.map(function(r){
+    var icon = r.status==="approved"?"✅":r.status==="rejected"?"❌":"⏳";
+    var label= r.status==="approved"?"Approved":r.status==="rejected"?"Not Approved":"Pending";
+    var isCurrent = r.status==="approved" && today>=r.fromDate && today<=r.toDate;
+    return '<div class="lsn-list-item ' + r.status + '" onclick="showLsnDetailFrom(this,\'' + r.id + '\')">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center">'
+      + '<div style="font-weight:700;font-size:.9rem">' + icon + ' ' + r.leaveType + '</div>'
+      + '<span class="bdg bdg-' + (r.status==="approved"?"approved":r.status==="rejected"?"rejected":"pending") + '">' + label + '</span>'
+      + '</div>'
+      + '<div style="font-size:.8rem;color:#6b7280;margin-top:4px">' + r.fromDate + ' → ' + r.toDate + ' · ' + r.numDays + ' day' + (r.numDays!==1?"s":"") + '</div>'
+      + (isCurrent ? '<div style="font-size:.78rem;font-weight:700;color:#15803d;margin-top:4px">📌 You are on leave today — no check-in needed</div>' : '')
+      + (r.status==="rejected"&&r.rejectReason ? '<div style="font-size:.78rem;color:#b91c1c;margin-top:4px">Reason: ' + r.rejectReason + '</div>' : '')
+      + '</div>';
+  }).join("");
+
+  // Store recs in window for detail drill-down
+  window._lsnRecs = recs;
+
+  box.className = "lsn-box lsn-pending";
+  box.innerHTML =
+    '<div class="lsn-header" style="background:linear-gradient(145deg,#1a2233,#0d1117)">'
+    + '<div class="lsn-icon">📋</div>'
+    + '<div class="lsn-title" style="color:#fff">Your Leave Applications</div>'
+    + '<div class="lsn-sub" style="color:#9ca3af">Tap any item to view details</div>'
+    + '</div>'
+    + '<div class="lsn-body" style="max-height:55vh;overflow-y:auto;padding-top:16px">' + items + '</div>'
+    + '<div class="lsn-footer">'
+    + '<button class="lsn-btn-primary" style="background:linear-gradient(135deg,#1a2233,#0d1117);color:#fff" onclick="closeLsnPopup()">Close</button>'
+    + '</div>';
+
+  popup.classList.add("open");
+}
+
+function showLsnDetailFrom(el, id) {
+  var today = new Date().toISOString().split("T")[0];
+  var recs = window._lsnRecs || [];
+  var r = recs.find(function(x){ return x.id===id; });
+  if (r) showLsnSingle(r, today);
+}
+
+function closeLsnPopup() {
+  var popup = document.getElementById("leaveStatusPopup");
+  if (popup) popup.classList.remove("open");
+}
+
+function lsnRow(k, v) {
+  return '<div class="lsn-row"><span class="lsn-k">' + k + '</span><span class="lsn-v">' + v + '</span></div>';
 }
 
 // ── Export Leave CSV ────────────────────────────────
