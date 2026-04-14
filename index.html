@@ -22,6 +22,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <!-- ✅ SECURITY: Firebase Authentication SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<!-- EmailJS for leave notification emails -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -276,6 +278,121 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 
 @media(max-width:768px){th:nth-child(n+8),td:nth-child(n+8){display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:500px){th:nth-child(n+6),td:nth-child(n+6){display:none}}
+
+/* ══ LEAVE MODULE CSS ══════════════════════════════ */
+/* Leave badges */
+.bdg-pending  {background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.bdg-approved {background:#f0fdf4;color:#15803d;border:1px solid #86efac}
+.bdg-rejected {background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
+.bdg-leave    {background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+
+/* Apply leave toggle btn */
+.apply-leave-btn{
+  width:100%;padding:13px;border-radius:14px;font-size:.95rem;font-weight:700;
+  background:linear-gradient(135deg,#0077ff,#005acc);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:16px;transition:all .25s;
+}
+.apply-leave-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,119,255,.35)}
+
+/* Leave form section */
+#leaveSection .card{border-left:4px solid var(--blue)}
+#leaveSection .field textarea{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);
+  font-size:.95rem;background:#fafaf8;color:var(--ink);resize:vertical;min-height:80px;
+  font-family:var(--body);transition:border .2s;
+}
+#leaveSection .field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,119,255,.1);background:#fff;outline:none}
+
+/* File upload */
+.file-upload-wrap{
+  position:relative;border:2px dashed var(--border);border-radius:var(--r);
+  padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:#fafaf8;
+}
+.file-upload-wrap:hover{border-color:var(--blue);background:#eff6ff}
+.file-upload-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.file-upload-wrap .fu-icon{font-size:1.5rem;margin-bottom:6px}
+.file-upload-wrap .fu-txt{font-size:.82rem;color:var(--ink3);line-height:1.5}
+.file-upload-wrap .fu-txt strong{color:var(--blue)}
+#leaveAttName{font-size:.82rem;color:var(--green);font-weight:600;margin-top:6px;min-height:18px}
+
+/* Leave submit btn */
+#leaveSubmitBtn{background:linear-gradient(135deg,#0077ff,#005acc)}
+#leaveSubmitBtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,119,255,.35)}
+
+/* Leave status banner (employee) */
+.leave-active-banner{
+  background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1.5px solid #93c5fd;
+  border-radius:var(--r2);padding:20px;margin-bottom:16px;
+}
+.leave-banner-title{font-size:1.1rem;font-weight:800;color:#1d4ed8;margin-bottom:8px}
+.leave-banner-detail{font-size:.85rem;color:#1e40af;line-height:1.8}
+
+/* Leave action buttons (admin table) */
+.leave-act-btn{
+  padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;
+  font-family:var(--body);transition:all .15s;border:none;
+}
+.leave-approve{background:#f0fdf4;color:#15803d;border:1px solid #86efac}
+.leave-approve:hover{background:#15803d;color:#fff}
+.leave-reject{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
+.leave-reject:hover{background:#b91c1c;color:#fff}
+
+/* Modals */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
+  z-index:9995;display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:var(--card);border-radius:var(--r2);box-shadow:var(--sh2);
+  padding:28px;width:100%;max-width:460px;position:relative;
+}
+.modal-title{font-size:1.1rem;font-weight:800;margin-bottom:6px}
+.modal-sub{font-size:.85rem;color:var(--ink3);margin-bottom:20px}
+.modal-close{
+  position:absolute;top:14px;right:16px;background:none;border:none;
+  font-size:1.2rem;cursor:pointer;color:var(--ink3);padding:4px;
+}
+.modal-close:hover{color:var(--ink)}
+.modal-textarea{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);
+  font-size:.9rem;font-family:var(--body);resize:vertical;min-height:90px;
+  background:#fafaf8;color:var(--ink);
+}
+.modal-textarea:focus{border-color:var(--red);outline:none}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+.modal-btn-cancel{flex:1;padding:11px;border-radius:var(--r);background:transparent;border:1.5px solid var(--border);font-weight:600;font-size:.9rem;color:var(--ink2);font-family:var(--body);cursor:pointer}
+.modal-btn-cancel:hover{border-color:var(--ink);background:var(--ink);color:#fff}
+.modal-btn-confirm{flex:2;padding:11px;border-radius:var(--r);background:var(--red);color:#fff;font-weight:700;font-size:.9rem;font-family:var(--body);cursor:pointer;border:none}
+.modal-btn-confirm:hover{background:#e02040}
+
+/* Email fallback modal */
+.ef-field{margin-bottom:12px}
+.ef-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:4px}
+.ef-value{font-size:.88rem;color:var(--ink);background:#f3f4f6;padding:10px 14px;border-radius:8px;line-height:1.6;word-break:break-word}
+.ef-body{max-height:200px;overflow-y:auto;white-space:pre-wrap}
+.mailto-btn{
+  display:inline-flex;align-items:center;gap:8px;padding:11px 20px;
+  border-radius:var(--r);background:var(--blue);color:#fff;font-weight:700;font-size:.9rem;
+  text-decoration:none;transition:all .2s;margin-right:10px;
+}
+.mailto-btn:hover{background:#005acc}
+
+/* Leave tab in attendance - on-leave row highlight */
+tr.on-leave-row td{background:#f0f9ff!important}
+
+/* Days counter badge */
+.days-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--ink);color:#fff;border-radius:8px;
+  font-family:var(--mono);font-size:.75rem;font-weight:700;
+  padding:2px 8px;min-width:32px;
+}
+
+/* Leave info card (employee — pending applications) */
+.leave-info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.83rem}
+.leave-info-row:last-child{border:none}
 </style>
 </head>
 <body>
@@ -339,6 +456,94 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
       <div class="emp-clock-date" id="empDate">Loading…</div>
     </div>
 
+    <!-- Leave active banner (shown when employee is on approved leave today) -->
+    <div id="leaveActiveBanner" style="display:none" class="leave-active-banner">
+      <div class="leave-banner-title" id="leaveBannerTitle">🌴 You are on leave today</div>
+      <div class="leave-banner-detail" id="leaveBannerDetail"></div>
+    </div>
+
+    <!-- Apply Leave Button -->
+    <button class="apply-leave-btn" id="applyLeaveBtn" onclick="showLeaveSection(true)">
+      📋 Apply for Leave
+    </button>
+
+    <!-- ── LEAVE APPLICATION FORM ──────────────────── -->
+    <div id="leaveSection" style="display:none">
+
+      <div class="card">
+        <div class="card-lbl" style="color:var(--blue)">📋 Leave Application Form</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field">
+            <label>Employee ID <span style="color:var(--red)">*</span></label>
+            <input type="text" id="leaveEmpId" placeholder="e.g. EMP001" maxlength="20"/>
+          </div>
+          <div class="field">
+            <label>Full Name <span style="color:var(--red)">*</span></label>
+            <input type="text" id="leaveEmpName" placeholder="e.g. Ahmad Bin Ali" maxlength="60"/>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email Address <span style="color:var(--red)">*</span></label>
+          <input type="email" id="leaveEmail" placeholder="your.email@company.com"/>
+        </div>
+
+        <div class="field">
+          <label>Work Site <span style="color:var(--red)">*</span></label>
+          <select id="leaveSite"></select>
+        </div>
+
+        <div class="field">
+          <label>Leave Type <span style="color:var(--red)">*</span></label>
+          <select id="leaveType"></select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">📅 Leave Period</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 90px;gap:12px;align-items:end">
+          <div class="field" style="margin-bottom:0">
+            <label>From Date <span style="color:var(--red)">*</span></label>
+            <input type="date" id="leaveFrom" onchange="calcLeaveDays()"/>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>To Date <span style="color:var(--red)">*</span></label>
+            <input type="date" id="leaveTo" onchange="calcLeaveDays()"/>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Days</label>
+            <input type="text" id="leaveNumDays" readonly placeholder="Auto" style="background:#f3f4f6;text-align:center;font-family:var(--mono);font-weight:700;color:var(--blue)"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">📎 Supporting Documents</div>
+        <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">Upload a photo or screenshot of your physical leave application form (max 2MB — JPG, PNG, or PDF).</p>
+        <div class="file-upload-wrap">
+          <div class="fu-icon">📄</div>
+          <div class="fu-txt">Tap to upload<br><strong>Leave Form / MC / Supporting Document</strong></div>
+          <input type="file" id="leaveAttachment" accept="image/*,.pdf" onchange="handleLeaveAttachment(this)"/>
+        </div>
+        <div id="leaveAttName"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">✏️ Reason / Notes (Optional)</div>
+        <div class="field" style="margin-bottom:0">
+          <textarea id="leaveReason" placeholder="Provide any additional notes or reason for your leave…"></textarea>
+        </div>
+      </div>
+
+      <button class="act-btn" id="leaveSubmitBtn" onclick="submitLeave()" style="background:linear-gradient(135deg,#0077ff,#005acc);margin-bottom:10px">
+        📩 Submit Leave Application
+      </button>
+      <button onclick="showLeaveSection(false)" style="width:100%;padding:12px;border-radius:12px;background:transparent;border:1.5px solid var(--border);font-weight:600;color:var(--ink2);font-family:var(--body);cursor:pointer;font-size:.9rem;margin-bottom:16px">
+        ✕ Cancel
+      </button>
+    </div>
+
     <!-- Active session badge -->
     <div class="sess" id="sessBadge" style="display:none">
       <div class="sess-hdr">
@@ -355,7 +560,7 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
     <div id="ciForm">
       <div class="card">
         <div class="card-lbl">Employee Details</div>
-        <div class="field"><label>Employee ID</label><input type="text" id="empId" placeholder="e.g. EMP001" oninput="chkBtn()"/></div>
+        <div class="field"><label>Employee ID</label><input type="text" id="empId" placeholder="e.g. EMP001" oninput="chkBtn()" onblur="if(this.value.trim()){checkApprovedLeaveForEmp(this.value.trim())}"/></div>
         <div class="field"><label>Full Name</label><input type="text" id="empName" placeholder="e.g. Ahmad Bin Ali" oninput="chkBtn()"/></div>
         <div class="field"><label>Work Site</label>
           <select id="empSite" onchange="chkBtn();resetGps('in')">
@@ -446,6 +651,7 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
     <div class="dash-tabs">
       <div class="dash-tab on" onclick="dTab('live',this)">Live Status</div>
       <div class="dash-tab" onclick="dTab('feed',this)">Activity Feed</div>
+      <div class="dash-tab" onclick="dTab('leave',this)" id="leaveTabBtn">🗓️ Leave Mgmt <span id="leavePendingBadge" style="display:none;background:var(--orange);color:#fff;border-radius:30px;padding:1px 7px;font-size:.7rem;margin-left:4px;font-family:var(--mono)">0</span></div>
       <div class="dash-tab" onclick="dTab('setup',this)">⚙️ Setup Guide</div>
     </div>
 
@@ -491,6 +697,67 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
       <div class="tbl-wrap" style="padding:20px">
         <div class="card-lbl" style="margin-bottom:16px">Recent Activity</div>
         <div id="feedList"><div class="empty"><div class="empty-icon">⏳</div><div class="empty-t">No activity yet</div></div></div>
+      </div>
+    </div>
+
+    <!-- LEAVE MANAGEMENT TAB -->
+    <div id="dTab-leave" style="display:none">
+
+      <!-- Leave Stats -->
+      <div class="stats-grid" style="margin-bottom:18px">
+        <div class="stat o"><div class="stat-n" id="ls-pending">0</div><div class="stat-l">⏳ Pending</div></div>
+        <div class="stat g"><div class="stat-n" id="ls-approved">0</div><div class="stat-l">✅ Approved</div></div>
+        <div class="stat r"><div class="stat-n" id="ls-rejected">0</div><div class="stat-l">✗ Rejected</div></div>
+        <div class="stat b"><div class="stat-n" id="ls-total">0</div><div class="stat-l">Total</div></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="toolbar">
+        <input type="text" id="lSearch" placeholder="Search name / ID…" oninput="renderLeaveTable()"/>
+        <select id="lStatus" onchange="renderLeaveTable()">
+          <option value="">All Status</option>
+          <option value="pending">⏳ Pending</option>
+          <option value="approved">✅ Approved</option>
+          <option value="rejected">✗ Rejected</option>
+        </select>
+        <select id="lLeaveType" onchange="renderLeaveTable()">
+          <option value="">All Leave Types</option>
+        </select>
+        <button class="tb-btn tb-pri" onclick="exportLeaveCSV()">⬇ Leave CSV</button>
+        <button class="tb-btn tb-out" onclick="exportCombinedCSV()">⬇ Full Report</button>
+      </div>
+
+      <!-- Leave Table -->
+      <div class="tbl-wrap">
+        <div class="tbl-hdr">
+          <span class="tbl-hdr-t">🗓️ Leave Applications</span>
+          <span class="tbl-count" id="leaveCount">0 applications</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr>
+              <th>Employee</th>
+              <th>Leave Type</th>
+              <th>Period</th>
+              <th>Days</th>
+              <th>Applied</th>
+              <th>Status</th>
+              <th>Attachment</th>
+              <th>Action / Decision</th>
+            </tr></thead>
+            <tbody id="leaveTblBody"></tbody>
+          </table>
+        </div>
+        <div id="leaveTblEmpty" class="empty" style="display:none">
+          <div class="empty-icon">🗓️</div>
+          <div class="empty-t">No leave applications yet</div>
+          <div>Leave applications from employees will appear here</div>
+        </div>
+      </div>
+
+      <!-- Firestore Rules Reminder -->
+      <div style="background:#fffbeb;border-radius:var(--r);padding:14px 16px;border:1px solid #fde68a;font-size:.82rem;color:#78350f;margin-top:16px">
+        <strong>⚙️ Remember:</strong> Add the <code style="background:#fef3c7;padding:1px 5px;border-radius:4px;font-family:var(--mono)">leaveApplications</code> Firestore rules from the Setup Guide → Step 10 for this feature to work.
       </div>
     </div>
 
@@ -596,17 +863,6 @@ service cloud.firestore {
       // Only signed-in admin can read or delete records
       allow read, delete: if request.auth != null;
     }
-
-    // ✅ ANTI-BUDDY-PUNCH: Device registry — permanently binds devices to employees
-    match /devices/{deviceId} {
-      // Anyone can read their own device record (to check if it's registered)
-      allow read: if true;
-      // Anyone can register a new device, but cannot overwrite an existing one
-      allow create: if request.resource.data.empId is string
-                    && request.resource.data.empId.size() &gt; 0;
-      // Once registered, device record cannot be changed (prevents tampering)
-      allow update, delete: if request.auth != null;
-    }
   }
 }</pre>
             <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This ensures only your admin can view data. Employees can only write their own records.</p>
@@ -644,6 +900,44 @@ service cloud.firestore {
           <strong>Firebase Free Tier limits</strong> (Spark plan — always free):<br>
           1 GB storage · 50,000 reads/day · 20,000 writes/day — more than enough for 100 employees.
         </div>
+
+        <div class="guide-step" style="margin-top:20px;border-left:4px solid var(--blue)">
+          <div class="gs-title">Step 10 — Add Leave Application Firestore Rules</div>
+          <div class="gs-body">
+            <p>In Firebase Console → <strong>Firestore Database</strong> → <strong>Rules</strong> tab, add the <code>leaveApplications</code> collection rules inside the existing <code>match /databases/{database}/documents</code> block:</p>
+            <pre>match /leaveApplications/{docId} {
+  // Any employee can submit a leave application
+  allow create: if request.resource.data.keys().hasAll([
+                  'empId','empName','empEmail','leaveType',
+                  'fromDate','toDate','numDays','status'])
+                && request.resource.data.empId is string
+                && request.resource.data.empId.size() > 0
+                && request.resource.data.status == 'pending';
+
+  // Employees can read leave records (to check status)
+  allow read: if true;
+
+  // Only signed-in admin can update (approve/reject) or delete
+  allow update, delete: if request.auth != null;
+}</pre>
+            <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This allows employees to submit and view leave applications. Only your admin can approve or reject them.</p>
+          </div>
+        </div>
+
+        <div class="guide-step" style="border-left:4px solid #f59e0b">
+          <div class="gs-title">Step 11 — Configure Email Notifications (Optional)</div>
+          <div class="gs-body">
+            <p>To enable automatic email notifications when leaves are approved/rejected:</p>
+            <ol>
+              <li>Sign up for free at <strong>emailjs.com</strong></li>
+              <li>Create an <strong>Email Service</strong> (connect your Gmail)</li>
+              <li>Create an <strong>Email Template</strong> with variables: <code>{{to_email}}</code>, <code>{{to_name}}</code>, <code>{{message}}</code>, <code>{{leave_type}}</code>, <code>{{status}}</code></li>
+              <li>Get your <strong>Public Key</strong>, <strong>Service ID</strong>, and <strong>Template ID</strong></li>
+              <li>In this file, find <code>var EMAILJS_KEY</code> near the top of the script and replace the placeholder values</li>
+            </ol>
+            <p style="margin-top:8px">If EmailJS is not configured, the system will show a <strong>"Send via Email Client"</strong> fallback button that opens your email app with the notification pre-filled.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -658,6 +952,62 @@ service cloud.firestore {
 
 <!-- Toast -->
 <div id="toast"></div>
+
+<!-- ══ REJECT REASON MODAL ══════════════════════════ -->
+<div id="rejectModal" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeRejectModal()">✕</button>
+    <div class="modal-title">✗ Reject Leave Application</div>
+    <div class="modal-sub">Please provide a reason — this will be included in the notification email to the employee.</div>
+    <div class="ef-field">
+      <div class="ef-label">Employee</div>
+      <div class="ef-value" id="rejectEmpInfo" style="margin-bottom:12px">—</div>
+    </div>
+    <textarea class="modal-textarea" id="rejectReasonInput" placeholder="e.g. Insufficient leave balance / Operational requirements during this period / Please reapply with supporting documents…"></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeRejectModal()">Cancel</button>
+      <button class="modal-btn-confirm" onclick="confirmReject()">✗ Confirm Rejection</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EMAIL FALLBACK MODAL ═════════════════════════ -->
+<div id="emailFallbackModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:540px">
+    <button class="modal-close" onclick="document.getElementById('emailFallbackModal').classList.remove('open')">✕</button>
+    <div class="modal-title">📧 Send Notification Email</div>
+    <div class="modal-sub">EmailJS is not configured. Use the button below to open your email client with the message pre-filled, or copy the content manually.</div>
+    <div class="ef-field">
+      <div class="ef-label">To</div>
+      <div class="ef-value" id="efTo">—</div>
+    </div>
+    <div class="ef-field">
+      <div class="ef-label">Subject</div>
+      <div class="ef-value" id="efSubject">—</div>
+    </div>
+    <div class="ef-field">
+      <div class="ef-label">Message</div>
+      <div class="ef-value ef-body" id="efBody">—</div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <a id="efMailto" href="#" class="mailto-btn">📧 Open in Email App</a>
+      <button onclick="copyEmailContent()" style="padding:11px 16px;border-radius:var(--r);background:transparent;border:1.5px solid var(--border);font-weight:600;font-family:var(--body);cursor:pointer;font-size:.88rem;color:var(--ink2)">📋 Copy Message</button>
+      <button onclick="document.getElementById('emailFallbackModal').classList.remove('open')" style="padding:11px 16px;border-radius:var(--r);background:transparent;border:1.5px solid var(--border);font-weight:600;font-family:var(--body);cursor:pointer;font-size:.88rem;color:var(--ink2)">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LEAVE ATTACHMENT VIEWER ══════════════════════ -->
+<div id="leaveAttModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:640px">
+    <button class="modal-close" onclick="document.getElementById('leaveAttModal').classList.remove('open')">✕</button>
+    <div class="modal-title" id="leaveAttModalTitle">📎 Leave Attachment</div>
+    <div style="margin-top:14px" id="leaveAttModalContent"></div>
+    <div style="margin-top:14px">
+      <button onclick="document.getElementById('leaveAttModal').classList.remove('open')" style="padding:10px 22px;border-radius:var(--r);background:var(--ink);color:#fff;border:none;font-weight:600;font-family:var(--body);cursor:pointer">Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════════
      SCRIPT  (plain script tag — no module)
@@ -688,11 +1038,11 @@ var WORK_SITES = [
   { name:"Site B - NTFGH",  lat:1.3340183111776367,  lng:103.74533785581737 },
   { name:"Site C - TTSH",   lat:1.3215956826375057,  lng:103.84600588650957 },
   { name:"Site D - WH",     lat:1.4255730640948574, lng:103.79358640285662 },
-  { name:"Site E - SEM",    lat:1.44826669629572,   lng:103.82301872883652 },
-  { name:"Site F - Tengah Poly",   lat:1.3606737598088592, lng:103.73895821534613 },
-  { name:"Site G - Buona Vista",       lat:1.3071,  lng:103.7903 },
-  { name:"Site H - Ang Mo Kio",        lat:1.3691,  lng:103.8454 },
-  { name:"Site I - Queenstown",        lat:1.2942,  lng:103.8060 },
+  { name:"Site E - NSC",    lat:1.3221829783973038, lng:103.84933935706384 },
+  { name:"Site F - Bizit Office",   lat:1.3529846010135893, lng:103.84316689510088 },
+  { name:"Site G - Bishan MRT",       lat:1.351292939593891, lng:103.84870003652243 },
+  { name:"Site H - Orchard Central",        lat:1.3010213243802298, lng:103.83972359419455 },
+  { name:"Site I - Ronald Home",        lat:1.4247928457305246, lng:103.83180977959292 },
   { name:"Site J - Evan Home",        lat:1.3069090997407309, lng:103.79446133317231 }
 ];
 
@@ -889,6 +1239,9 @@ function initEmp() {
   sel.innerHTML = '<option value="">— Select your work site —</option>';
   WORK_SITES.forEach(function(s,i){ var o=document.createElement("option"); o.value=i; o.textContent=s.name; sel.appendChild(o); });
 
+  // Reset leave banner
+  var lb = document.getElementById("leaveActiveBanner"); if(lb) lb.style.display="none";
+
   // Reset selfie state
   selfieData = null;
   if (selfieStream) { selfieStream.getTracks().forEach(function(t){ t.stop(); }); selfieStream = null; }
@@ -917,11 +1270,16 @@ function initEmp() {
     document.getElementById("sb-site").textContent = sess.site;
     document.getElementById("sb-cin").textContent  = sess.checkinTime;
     updateDur();
+    // Also check if checked-in employee has leave (just for info)
+    checkApprovedLeaveForEmp(sess.empId);
   } else {
     document.getElementById("ciForm").style.display    = "block";
     document.getElementById("coSection").style.display = "none";
     document.getElementById("sessBadge").style.display = "none";
     document.getElementById("resultCard").style.display= "none";
+    // Show leave section hidden
+    var ls = document.getElementById("leaveSection"); if(ls) ls.style.display="none";
+    var ab = document.getElementById("applyLeaveBtn"); if(ab) ab.style.display="flex";
   }
 }
 
@@ -1030,113 +1388,30 @@ function showSelfie(recordId) {
 }
 
 // ── Device fingerprint (anti-buddy-punch) ──────────
-// Generates a stable fingerprint from hardware/browser signals
-// Survives localStorage clears — based on device characteristics
-function getDeviceFingerprint() {
-  var nav = navigator;
-  var parts = [
-    nav.userAgent,
-    nav.language,
-    nav.hardwareConcurrency || "",
-    nav.deviceMemory || "",
-    screen.width + "x" + screen.height,
-    screen.colorDepth,
-    new Date().getTimezoneOffset(),
-    nav.platform || ""
-  ];
-
-  // Canvas fingerprint — unique per GPU/driver combination
-  try {
-    var c = document.createElement("canvas");
-    var ctx = c.getContext("2d");
-    ctx.textBaseline = "top";
-    ctx.font = "14px Arial";
-    ctx.fillStyle = "#f00";
-    ctx.fillText("AttendTrack🔒", 2, 2);
-    parts.push(c.toDataURL().slice(-40));
-  } catch(e) {}
-
-  // Hash the combined string into a short ID
-  var str = parts.join("|");
-  var hash = 0;
-  for (var i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  var fp = "fp_" + Math.abs(hash).toString(36);
-
-  // Also store in localStorage as fallback, but fp is primary
-  localStorage.setItem("_at_device", fp);
-  return fp;
-}
-
-var _deviceId = null;
 function getDeviceId() {
-  if (!_deviceId) _deviceId = getDeviceFingerprint();
-  return _deviceId;
-}
-
-// Check Firestore if this device is already registered to a different employee
-function checkDeviceRegistration(empId, callback) {
-  if (!fbOk || !db) {
-    // No Firebase — fall back to localStorage-only check
-    var localBound = localStorage.getItem("_at_bound_emp");
-    if (localBound && localBound !== empId) {
-      callback({ blocked: true, boundTo: localBound, source: "local" });
-    } else {
-      callback({ blocked: false });
-    }
-    return;
+  var id = localStorage.getItem("_at_device");
+  if (!id) {
+    id = "dev_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem("_at_device", id);
   }
-
-  var devId = getDeviceId();
-  db.collection("devices").doc(devId).get()
-    .then(function(doc) {
-      if (doc.exists) {
-        var data = doc.data();
-        if (data.empId && data.empId !== empId) {
-          // This device is permanently registered to a different employee
-          callback({ blocked: true, boundTo: data.empId, boundName: data.empName, source: "firestore" });
-        } else {
-          callback({ blocked: false });
-        }
-      } else {
-        callback({ blocked: false }); // New device, not registered yet
-      }
-    })
-    .catch(function(err) {
-      console.warn("Device check failed:", err);
-      callback({ blocked: false }); // Fail open — don't block on network error
-    });
+  return id;
 }
 
-// Permanently register this device to an employee in Firestore
-function registerDevice(empId, empName) {
-  var devId = getDeviceId();
-  localStorage.setItem("_at_bound_emp", empId);
-  if (!fbOk || !db) return;
-  db.collection("devices").doc(devId).set({
-    empId: empId,
-    empName: empName,
-    deviceId: devId,
-    userAgent: navigator.userAgent.slice(0, 150),
-    registeredAt: Date.now(),
-    registeredDate: new Date().toISOString()
-  }).catch(function(e){ console.warn("Device register failed:", e); });
-}
-
-// Check if this device already checked in someone today (local fast-check)
-function deviceAlreadyCheckedInToday(empId) {
+// Check if this device already checked in someone today
+function deviceAlreadyCheckedIn(empId) {
   var today = new Date().toLocaleDateString("en-SG");
   var key = "_at_ci_" + today;
   var existing = localStorage.getItem(key);
-  if (existing && existing !== empId) return existing;
+  if (existing && existing !== empId) {
+    return existing; // returns the empId that already used this device
+  }
   return null;
 }
 
 function recordDeviceCheckin(empId) {
   var today = new Date().toLocaleDateString("en-SG");
-  localStorage.setItem("_at_ci_" + today, empId);
+  var key = "_at_ci_" + today;
+  localStorage.setItem(key, empId);
 }
 
 // ── Check-in ───────────────────────────────────────
@@ -1154,80 +1429,66 @@ function doCheckin() {
   // ✅ ANTI-BUDDY-PUNCH: Require selfie photo
   if (!selfieData) { toast("📷 Please take a selfie first", "t-err"); return; }
 
-  // ✅ ANTI-BUDDY-PUNCH: Quick local check first (fast)
-  var todayConflict = deviceAlreadyCheckedInToday(empId);
-  if (todayConflict) {
-    toast("⛔ This device already checked in " + todayConflict + " today", "t-err");
+  // ✅ ANTI-BUDDY-PUNCH: Block if this device already checked in a different person today
+  var alreadyCheckedIn = deviceAlreadyCheckedIn(empId);
+  if (alreadyCheckedIn) {
+    toast("⛔ This device already checked in " + alreadyCheckedIn + " today", "t-err");
+    document.getElementById("ciBtn").disabled = true;
     setTimeout(function(){
-      alert("⛔ Buddy Punching Detected!\n\nThis device was already used to check in: " + todayConflict + "\n\nEach employee must use their own phone.");
+      alert("⛔ Buddy Punching Detected!\n\nThis device was already used to check in employee: " + alreadyCheckedIn + "\n\nEach employee must check in from their own phone.");
     }, 300);
     return;
   }
-
-  // ✅ ANTI-BUDDY-PUNCH: Firestore device registration check (permanent, can't be cleared)
-  var btn = document.getElementById("ciBtn");
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span> Verifying device…';
 
   var site    = WORK_SITES[parseInt(siteIdx)];
   var gps     = GPS.in;
   var now     = new Date();
   var isLate  = now.getHours() >= WORK_HOUR_LATE + 1;
 
-  checkDeviceRegistration(empId, function(result) {
-    if (result.blocked) {
-      btn.disabled = false;
-      btn.innerHTML = "✅ Check In";
-      toast("⛔ Device registered to another employee", "t-err");
-      setTimeout(function(){
-        alert("⛔ Device Already Registered!\n\nThis phone/browser is permanently linked to:\n• Employee: " + (result.boundName || result.boundTo) + "\n\nIt cannot be used to check in a different employee.\nEach person must use their own device.");
-      }, 300);
-      return;
-    }
+  var rec = {
+    empId:empId, empName:empName, site:site.name,
+    checkinTime:now.toLocaleTimeString("en-SG"),
+    checkinDate:now.toLocaleDateString("en-SG"),
+    checkinISO:now.toISOString(),
+    checkinTimestamp:now.getTime(),
+    checkinLat:gps.lat, checkinLng:gps.lng, checkinDist:gps.dist, checkinAcc:gps.accuracy,
+    checkoutTime:null, checkoutTimestamp:null,
+    checkoutLat:null, checkoutLng:null, checkoutDist:null,
+    status:"in", isLate:isLate, isOvertime:false, duration:null,
+    // ✅ ANTI-BUDDY-PUNCH: Store selfie photo and device ID
+    selfiePhoto: selfieData,
+    deviceId: getDeviceId(),
+    // ✅ SECURITY: Track submission source for audit purposes
+    _source: "web", _userAgent: navigator.userAgent.slice(0, 100)
+  };
 
-    // ✅ Device is clear — build record and save
-    var rec = {
-      empId:empId, empName:empName, site:site.name,
-      checkinTime:now.toLocaleTimeString("en-SG"),
-      checkinDate:now.toLocaleDateString("en-SG"),
-      checkinISO:now.toISOString(),
-      checkinTimestamp:now.getTime(),
-      checkinLat:gps.lat, checkinLng:gps.lng, checkinDist:gps.dist, checkinAcc:gps.accuracy,
-      checkoutTime:null, checkoutTimestamp:null,
-      checkoutLat:null, checkoutLng:null, checkoutDist:null,
-      status:"in", isLate:isLate, isOvertime:false, duration:null,
-      selfiePhoto: selfieData,
-      deviceId: getDeviceId(),
-      _source: "web", _userAgent: navigator.userAgent.slice(0, 100)
-    };
+  var btn = document.getElementById("ciBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Saving…';
 
-    btn.innerHTML = '<span class="spin"></span> Saving…';
+  function onSaved(docId) {
+    recordDeviceCheckin(empId); // ✅ ANTI-BUDDY-PUNCH: mark this device as used today
+    setSess(rec); setSessDocId(docId);
+    btn.innerHTML = "✅ Check In";
+    showResult("ci", rec, isLate, false);
+    toast("✅ Checked in successfully!", "t-ok");
+    setTimeout(function(){
+      document.getElementById("ciForm").style.display    = "none";
+      document.getElementById("coSection").style.display = "block";
+      document.getElementById("sessBadge").style.display = "block";
+      document.getElementById("sb-emp").textContent  = rec.empName+" ("+rec.empId+")";
+      document.getElementById("sb-site").textContent = rec.site;
+      document.getElementById("sb-cin").textContent  = rec.checkinTime;
+    }, 1600);
+  }
 
-    function onSaved(docId) {
-      recordDeviceCheckin(empId);
-      registerDevice(empId, empName); // ✅ ANTI-BUDDY-PUNCH: bind device to this employee in Firestore
-      setSess(rec); setSessDocId(docId);
-      btn.innerHTML = "✅ Check In";
-      showResult("ci", rec, isLate, false);
-      toast("✅ Checked in successfully!", "t-ok");
-      setTimeout(function(){
-        document.getElementById("ciForm").style.display    = "none";
-        document.getElementById("coSection").style.display = "block";
-        document.getElementById("sessBadge").style.display = "block";
-        document.getElementById("sb-emp").textContent  = rec.empName+" ("+rec.empId+")";
-        document.getElementById("sb-site").textContent = rec.site;
-        document.getElementById("sb-cin").textContent  = rec.checkinTime;
-      }, 1600);
-    }
-
-    if (fbOk && db) {
-      db.collection("attendance").add(rec)
-        .then(function(ref){ onSaved(ref.id); })
-        .catch(function(e){ console.warn(e); saveLocal(rec); onSaved(null); });
-    } else {
-      saveLocal(rec); onSaved(null);
-    }
-  });
+  if (fbOk && db) {
+    db.collection("attendance").add(rec)
+      .then(function(ref){ onSaved(ref.id); })
+      .catch(function(e){ console.warn(e); saveLocal(rec); onSaved(null); });
+  } else {
+    saveLocal(rec); onSaved(null);
+  }
 }
 
 // ── Check-out ──────────────────────────────────────
@@ -1378,9 +1639,21 @@ function initDash() {
         allRecs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
         renderAll();
       });
+    // Pre-load leave pending count for badge
+    db.collection("leaveApplications").where("status","==","pending")
+      .onSnapshot(function(snap){
+        var count = snap.size;
+        var badge = document.getElementById("leavePendingBadge");
+        if (badge) { badge.textContent = count; badge.style.display = count > 0 ? "inline" : "none"; }
+      });
   } else {
     allRecs = localRecs.slice().reverse();
     renderAll();
+    // load local leaves for badge
+    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+    var pc = ll.filter(function(r){ return r.status==="pending"; }).length;
+    var badge = document.getElementById("leavePendingBadge");
+    if (badge) { badge.textContent = pc; badge.style.display = pc > 0 ? "inline" : "none"; }
   }
 }
 
@@ -1471,11 +1744,12 @@ function refreshDash() {
 
 // ── Dashboard tabs ─────────────────────────────────
 function dTab(id, el) {
-  ["live","feed","setup"].forEach(function(t){
+  ["live","feed","leave","setup"].forEach(function(t){
     var p = document.getElementById("dTab-"+t); if(p) p.style.display = t===id?"block":"none";
   });
   document.querySelectorAll(".dash-tab").forEach(function(e){ e.classList.remove("on"); });
   if (el) el.classList.add("on");
+  if (id === "leave") loadLeaves();
 }
 
 // ── CSV export ─────────────────────────────────────
@@ -1500,7 +1774,634 @@ function toast(msg, cls) {
 }
 
 // ── Init ───────────────────────────────────────────
+// ╔══════════════════════════════════════════════════════╗
+// ║  LEAVE MODULE                                        ║
+// ╚══════════════════════════════════════════════════════╝
+
+// ── Leave Configuration (edit these) ───────────────
+var EMAILJS_KEY = "YOUR_EMAILJS_PUBLIC_KEY";     // from emailjs.com → Account → Public Key
+var EMAILJS_SVC = "YOUR_EMAILJS_SERVICE_ID";     // EmailJS Service ID
+var EMAILJS_TPL = "YOUR_EMAILJS_TEMPLATE_ID";    // EmailJS Template ID
+var emailjsReady = false;
+
+var LEAVE_TYPES = [
+  "Annual Leave","Sick Leave","Unpaid Leave",
+  "Medical Leave","Compassionate Leave",
+  "Maternity/Paternity Leave","Emergency Leave","Others"
+];
+
+// ── Leave State ─────────────────────────────────────
+var leaveRecs = [];
+var fbLeaveUnsub = null;
+var leaveAttachment = null; // { name, type, base64 }
+var rejectTargetId = null;
+
+// ── Init EmailJS ────────────────────────────────────
+function initEmailJS() {
+  if (typeof emailjs !== "undefined" && EMAILJS_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
+    emailjs.init({ publicKey: EMAILJS_KEY });
+    emailjsReady = true;
+  }
+}
+
+// ── Employee: Show/Hide Leave Section ───────────────
+function showLeaveSection(show) {
+  var ls = document.getElementById("leaveSection");
+  var cf = document.getElementById("ciForm");
+  var ab = document.getElementById("applyLeaveBtn");
+  var cs = document.getElementById("coSection");
+  if (ls) ls.style.display = show ? "block" : "none";
+  if (ab) ab.style.display = show ? "none" : "flex";
+  if (!show && cf) {
+    // Only show ciForm if not checked in
+    var sess = getSess();
+    var isCheckedIn = sess && sess.checkinTimestamp && !sess.checkoutTimestamp;
+    cf.style.display = isCheckedIn ? "none" : "block";
+    if (cs) cs.style.display = isCheckedIn ? "block" : "none";
+  } else if (show && cf) {
+    cf.style.display = "none";
+    if (cs) cs.style.display = "none";
+  }
+  if (show) initLeaveForm();
+  // reset result card
+  var rc = document.getElementById("resultCard"); if(rc) rc.style.display = "none";
+}
+
+// ── Init Leave Form ─────────────────────────────────
+function initLeaveForm() {
+  // Populate site dropdown
+  var sel = document.getElementById("leaveSite");
+  if (sel) {
+    sel.innerHTML = '<option value="">— Select your work site —</option>';
+    WORK_SITES.forEach(function(s){ var o=document.createElement("option"); o.value=s.name; o.textContent=s.name; sel.appendChild(o); });
+  }
+  // Populate leave type dropdown
+  var lt = document.getElementById("leaveType");
+  if (lt) {
+    lt.innerHTML = '<option value="">— Select leave type —</option>';
+    LEAVE_TYPES.forEach(function(t){ var o=document.createElement("option"); o.value=t; o.textContent=t; lt.appendChild(o); });
+  }
+  // Set today as default min date
+  var today = new Date().toISOString().split("T")[0];
+  var lf = document.getElementById("leaveFrom"); if(lf) lf.min = today;
+  var lt2 = document.getElementById("leaveTo");  if(lt2) lt2.min = today;
+  // Clear state
+  leaveAttachment = null;
+  var an = document.getElementById("leaveAttName"); if(an) an.textContent = "";
+  var nd = document.getElementById("leaveNumDays"); if(nd) nd.value = "";
+  var att = document.getElementById("leaveAttachment"); if(att) att.value = "";
+  var ra = document.getElementById("leaveReason"); if(ra) ra.value = "";
+  var lf2 = document.getElementById("leaveFrom"); if(lf2) lf2.value = "";
+  var lt3 = document.getElementById("leaveTo"); if(lt3) lt3.value = "";
+  // Pre-fill from session
+  var sess = getSess();
+  var ei = document.getElementById("leaveEmpId"), en = document.getElementById("leaveEmpName");
+  if (sess && sess.empId && ei && !ei.value) ei.value = sess.empId;
+  if (sess && sess.empName && en && !en.value) en.value = sess.empName;
+}
+
+// ── Calculate Leave Days ────────────────────────────
+function calcLeaveDays() {
+  var f = (document.getElementById("leaveFrom")||{}).value;
+  var t = (document.getElementById("leaveTo")||{}).value;
+  var nd = document.getElementById("leaveNumDays");
+  if (!nd) return;
+  if (!f || !t) { nd.value = ""; return; }
+  var from = new Date(f), to = new Date(t);
+  if (to < from) { nd.value = "❌"; nd.style.color = "var(--red)"; return; }
+  var diff = Math.round((to - from) / (1000*60*60*24)) + 1;
+  nd.value = diff + " day" + (diff !== 1 ? "s" : "");
+  nd.style.color = "var(--blue)";
+}
+
+// ── Handle Attachment Upload ────────────────────────
+function handleLeaveAttachment(input) {
+  var file = input.files[0]; if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    toast("File too large — max 2MB", "t-err"); input.value = ""; return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    leaveAttachment = { name: file.name, type: file.type, base64: e.target.result };
+    var an = document.getElementById("leaveAttName");
+    if (an) an.innerHTML = '✅ <strong>' + file.name + '</strong> ready';
+    toast("📎 Attachment ready", "t-ok");
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Submit Leave Application ────────────────────────
+function submitLeave() {
+  var empId    = sanitize((document.getElementById("leaveEmpId")||{}).value||"", 20);
+  var empName  = sanitize((document.getElementById("leaveEmpName")||{}).value||"", 60);
+  var empEmail = ((document.getElementById("leaveEmail")||{}).value||"").trim();
+  var site     = (document.getElementById("leaveSite")||{}).value||"";
+  var leaveType= (document.getElementById("leaveType")||{}).value||"";
+  var fromDate = (document.getElementById("leaveFrom")||{}).value||"";
+  var toDate   = (document.getElementById("leaveTo")||{}).value||"";
+  var reason   = sanitize((document.getElementById("leaveReason")||{}).value||"", 500);
+
+  if (!empId || !empName) { toast("Please enter your Employee ID and Name", "t-err"); return; }
+  if (!empEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(empEmail)) { toast("Please enter a valid email address", "t-err"); return; }
+  if (!site) { toast("Please select your work site", "t-err"); return; }
+  if (!leaveType) { toast("Please select a leave type", "t-err"); return; }
+  if (!fromDate || !toDate) { toast("Please select leave dates", "t-err"); return; }
+  if (toDate < fromDate) { toast("End date must be on or after start date", "t-err"); return; }
+
+  var numDays = Math.round((new Date(toDate) - new Date(fromDate)) / (1000*60*60*24)) + 1;
+  var now = new Date();
+
+  var leaveRec = {
+    empId: empId, empName: empName, empEmail: empEmail, site: site,
+    leaveType: leaveType, fromDate: fromDate, toDate: toDate, numDays: numDays,
+    reason: reason,
+    attachmentName: leaveAttachment ? leaveAttachment.name : null,
+    attachmentBase64: leaveAttachment ? leaveAttachment.base64 : null,
+    status: "pending",
+    appliedAt: now.getTime(),
+    appliedDate: now.toLocaleDateString("en-SG"),
+    appliedISO: now.toISOString(),
+    decidedAt: null, decidedDate: null, decidedBy: null, rejectReason: null
+  };
+
+  var btn = document.getElementById("leaveSubmitBtn");
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Submitting…'; }
+
+  function onSaved() {
+    if (btn) { btn.disabled = false; btn.innerHTML = "📩 Submit Leave Application"; }
+    toast("✅ Leave application submitted!", "t-ok");
+    showLeaveSection(false);
+    var rc = document.getElementById("resultCard");
+    if (rc) {
+      rc.style.display = "block";
+      document.getElementById("resultTitle").textContent = "📋 Leave Application Submitted";
+      document.getElementById("resultBody").innerHTML =
+        row("Employee",  empName + " · " + empId) +
+        row("Leave Type", leaveType) +
+        row("From Date",  fromDate) +
+        row("To Date",    toDate) +
+        row("Total Days", numDays + " day" + (numDays!==1?"s":"")) +
+        row("Submitted",  now.toLocaleString("en-SG")) +
+        '<div class="pill pill-info" style="margin-top:10px">⏳ Pending review — you will be notified by email once admin approves or rejects.</div>';
+    }
+  }
+
+  if (fbOk && db) {
+    db.collection("leaveApplications").add(leaveRec)
+      .then(function() { onSaved(); })
+      .catch(function(e) {
+        console.warn("Leave submit error:", e);
+        toast("Error submitting. Check connection and try again.", "t-err");
+        if (btn) { btn.disabled = false; btn.innerHTML = "📩 Submit Leave Application"; }
+      });
+  } else {
+    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+    leaveRec.id = "local_" + Date.now();
+    ll.push(leaveRec);
+    localStorage.setItem("at_leaves", JSON.stringify(ll));
+    onSaved();
+  }
+}
+
+// ── Admin: Load Leave Applications ──────────────────
+function loadLeaves() {
+  // Populate leave type filter
+  var llt = document.getElementById("lLeaveType");
+  if (llt && llt.options.length <= 1) {
+    llt.innerHTML = '<option value="">All Leave Types</option>';
+    LEAVE_TYPES.forEach(function(t){ var o=document.createElement("option"); o.value=t; o.textContent=t; llt.appendChild(o); });
+  }
+
+  if (fbOk && db) {
+    if (fbLeaveUnsub) fbLeaveUnsub();
+    fbLeaveUnsub = db.collection("leaveApplications").orderBy("appliedAt","desc")
+      .onSnapshot(function(snap){
+        leaveRecs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+        renderLeaveTable(); updateLeaveStats();
+      });
+  } else {
+    leaveRecs = JSON.parse(localStorage.getItem("at_leaves")||"[]").reverse();
+    renderLeaveTable(); updateLeaveStats();
+  }
+}
+
+// ── Leave Table Filter ──────────────────────────────
+function filteredLeaves() {
+  var q  = ((document.getElementById("lSearch")||{}).value||"").toLowerCase();
+  var s  = (document.getElementById("lStatus")||{}).value||"";
+  var lt = (document.getElementById("lLeaveType")||{}).value||"";
+  return leaveRecs.filter(function(r){
+    if (q && !((r.empId||"").toLowerCase().includes(q)||(r.empName||"").toLowerCase().includes(q))) return false;
+    if (s && r.status !== s) return false;
+    if (lt && r.leaveType !== lt) return false;
+    return true;
+  });
+}
+
+// ── Render Leave Table ──────────────────────────────
+function renderLeaveTable() {
+  var rows  = filteredLeaves();
+  var body  = document.getElementById("leaveTblBody");
+  var empty = document.getElementById("leaveTblEmpty");
+  var cnt   = document.getElementById("leaveCount");
+  if (!body) return;
+  if (cnt) cnt.textContent = rows.length + " application" + (rows.length!==1?"s":"");
+  if (!rows.length) { body.innerHTML=""; if(empty) empty.style.display="block"; return; }
+  if (empty) empty.style.display="none";
+
+  body.innerHTML = rows.map(function(r){
+    var statusBdg = r.status==="pending"
+      ? '<span class="bdg bdg-pending">⏳ Pending</span>'
+      : r.status==="approved"
+      ? '<span class="bdg bdg-approved">✅ Approved</span>'
+      : '<span class="bdg bdg-rejected">✗ Rejected</span>';
+
+    var ltColor = {
+      "Annual Leave":"#15803d;border:1px solid #86efac;background:#f0fdf4",
+      "Sick Leave":"#c2410c;border:1px solid #fed7aa;background:#fff7ed",
+      "Unpaid Leave":"#7e22ce;border:1px solid #e9d5ff;background:#fdf4ff",
+      "Medical Leave":"#0369a1;border:1px solid #bae6fd;background:#f0f9ff",
+      "Compassionate Leave":"#b45309;border:1px solid #fde68a;background:#fffbeb",
+      "Emergency Leave":"#b91c1c;border:1px solid #fca5a5;background:#fef2f2"
+    }[r.leaveType]||"#374151;border:1px solid #d1d5db;background:#f9fafb";
+    var leaveBdg = '<span class="bdg" style="color:'+ltColor+'">'+(r.leaveType||"—")+'</span>';
+
+    var actions = "";
+    if (r.status==="pending") {
+      actions = '<div style="display:flex;gap:6px;flex-wrap:wrap">'
+        +'<button class="leave-act-btn leave-approve" onclick="approveLeave(\''+r.id+'\')">✓ Approve</button>'
+        +'<button class="leave-act-btn leave-reject" onclick="promptReject(\''+r.id+'\')">✗ Reject</button>'
+        +'</div>';
+    } else {
+      var decInfo = '<span style="font-size:.73rem;color:var(--ink3);line-height:1.6">Decided by:<br><strong>'+(r.decidedBy||"—")+'</strong><br>'+(r.decidedDate||"—")+'</span>';
+      if (r.status==="rejected" && r.rejectReason) {
+        decInfo += '<br><span style="font-size:.73rem;color:var(--red)">Reason: '+r.rejectReason+'</span>';
+      }
+      actions = decInfo;
+    }
+
+    var attBtn = r.attachmentBase64
+      ? '<button onclick="viewLeaveAtt(\''+r.id+'\')" style="background:none;border:1px solid var(--blue);border-radius:6px;padding:4px 10px;font-size:.72rem;cursor:pointer;color:var(--blue);font-weight:600;font-family:var(--body)">📎 View</button>'
+      : '<span style="color:var(--ink3);font-size:.75rem">None</span>';
+
+    var ini = (r.empName||"?").split(" ").map(function(w){return w[0]||"";}).slice(0,2).join("").toUpperCase();
+
+    return '<tr>'
+      +'<td><div class="ec"><div class="av">'+ini+'</div><div>'
+      +'<div class="en">'+(r.empName||"—")+'</div>'
+      +'<div class="eid">'+(r.empId||"—")+'</div>'
+      +'<div style="font-size:.72rem;color:var(--ink3)">'+(r.empEmail||"—")+'</div>'
+      +'</div></div></td>'
+      +'<td>'+leaveBdg+'</td>'
+      +'<td style="font-size:.8rem"><span style="font-family:var(--mono);background:#f3f4f6;padding:2px 6px;border-radius:4px">'+(r.fromDate||"—")+'</span><br>'
+      +'<span style="color:var(--ink3);font-size:.72rem;padding:2px 0 2px 4px">→ '+(r.toDate||"—")+'</span></td>'
+      +'<td><span class="days-badge">'+(r.numDays||"—")+'</span></td>'
+      +'<td style="font-size:.78rem;color:var(--ink3)">'+(r.appliedDate||"—")+'<br><span style="font-size:.7rem">'+(r.site||"—")+'</span></td>'
+      +'<td>'+statusBdg+'</td>'
+      +'<td>'+attBtn+'</td>'
+      +'<td style="min-width:160px">'+actions+'</td>'
+      +'</tr>';
+  }).join("");
+}
+
+// ── Update Leave Stats ──────────────────────────────
+function updateLeaveStats() {
+  var pending  = leaveRecs.filter(function(r){return r.status==="pending";}).length;
+  var approved = leaveRecs.filter(function(r){return r.status==="approved";}).length;
+  var rejected = leaveRecs.filter(function(r){return r.status==="rejected";}).length;
+  var el;
+  el=document.getElementById("ls-pending");  if(el) el.textContent=pending;
+  el=document.getElementById("ls-approved"); if(el) el.textContent=approved;
+  el=document.getElementById("ls-rejected"); if(el) el.textContent=rejected;
+  el=document.getElementById("ls-total");    if(el) el.textContent=leaveRecs.length;
+  var badge = document.getElementById("leavePendingBadge");
+  if (badge) { badge.textContent=pending; badge.style.display=pending>0?"inline":"none"; }
+}
+
+// ── Admin: Approve Leave ────────────────────────────
+function approveLeave(id) {
+  var rec = leaveRecs.find(function(r){return r.id===id;});
+  if (!rec) return;
+  if (!confirm("✅ Approve leave for "+rec.empName+"?\n"+rec.leaveType+"\n"+rec.fromDate+" → "+rec.toDate+" ("+rec.numDays+" day"+(rec.numDays!==1?"s":"") +")")) return;
+
+  var user = (fbOk && firebase.auth().currentUser) ? firebase.auth().currentUser : null;
+  var adminEmail = user ? user.email : "Admin";
+  var now = new Date();
+  var updates = {
+    status: "approved",
+    decidedAt: now.getTime(),
+    decidedDate: now.toLocaleDateString("en-SG"),
+    decidedBy: adminEmail
+  };
+
+  function onDone() {
+    toast("✅ Leave approved — notifying employee…", "t-ok");
+    sendLeaveEmail(Object.assign({}, rec, updates), "approved", null);
+  }
+
+  if (fbOk && db) {
+    db.collection("leaveApplications").doc(id).update(updates)
+      .then(onDone)
+      .catch(function(e){ console.warn(e); toast("Error updating record", "t-err"); });
+  } else {
+    var idx = leaveRecs.findIndex(function(r){return r.id===id;});
+    if (idx>-1) Object.assign(leaveRecs[idx], updates);
+    renderLeaveTable(); updateLeaveStats();
+    onDone();
+  }
+}
+
+// ── Admin: Prompt Reject ────────────────────────────
+function promptReject(id) {
+  var rec = leaveRecs.find(function(r){return r.id===id;});
+  if (!rec) return;
+  rejectTargetId = id;
+  var info = document.getElementById("rejectEmpInfo");
+  if (info) info.textContent = rec.empName + " (" + rec.empId + ") — " + rec.leaveType + " · " + rec.fromDate + " → " + rec.toDate;
+  var modal = document.getElementById("rejectModal");
+  if (modal) { modal.classList.add("open"); }
+  var inp = document.getElementById("rejectReasonInput");
+  if (inp) { inp.value = ""; setTimeout(function(){ inp.focus(); }, 200); }
+}
+
+function closeRejectModal() {
+  var modal = document.getElementById("rejectModal");
+  if (modal) modal.classList.remove("open");
+  rejectTargetId = null;
+}
+
+// ── Admin: Confirm Rejection ────────────────────────
+function confirmReject() {
+  var reason = ((document.getElementById("rejectReasonInput")||{}).value||"").trim();
+  if (!reason) { toast("Please enter a rejection reason", "t-err"); return; }
+  var id = rejectTargetId;
+  var rec = leaveRecs.find(function(r){return r.id===id;});
+  if (!rec) return;
+
+  var user = (fbOk && firebase.auth().currentUser) ? firebase.auth().currentUser : null;
+  var adminEmail = user ? user.email : "Admin";
+  var now = new Date();
+  var updates = {
+    status: "rejected",
+    decidedAt: now.getTime(),
+    decidedDate: now.toLocaleDateString("en-SG"),
+    decidedBy: adminEmail,
+    rejectReason: reason
+  };
+
+  closeRejectModal();
+
+  function onDone() {
+    toast("Leave application rejected — notifying employee…", "t-ok");
+    sendLeaveEmail(Object.assign({}, rec, updates), "rejected", reason);
+  }
+
+  if (fbOk && db) {
+    db.collection("leaveApplications").doc(id).update(updates)
+      .then(onDone)
+      .catch(function(e){ console.warn(e); toast("Error updating record", "t-err"); });
+  } else {
+    var idx = leaveRecs.findIndex(function(r){return r.id===id;});
+    if (idx>-1) Object.assign(leaveRecs[idx], updates);
+    renderLeaveTable(); updateLeaveStats();
+    onDone();
+  }
+}
+
+// ── Send Leave Notification Email ───────────────────
+function sendLeaveEmail(rec, status, rejectReason) {
+  var isApproved = status === "approved";
+  var subject = isApproved
+    ? "✅ Leave Application Approved — " + rec.leaveType + " (" + rec.fromDate + " to " + rec.toDate + ")"
+    : "❌ Leave Application Not Approved — " + rec.leaveType + " (" + rec.fromDate + " to " + rec.toDate + ")";
+
+  var body = "Dear " + rec.empName + ",\n\n";
+  if (isApproved) {
+    body += "We are pleased to inform you that your leave application has been APPROVED.\n\n";
+    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    body += "LEAVE APPROVAL DETAILS\n";
+    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    body += "Employee ID   : " + rec.empId + "\n";
+    body += "Leave Type    : " + rec.leaveType + "\n";
+    body += "From Date     : " + rec.fromDate + "\n";
+    body += "To Date       : " + rec.toDate + "\n";
+    body += "Total Days    : " + rec.numDays + " day" + (rec.numDays!==1?"s":"") + "\n";
+    body += "Approved By   : " + rec.decidedBy + "\n";
+    body += "Approval Date : " + rec.decidedDate + "\n";
+    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    body += "📌 IMPORTANT: You do NOT need to check in to the attendance system during your approved leave period. Your attendance will be automatically recorded as \"" + rec.leaveType + "\" for the approved dates.\n\n";
+    body += "Please ensure you inform your supervisor and handover any pending tasks before your leave begins.\n\n";
+  } else {
+    body += "We regret to inform you that your leave application has NOT been approved.\n\n";
+    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    body += "APPLICATION DETAILS\n";
+    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    body += "Employee ID   : " + rec.empId + "\n";
+    body += "Leave Type    : " + rec.leaveType + "\n";
+    body += "From Date     : " + rec.fromDate + "\n";
+    body += "To Date       : " + rec.toDate + "\n";
+    body += "Total Days    : " + rec.numDays + " day" + (rec.numDays!==1?"s":"") + "\n";
+    body += "Rejected By   : " + rec.decidedBy + "\n";
+    body += "Decision Date : " + rec.decidedDate + "\n";
+    body += "Reason        : " + (rejectReason||"—") + "\n";
+    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    body += "If you have any questions, please speak with your manager or HR.\n\n";
+  }
+  body += "This is an automated notification from the AttendTrack system.\n\nBest regards,\nAttendTrack System";
+
+  if (emailjsReady) {
+    emailjs.send(EMAILJS_SVC, EMAILJS_TPL, {
+      to_email: rec.empEmail,
+      to_name: rec.empName,
+      subject: subject,
+      message: body,
+      leave_type: rec.leaveType,
+      status: isApproved ? "APPROVED ✅" : "REJECTED ❌",
+      from_date: rec.fromDate,
+      to_date: rec.toDate,
+      num_days: rec.numDays,
+      decided_by: rec.decidedBy,
+      reject_reason: rejectReason||"N/A"
+    }).then(function(){
+      toast("📧 Notification email sent to " + rec.empEmail, "t-ok");
+    }).catch(function(e){
+      console.warn("EmailJS error:", e);
+      showEmailFallback(rec.empEmail, subject, body);
+    });
+  } else {
+    showEmailFallback(rec.empEmail, subject, body);
+  }
+}
+
+// ── Email Fallback Modal ────────────────────────────
+function showEmailFallback(toEmail, subject, body) {
+  var modal = document.getElementById("emailFallbackModal");
+  document.getElementById("efTo").textContent      = toEmail;
+  document.getElementById("efSubject").textContent = subject;
+  document.getElementById("efBody").textContent    = body;
+  document.getElementById("efMailto").href = "mailto:"+toEmail
+    +"?subject="+encodeURIComponent(subject)
+    +"&body="+encodeURIComponent(body);
+  if (modal) modal.classList.add("open");
+}
+
+function copyEmailContent() {
+  var txt = "To: " + document.getElementById("efTo").textContent
+    + "\nSubject: " + document.getElementById("efSubject").textContent
+    + "\n\n" + document.getElementById("efBody").textContent;
+  navigator.clipboard.writeText(txt)
+    .then(function(){ toast("📋 Copied to clipboard", "t-ok"); })
+    .catch(function(){ toast("Could not copy — please copy manually", "t-err"); });
+}
+
+// ── View Leave Attachment ───────────────────────────
+function viewLeaveAtt(id) {
+  var rec = leaveRecs.find(function(r){return r.id===id;});
+  if (!rec || !rec.attachmentBase64) return;
+  var modal = document.getElementById("leaveAttModal");
+  var content = document.getElementById("leaveAttModalContent");
+  document.getElementById("leaveAttModalTitle").textContent = "📎 " + (rec.attachmentName||"Attachment") + " — " + (rec.empName||"");
+  if (rec.attachmentBase64.startsWith("data:image")) {
+    content.innerHTML = '<img src="'+rec.attachmentBase64+'" style="max-width:100%;border-radius:8px"/>';
+  } else if (rec.attachmentBase64.startsWith("data:application/pdf")) {
+    content.innerHTML = '<iframe src="'+rec.attachmentBase64+'" style="width:100%;height:400px;border:none;border-radius:8px"></iframe>';
+  } else {
+    content.innerHTML = '<a href="'+rec.attachmentBase64+'" download="'+rec.attachmentName+'" style="color:var(--blue);font-weight:700">⬇ Download Attachment</a>';
+  }
+  if (modal) modal.classList.add("open");
+}
+
+// ── Check Approved Leave for Employee (today) ───────
+function checkApprovedLeaveForEmp(empId) {
+  var today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  if (fbOk && db) {
+    db.collection("leaveApplications")
+      .where("empId","==",empId)
+      .where("status","==","approved")
+      .get()
+      .then(function(snap){
+        snap.docs.forEach(function(d){
+          var r = d.data();
+          if (today >= r.fromDate && today <= r.toDate) {
+            showLeaveBanner(r);
+          }
+        });
+      }).catch(function(e){ console.warn("Leave check:", e); });
+  } else {
+    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+    ll.forEach(function(r){
+      if (r.empId===empId && r.status==="approved" && today>=r.fromDate && today<=r.toDate) {
+        showLeaveBanner(r);
+      }
+    });
+  }
+}
+
+function showLeaveBanner(r) {
+  var banner = document.getElementById("leaveActiveBanner");
+  if (!banner) return;
+  var title = document.getElementById("leaveBannerTitle");
+  var detail = document.getElementById("leaveBannerDetail");
+  if (title) title.textContent = "🌴 You are on " + r.leaveType + " today";
+  if (detail) detail.innerHTML =
+    "Your <strong>" + r.leaveType + "</strong> from <strong>" + r.fromDate + "</strong> to <strong>" + r.toDate + "</strong> (" + r.numDays + " day" + (r.numDays!==1?"s":"") + ") has been approved.<br>"
+    + "You do <strong>not</strong> need to check in. Your attendance is automatically recorded as <strong>" + r.leaveType + "</strong>.";
+  banner.style.display = "block";
+  // Hide check-in form
+  var ci = document.getElementById("ciForm"); if(ci) ci.style.display="none";
+  var ab = document.getElementById("applyLeaveBtn"); if(ab) ab.style.display="none";
+}
+
+// ── Export Leave CSV ────────────────────────────────
+function exportLeaveCSV() {
+  var rows = filteredLeaves();
+  if (!rows.length) { toast("No leave records to export", "t-err"); return; }
+  var hdr = ["Employee ID","Employee Name","Email","Site","Leave Type","From Date","To Date","Total Days","Reason","Status","Applied Date","Decided By","Decided Date","Reject Reason"].join(",");
+  var lines = [hdr].concat(rows.map(function(r){
+    return [
+      '"'+(r.empId||"")+'"',
+      '"'+(r.empName||"")+'"',
+      '"'+(r.empEmail||"")+'"',
+      '"'+(r.site||"")+'"',
+      '"'+(r.leaveType||"")+'"',
+      '"'+(r.fromDate||"")+'"',
+      '"'+(r.toDate||"")+'"',
+      r.numDays||"",
+      '"'+(r.reason||"")+'"',
+      '"'+(r.status||"")+'"',
+      '"'+(r.appliedDate||"")+'"',
+      '"'+(r.decidedBy||"")+'"',
+      '"'+(r.decidedDate||"")+'"',
+      '"'+(r.rejectReason||"")+'"'
+    ].join(",");
+  }));
+  var blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "leave_applications_" + new Date().toISOString().split("T")[0] + ".csv";
+  a.click();
+  toast("📋 Leave CSV exported (" + rows.length + " records)", "t-ok");
+}
+
+// ── Export Combined (Attendance + Approved Leaves) ─
+function exportCombinedCSV() {
+  var attHdr = ["Type","Employee ID","Name","Site","Date","Check-In","Check-Out","Duration","Status","Leave Type","Decided By","Late","Overtime","GPS In","GPS Out"];
+  var lines = [attHdr.join(",")];
+
+  // Attendance records
+  allRecs.forEach(function(r){
+    lines.push([
+      '"Attendance"',
+      '"'+(r.empId||"")+'"',
+      '"'+(r.empName||"")+'"',
+      '"'+(r.site||"")+'"',
+      '"'+(r.checkinDate||"")+'"',
+      '"'+(r.checkinTime||"")+'"',
+      '"'+(r.checkoutTime||"")+'"',
+      '"'+(r.duration||"")+'"',
+      '"'+(r.status||"")+'"',
+      '""','"—"',
+      r.isLate?"Yes":"No",
+      r.isOvertime?"Yes":"No",
+      '"'+(r.checkinDist?r.checkinDist+"m":"")+'"',
+      '"'+(r.checkoutDist?r.checkoutDist+"m":"")+'"'
+    ].join(","));
+  });
+
+  // Approved leave records (one row per leave day)
+  leaveRecs.filter(function(r){return r.status==="approved";}).forEach(function(r){
+    var from = new Date(r.fromDate), to = new Date(r.toDate);
+    for (var d = new Date(from); d <= to; d.setDate(d.getDate()+1)) {
+      var dateStr = d.toISOString().split("T")[0];
+      lines.push([
+        '"Leave"',
+        '"'+(r.empId||"")+'"',
+        '"'+(r.empName||"")+'"',
+        '"'+(r.site||"")+'"',
+        '"'+dateStr+'"',
+        '"—"','"—"','"—"',
+        '"on leave"',
+        '"'+(r.leaveType||"")+'"',
+        '"'+(r.decidedBy||"")+'"',
+        "No","No","—","—"
+      ].join(","));
+    }
+  });
+
+  var blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "full_attendance_leave_" + new Date().toISOString().split("T")[0] + ".csv";
+  a.click();
+  toast("📋 Full report exported", "t-ok");
+}
+
+// ╔══════════════════════════════════════════════════════╗
+// ║  END LEAVE MODULE                                    ║
+// ╚══════════════════════════════════════════════════════╝
+
 initFirebase();
+initEmailJS();
 </script>
 </body>
 </html>
