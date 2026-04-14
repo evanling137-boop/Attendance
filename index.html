@@ -712,6 +712,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <div class="dash-tab on" onclick="dTab('live',this)">Live Status</div>
       <div class="dash-tab" onclick="dTab('feed',this)">Activity Feed</div>
       <div class="dash-tab" onclick="dTab('leave',this)" id="leaveTabBtn">🗓️ Leave Mgmt <span id="leavePendingBadge" style="display:none;background:var(--orange);color:#fff;border-radius:30px;padding:1px 7px;font-size:.7rem;margin-left:4px;font-family:var(--mono)">0</span></div>
+      <div class="dash-tab" onclick="dTab('device',this)">🔒 Device Audit <span id="suspiciousBadge" style="display:none;background:var(--red);color:#fff;border-radius:30px;padding:1px 7px;font-size:.7rem;margin-left:4px;font-family:var(--mono)">!</span></div>
       <div class="dash-tab" onclick="dTab('setup',this)">⚙️ Setup Guide</div>
     </div>
 
@@ -739,7 +740,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
             <thead><tr>
               <th>Employee</th><th>Selfie</th><th>Site</th><th>Status</th>
               <th>Check-In</th><th>Check-Out</th><th>Duration</th>
-              <th>GPS In</th><th>GPS Out</th><th>Date</th>
+              <th>GPS In</th><th>GPS Out</th><th>Device</th><th>Date</th>
             </tr></thead>
             <tbody id="tblBody"></tbody>
           </table>
@@ -818,6 +819,54 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <!-- Firestore Rules Reminder -->
       <div style="background:#fffbeb;border-radius:var(--r);padding:14px 16px;border:1px solid #fde68a;font-size:.82rem;color:#78350f;margin-top:16px">
         <strong>⚙️ Remember:</strong> Add the <code style="background:#fef3c7;padding:1px 5px;border-radius:4px;font-family:var(--mono)">leaveApplications</code> Firestore rules from the Setup Guide → Step 10 for this feature to work.
+      </div>
+    </div>
+
+    <!-- DEVICE AUDIT TAB -->
+    <div id="dTab-device" style="display:none">
+
+      <div style="background:linear-gradient(135deg,#0d1117,#1a2233);border-radius:var(--r2);padding:18px 20px;margin-bottom:18px;display:flex;align-items:flex-start;gap:14px">
+        <div style="font-size:2rem;flex-shrink:0">🔒</div>
+        <div>
+          <div style="color:#fff;font-weight:800;font-size:1rem;margin-bottom:4px">Device–Employee Binding</div>
+          <div style="color:#9ca3af;font-size:.83rem;line-height:1.6">Each employee's phone generates a unique <strong style="color:#e5e7eb">Device ID</strong> on first use. It is saved with every check-in record. If one device is used to check in <strong style="color:var(--orange)">more than one employee on the same date</strong>, it is automatically flagged as a suspected buddy-punch attempt.</div>
+        </div>
+      </div>
+
+      <!-- Suspicious flags summary -->
+      <div id="deviceFlagsWrap" style="margin-bottom:18px"></div>
+
+      <!-- All device bindings table -->
+      <div class="tbl-wrap">
+        <div class="tbl-hdr">
+          <span class="tbl-hdr-t">📱 Device — Employee Registry</span>
+          <span class="tbl-count" id="deviceCount">—</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr>
+              <th>Device ID</th>
+              <th>Employee(s) on This Device</th>
+              <th>Last Check-In</th>
+              <th>Total Check-Ins</th>
+              <th>Flag</th>
+            </tr></thead>
+            <tbody id="deviceTblBody"></tbody>
+          </table>
+        </div>
+        <div id="deviceTblEmpty" class="empty" style="display:none">
+          <div class="empty-icon">📱</div>
+          <div class="empty-t">No device records yet</div>
+          <div>Device IDs are recorded automatically with every check-in</div>
+        </div>
+      </div>
+
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:var(--r);padding:14px 16px;margin-top:16px;font-size:.82rem;color:#0369a1;line-height:1.7">
+        <strong>💡 How to investigate a flagged device:</strong><br>
+        1. Note the Device ID from the flagged row above<br>
+        2. Go to <strong>Live Status</strong> tab and search for the Employee ID of any suspicious record<br>
+        3. Compare the selfie photos for each employee who used that device — if the same face appears, it confirms buddy punching<br>
+        4. Cross-reference GPS check-in locations if needed
       </div>
     </div>
 
@@ -1065,14 +1114,24 @@ service cloud.firestore {
 </div>
 
 <!-- ══ LEAVE ATTACHMENT VIEWER ══════════════════════ -->
-<div id="leaveAttModal" class="modal-overlay">
-  <div class="modal-box" style="max-width:640px">
-    <button class="modal-close" onclick="document.getElementById('leaveAttModal').classList.remove('open')">✕</button>
-    <div class="modal-title" id="leaveAttModalTitle">📎 Leave Attachment</div>
-    <div style="margin-top:14px" id="leaveAttModalContent"></div>
-    <div style="margin-top:14px">
-      <button onclick="document.getElementById('leaveAttModal').classList.remove('open')" style="padding:10px 22px;border-radius:var(--r);background:var(--ink);color:#fff;border:none;font-weight:600;font-family:var(--body);cursor:pointer">Close</button>
+<div id="leaveAttModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9997;flex-direction:column">
+  <!-- Sticky header — always visible -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);flex-shrink:0;gap:12px;border-bottom:1px solid rgba(255,255,255,.1)">
+    <div style="color:#fff;font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="leaveAttModalTitle">📎 Leave Attachment</div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button id="attZoomBtn" onclick="toggleAttZoom()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:var(--body)">🔍 Fit</button>
+      <button onclick="closeLeaveAttModal()" style="background:rgba(255,59,92,.8);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:var(--body)">✕ Close</button>
     </div>
+  </div>
+  <!-- Scrollable image area -->
+  <div id="leaveAttModalContent" style="flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:16px">
+    <!-- injected by viewLeaveAtt() -->
+  </div>
+  <!-- Sticky footer — always visible -->
+  <div style="padding:12px 18px;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;gap:10px;align-items:center;flex-shrink:0;border-top:1px solid rgba(255,255,255,.1)">
+    <div id="attFileName" style="color:#9ca3af;font-size:.8rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+    <a id="attDownloadBtn" href="#" download="" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:none;font-family:var(--body)">⬇ Download</a>
+    <button onclick="closeLeaveAttModal()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:var(--body)">✕ Close</button>
   </div>
 </div>
 
@@ -1728,7 +1787,24 @@ function initDash() {
   }
 }
 
-function renderAll() { renderTable(); renderFeed(); updateStats(); }
+function renderAll() { renderTable(); renderFeed(); updateStats(); updateDeviceBadge(); }
+
+function updateDeviceBadge() {
+  // Quick pass to see if any suspicious devices exist — updates the tab badge without full render
+  var suspicious = false;
+  var devDateEmps = {}; // "deviceId|date" -> Set of empIds
+  allRecs.forEach(function(r){
+    if (!r.deviceId || !r.checkinDate) return;
+    var key = r.deviceId + "|" + r.checkinDate;
+    if (!devDateEmps[key]) devDateEmps[key] = {};
+    devDateEmps[key][r.empId] = true;
+  });
+  Object.keys(devDateEmps).forEach(function(key){
+    if (Object.keys(devDateEmps[key]).length > 1) suspicious = true;
+  });
+  var badge = document.getElementById("suspiciousBadge");
+  if (badge) badge.style.display = suspicious ? "inline" : "none";
+}
 
 function filtered() {
   var q = (document.getElementById("fSearch")||{}).value||"";
@@ -1763,7 +1839,17 @@ function renderTable() {
     var selfieCell = r.selfiePhoto
       ? '<img src="'+r.selfiePhoto+'" class="selfie-thumb" title="Click to enlarge" onclick="showSelfie(\''+r.id+'\')" style="cursor:pointer"/>'
       : '<span style="font-size:.75rem;color:var(--red);font-weight:700">⚠ No photo</span>';
-    return '<tr>'
+
+    // Device cell — show short ID + flag if same device used by another employee same day
+    var devId = r.deviceId || "";
+    var devShort = devId ? devId.slice(-8) : "—";
+    var isSuspicious = devId ? isBuddyPunch(devId, r.empId, r.checkinDate) : false;
+    var devCell = devId
+      ? '<span style="font-family:var(--mono);font-size:.72rem;background:#f3f4f6;padding:2px 6px;border-radius:4px;color:var(--ink2)" title="'+devId+'">…'+devShort+'</span>'
+        + (isSuspicious ? ' <span class="bdg" style="background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;font-size:.68rem" title="Same device used by another employee on this date">⚠ Flagged</span>' : '')
+      : '<span style="font-size:.75rem;color:var(--ink3)">—</span>';
+
+    return '<tr' + (isSuspicious ? ' style="background:#fff5f5"' : '') + '>'
       +'<td><div class="ec"><div class="av">'+ini+'</div><div><div class="en">'+(r.empName||"—")+'</div><div class="eid">'+(r.empId||"—")+'</div></div></div></td>'
       +'<td>'+selfieCell+'</td>'
       +'<td style="font-size:.82rem;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.site||"—")+'</td>'
@@ -1773,6 +1859,7 @@ function renderTable() {
       +'<td><span class="dur">'+(r.duration||"—")+'</span></td>'
       +'<td>'+mapIn+'</td>'
       +'<td>'+mapOut+'</td>'
+      +'<td>'+devCell+'</td>'
       +'<td style="font-size:.78rem;color:var(--ink3)">'+(r.checkinDate||"—")+'</td>'
       +'</tr>';
   }).join("");
@@ -1815,12 +1902,13 @@ function refreshDash() {
 
 // ── Dashboard tabs ─────────────────────────────────
 function dTab(id, el) {
-  ["live","feed","leave","setup"].forEach(function(t){
+  ["live","feed","leave","device","setup"].forEach(function(t){
     var p = document.getElementById("dTab-"+t); if(p) p.style.display = t===id?"block":"none";
   });
   document.querySelectorAll(".dash-tab").forEach(function(e){ e.classList.remove("on"); });
   if (el) el.classList.add("on");
   if (id === "leave") loadLeaves();
+  if (id === "device") renderDeviceAudit();
 }
 
 // ── CSV export ─────────────────────────────────────
@@ -2409,21 +2497,195 @@ function copyEmailContent() {
     .catch(function(){ toast("Could not copy — please copy manually", "t-err"); });
 }
 
-// ── View Leave Attachment ───────────────────────────
+// ── View Leave Attachment (full-screen viewer) ──────
+var _attZoomFit = true; // start in "fit" mode
+
 function viewLeaveAtt(id) {
-  var rec = leaveRecs.find(function(r){return r.id===id;});
+  var rec = leaveRecs.find(function(r){ return r.id===id; });
   if (!rec || !rec.attachmentBase64) return;
-  var modal = document.getElementById("leaveAttModal");
+
+  var modal   = document.getElementById("leaveAttModal");
   var content = document.getElementById("leaveAttModalContent");
-  document.getElementById("leaveAttModalTitle").textContent = "📎 " + (rec.attachmentName||"Attachment") + " — " + (rec.empName||"");
+  var title   = document.getElementById("leaveAttModalTitle");
+  var dlBtn   = document.getElementById("attDownloadBtn");
+  var fnLabel = document.getElementById("attFileName");
+  var zoomBtn = document.getElementById("attZoomBtn");
+
+  title.textContent = "📎 " + (rec.attachmentName||"Attachment") + " — " + (rec.empName||"");
+  fnLabel.textContent = rec.attachmentName || "attachment";
+  dlBtn.href = rec.attachmentBase64;
+  dlBtn.download = rec.attachmentName || "attachment";
+  _attZoomFit = true;
+  if (zoomBtn) zoomBtn.textContent = "🔍 Actual Size";
+
   if (rec.attachmentBase64.startsWith("data:image")) {
-    content.innerHTML = '<img src="'+rec.attachmentBase64+'" style="max-width:100%;border-radius:8px"/>';
+    content.innerHTML = '<img id="attImg" src="'+rec.attachmentBase64+'" style="max-width:100%;max-height:calc(100vh - 120px);object-fit:contain;border-radius:8px;display:block;cursor:zoom-in" onclick="toggleAttZoom()" title="Click to toggle zoom"/>';
   } else if (rec.attachmentBase64.startsWith("data:application/pdf")) {
-    content.innerHTML = '<iframe src="'+rec.attachmentBase64+'" style="width:100%;height:400px;border:none;border-radius:8px"></iframe>';
+    content.innerHTML = '<iframe src="'+rec.attachmentBase64+'" style="width:min(700px,90vw);height:calc(100vh - 140px);border:none;border-radius:8px;background:#fff"></iframe>';
+    if (zoomBtn) zoomBtn.style.display = "none";
   } else {
-    content.innerHTML = '<a href="'+rec.attachmentBase64+'" download="'+rec.attachmentName+'" style="color:var(--blue);font-weight:700">⬇ Download Attachment</a>';
+    content.innerHTML = '<div style="color:#fff;text-align:center;padding:40px"><div style="font-size:3rem;margin-bottom:16px">📄</div><div style="margin-bottom:16px">Preview not available for this file type.</div></div>';
+    if (zoomBtn) zoomBtn.style.display = "none";
   }
-  if (modal) modal.classList.add("open");
+
+  modal.style.display = "flex";
+}
+
+function toggleAttZoom() {
+  var img = document.getElementById("attImg");
+  var btn = document.getElementById("attZoomBtn");
+  if (!img) return;
+  _attZoomFit = !_attZoomFit;
+  if (_attZoomFit) {
+    img.style.maxWidth = "100%";
+    img.style.maxHeight = "calc(100vh - 120px)";
+    img.style.width = "";
+    img.style.cursor = "zoom-in";
+    if (btn) btn.textContent = "🔍 Actual Size";
+  } else {
+    img.style.maxWidth = "none";
+    img.style.maxHeight = "none";
+    img.style.width = "auto";
+    img.style.cursor = "zoom-out";
+    if (btn) btn.textContent = "⬜ Fit Screen";
+  }
+}
+
+function closeLeaveAttModal() {
+  var modal = document.getElementById("leaveAttModal");
+  if (modal) modal.style.display = "none";
+  var btn = document.getElementById("attZoomBtn");
+  if (btn) btn.style.display = "";
+}
+
+// ── Device Audit ────────────────────────────────────
+// Returns true if the given deviceId was used by a DIFFERENT empId on the same date
+function isBuddyPunch(deviceId, empId, date) {
+  if (!deviceId || !date) return false;
+  return allRecs.some(function(r){
+    return r.deviceId === deviceId && r.empId !== empId && r.checkinDate === date;
+  });
+}
+
+function renderDeviceAudit() {
+  // Build a map: deviceId → { employees: Set, records: [], lastCheckin, lastDate }
+  var devMap = {};
+  allRecs.forEach(function(r){
+    if (!r.deviceId) return;
+    if (!devMap[r.deviceId]) devMap[r.deviceId] = { emps: {}, records: [], lastTs: 0 };
+    var d = devMap[r.deviceId];
+    if (!d.emps[r.empId]) d.emps[r.empId] = { name: r.empName, dates: [] };
+    d.emps[r.empId].dates.push(r.checkinDate);
+    d.records.push(r);
+    if ((r.checkinTimestamp||0) > d.lastTs) { d.lastTs = r.checkinTimestamp||0; d.lastDate = r.checkinDate; d.lastEmp = r.empName; }
+  });
+
+  var devices = Object.keys(devMap);
+  var body  = document.getElementById("deviceTblBody");
+  var empty = document.getElementById("deviceTblEmpty");
+  var cnt   = document.getElementById("deviceCount");
+  if (!body) return;
+
+  // Find suspicious devices: same device, different employees on the SAME date
+  var suspiciousDevices = devices.filter(function(devId){
+    var d = devMap[devId];
+    var empIds = Object.keys(d.emps);
+    if (empIds.length < 2) return false;
+    // Check if any two employees used this device on the same calendar date
+    var dateToEmps = {};
+    d.records.forEach(function(r){
+      if (!dateToEmps[r.checkinDate]) dateToEmps[r.checkinDate] = new Set ? new Set() : {};
+      if (dateToEmps[r.checkinDate].add) dateToEmps[r.checkinDate].add(r.empId);
+      else dateToEmps[r.checkinDate][r.empId] = true;
+    });
+    return Object.keys(dateToEmps).some(function(date){
+      var s = dateToEmps[date];
+      return (s.size !== undefined ? s.size : Object.keys(s).length) > 1;
+    });
+  });
+
+  // Update suspicious badge in tab
+  var badge = document.getElementById("suspiciousBadge");
+  if (badge) { badge.style.display = suspiciousDevices.length > 0 ? "inline" : "none"; }
+
+  // Render suspicious flags summary
+  var flagsWrap = document.getElementById("deviceFlagsWrap");
+  if (flagsWrap) {
+    if (suspiciousDevices.length > 0) {
+      flagsWrap.innerHTML = '<div style="background:linear-gradient(135deg,#fef2f2,#ffe4e6);border:2px solid #fca5a5;border-radius:var(--r2);padding:18px 20px;margin-bottom:4px">'
+        +'<div style="font-weight:800;color:#b91c1c;font-size:1rem;margin-bottom:10px">⚠️ ' + suspiciousDevices.length + ' Suspected Buddy-Punch Device' + (suspiciousDevices.length>1?"s":"") + ' Detected</div>'
+        + suspiciousDevices.map(function(devId){
+          var d = devMap[devId];
+          var empIds = Object.keys(d.emps);
+          // Find the dates with multiple employees
+          var dateToEmps = {};
+          d.records.forEach(function(r){
+            if (!dateToEmps[r.checkinDate]) dateToEmps[r.checkinDate] = {};
+            dateToEmps[r.checkinDate][r.empId] = r.empName;
+          });
+          var badDates = Object.keys(dateToEmps).filter(function(date){
+            return Object.keys(dateToEmps[date]).length > 1;
+          });
+          return '<div style="background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #fca5a5">'
+            +'<div style="font-family:var(--mono);font-size:.75rem;color:#6b7280;margin-bottom:6px">Device: …' + devId.slice(-12) + '</div>'
+            + badDates.map(function(date){
+              var emps = Object.keys(dateToEmps[date]).map(function(eid){
+                return '<strong>' + eid + '</strong> (' + dateToEmps[date][eid] + ')';
+              }).join(' &amp; ');
+              return '<div style="font-size:.84rem;color:#b91c1c;margin-bottom:2px">📅 <strong>' + date + '</strong> — used by ' + emps + '</div>';
+            }).join("")
+            +'</div>';
+        }).join("")
+        +'</div>';
+    } else {
+      flagsWrap.innerHTML = '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:var(--r2);padding:14px 18px;margin-bottom:4px;font-size:.85rem;color:#15803d;font-weight:600">✅ No buddy-punch activity detected across all records.</div>';
+    }
+  }
+
+  if (!devices.length) {
+    if (cnt) cnt.textContent = "0 devices";
+    body.innerHTML = "";
+    if (empty) empty.style.display = "block";
+    return;
+  }
+  if (empty) empty.style.display = "none";
+  if (cnt) cnt.textContent = devices.length + " device" + (devices.length!==1?"s":"") + (suspiciousDevices.length>0 ? " · " + suspiciousDevices.length + " flagged" : "");
+
+  // Sort: suspicious first, then by last check-in
+  devices.sort(function(a,b){
+    var aSus = suspiciousDevices.indexOf(a)>=0, bSus = suspiciousDevices.indexOf(b)>=0;
+    if (aSus && !bSus) return -1;
+    if (!aSus && bSus) return 1;
+    return (devMap[b].lastTs||0)-(devMap[a].lastTs||0);
+  });
+
+  body.innerHTML = devices.map(function(devId){
+    var d = devMap[devId];
+    var empIds = Object.keys(d.emps);
+    var isSus = suspiciousDevices.indexOf(devId) >= 0;
+
+    var empList = empIds.map(function(eid){
+      var e = d.emps[eid];
+      var uniqueDates = e.dates.filter(function(v,i,a){ return a.indexOf(v)===i; });
+      return '<div style="margin-bottom:3px"><span style="font-family:var(--mono);font-size:.75rem;background:#f3f4f6;padding:1px 6px;border-radius:4px">'
+        +eid+'</span> <span style="font-size:.82rem;color:var(--ink2)">'+e.name+'</span>'
+        +' <span style="font-size:.72rem;color:var(--ink3)">('+uniqueDates.length+' day'+(uniqueDates.length!==1?"s":"")+')</span>'
+        +'</div>';
+    }).join("");
+
+    var flagCell = isSus
+      ? '<span class="bdg" style="background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5">⚠️ Buddy Punch Suspected</span>'
+      : '<span class="bdg" style="background:#f0fdf4;color:#15803d;border:1px solid #86efac">✅ Clean</span>';
+
+    return '<tr' + (isSus ? ' style="background:#fff5f5"':'') + '>'
+      +'<td style="font-family:var(--mono);font-size:.75rem;color:var(--ink3);max-width:120px">…'+devId.slice(-16)
+        +'<br><span style="font-size:.65rem;word-break:break-all;color:#d1d5db">'+devId+'</span></td>'
+      +'<td>'+empList+'</td>'
+      +'<td style="font-size:.78rem;color:var(--ink3)">'+(d.lastDate||"—")+'<br><span style="font-size:.72rem">'+d.lastEmp+'</span></td>'
+      +'<td><span class="days-badge">'+d.records.length+'</span></td>'
+      +'<td>'+flagCell+'</td>'
+      +'</tr>';
+  }).join("");
 }
 
 // ── Check ALL Leave Status for Employee ─────────────
