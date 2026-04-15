@@ -44,10 +44,11 @@ input,select{font-family:var(--body);outline:none}
 /* ── SCREENS ── */
 .screen{display:none;min-height:100vh}
 .screen.active{display:block}
+.screen.active.flex-screen{display:flex}
 
 /* ── LANDING ── */
 #screen-landing{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex-direction:column;align-items:center;justify-content:center;
   min-height:100vh;padding:40px 20px;
   background:linear-gradient(145deg,#0d1117 0%,#1a2233 60%,#0d1117 100%);
 }
@@ -163,7 +164,7 @@ input,select{font-family:var(--body);outline:none}
 
 /* ── ADMIN LOGIN ── */
 #screen-admin-login{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex-direction:column;align-items:center;justify-content:center;
   min-height:100vh;background:var(--ink);padding:40px 20px;
 }
 .login-card{background:#1a2233;border:1px solid rgba(255,255,255,.08);border-radius:var(--r2);padding:36px 32px;width:100%;max-width:380px}
@@ -453,6 +454,69 @@ tr.on-leave-row td{background:#f0f9ff!important}
 .lsn-list-item.approved{border-color:#86efac;background:#f0fdf4}
 .lsn-list-item.rejected{border-color:#fca5a5;background:#fef2f2}
 .lsn-list-item.pending {border-color:#fde68a;background:#fffbeb}
+
+/* ── LEAVE CANCEL / EDIT BUTTONS ───────────────── */
+.leave-cancel{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.leave-cancel:hover{background:#c2410c;color:#fff}
+.leave-edit{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.leave-edit:hover{background:#1d4ed8;color:#fff}
+.bdg-cancelled{background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db}
+.bdg-cancel-req{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+
+/* My Leaves button (employee screen) */
+.my-leaves-btn{
+  width:100%;padding:11px;border-radius:12px;font-size:.88rem;font-weight:700;
+  background:transparent;border:1.5px solid var(--border);color:var(--ink2);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:12px;font-family:var(--body);cursor:pointer;transition:all .2s;
+}
+.my-leaves-btn:hover{border-color:var(--blue);color:var(--blue);background:#eff6ff}
+
+/* ── RESPONSIVE OVERHAUL ─────────────────────────*/
+@media(max-width:900px){
+  .dash-wrap{padding:16px 12px 60px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .dash-tabs{flex-wrap:wrap;width:100%;gap:3px}
+  .dash-tab{font-size:.77rem;padding:6px 10px}
+  .toolbar{gap:8px}
+  .toolbar input,.toolbar select{font-size:.82rem}
+}
+@media(max-width:768px){
+  .topbar{padding:10px 14px;gap:8px}
+  .tb-title{font-size:.88rem}
+  .tb-back{padding:6px 10px;font-size:.75rem}
+  .live-dot{font-size:.7rem}
+  .stats-grid{gap:8px}
+  .stat{padding:12px 14px}
+  .stat-n{font-size:1.5rem}
+  .dash-tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:3px}
+  .dash-tabs::-webkit-scrollbar{display:none}
+  .dash-tab{white-space:nowrap;flex-shrink:0}
+  .leave-act-btn{padding:4px 8px;font-size:.72rem}
+  .modal-box{padding:18px 14px;border-radius:14px}
+  .modal-actions{flex-direction:column}
+  .modal-btn-cancel,.modal-btn-confirm{flex:none;width:100%}
+  .land-cards{flex-direction:column;align-items:center}
+  .land-card{min-width:unset;width:100%;max-width:340px}
+  .land-h1{font-size:clamp(1.7rem,8vw,2.6rem)}
+  .land-sub{margin-bottom:32px}
+  .emp-wrap{padding:14px 12px 60px}
+  .lsn-box{border-radius:16px}
+  .lsn-header{padding:20px 18px 14px}
+  .lsn-body{padding:0 14px 14px}
+  .lsn-footer{padding:0 14px 16px}
+  th:nth-child(n+8),td:nth-child(n+8){display:none}
+}
+@media(max-width:500px){
+  th:nth-child(n+6),td:nth-child(n+6){display:none}
+  .tbl-hdr{flex-direction:column;align-items:flex-start;gap:6px}
+  .toolbar{flex-direction:column}
+  .toolbar input,.toolbar select,.tb-btn{width:100%;min-width:unset}
+  .login-card{padding:22px 16px}
+  .emp-clock-time{font-size:2rem;letter-spacing:2px}
+  .act-btn{font-size:.92rem;padding:13px}
+  .card{padding:18px 14px}
+}
 </style>
 </head>
 <body>
@@ -460,7 +524,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
 <!-- ══════════════════════════════════════════
      LANDING
 ══════════════════════════════════════════ -->
-<div id="screen-landing" class="screen active">
+<div id="screen-landing" class="screen active flex-screen">
   <div class="land-mono">⚡ AttendTrack</div>
   <h1 class="land-h1">Smart Attendance<br><span>Made Simple</span></h1>
   <p class="land-sub">GPS-verified check-ins, live employer dashboard, and real-time tracking — all from a single link.</p>
@@ -522,10 +586,16 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <div class="leave-banner-detail" id="leaveBannerDetail"></div>
     </div>
 
-    <!-- Apply Leave Button -->
-    <button class="apply-leave-btn" id="applyLeaveBtn" onclick="showLeaveSection(true)">
-      📋 Apply for Leave
-    </button>
+    <!-- Apply Leave Button row -->
+    <div style="display:flex;gap:10px">
+      <button class="apply-leave-btn" id="applyLeaveBtn" onclick="showLeaveSection(true)" style="flex:1;margin-bottom:0">
+        📋 Apply for Leave
+      </button>
+      <button class="my-leaves-btn" id="myLeavesBtn" onclick="showMyLeaves()" style="flex:1;margin-bottom:0">
+        📁 My Leaves
+      </button>
+    </div>
+    <div style="margin-bottom:16px"></div>
 
     <!-- ── LEAVE APPLICATION FORM ──────────────────── -->
     <div id="leaveSection" style="display:none">
@@ -1059,6 +1129,63 @@ service cloud.firestore {
   <button onclick="document.getElementById('selfieLightbox').style.display='none'" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:10px 28px;border-radius:30px;font-size:.9rem;cursor:pointer">✕ Close</button>
 </div>
 
+<!-- ══ MY LEAVES MODAL (employee) ════════════════════ -->
+<div id="myLeavesModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:540px;max-height:90vh;overflow-y:auto">
+    <button class="modal-close" onclick="document.getElementById('myLeavesModal').classList.remove('open')">✕</button>
+    <div class="modal-title">📁 My Leave Applications</div>
+    <div class="modal-sub" id="myLeavesEmpInfo">Enter your Employee ID to view your leaves</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <input type="text" id="myLeavesEmpId" placeholder="Employee ID (e.g. EMP001)" style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:.9rem;font-family:var(--body)"/>
+      <button onclick="loadMyLeaves()" style="padding:10px 18px;border-radius:var(--r);background:var(--blue);color:#fff;border:none;font-weight:700;font-family:var(--body);cursor:pointer;font-size:.88rem">Search</button>
+    </div>
+    <div id="myLeavesList"><div style="text-align:center;padding:30px;color:var(--ink3);font-size:.88rem">Enter your Employee ID above and tap Search</div></div>
+  </div>
+</div>
+
+<!-- ══ EDIT LEAVE MODAL ════════════════════════════ -->
+<div id="editLeaveModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:480px;max-height:90vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeEditLeaveModal()">✕</button>
+    <div class="modal-title">✏️ Edit Leave Application</div>
+    <div class="modal-sub">Only <strong>pending</strong> applications can be edited. All fields below are editable.</div>
+    <input type="hidden" id="editLeaveId"/>
+    <div class="field"><label>Leave Type</label><select id="editLeaveType"></select></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field"><label>From Date</label><input type="date" id="editLeaveFrom" onchange="calcEditLeaveDays()"/></div>
+      <div class="field"><label>To Date</label><input type="date" id="editLeaveTo" onchange="calcEditLeaveDays()"/></div>
+    </div>
+    <div class="field"><label>Days</label><input type="text" id="editLeaveNumDays" readonly style="background:#f3f4f6;text-align:center;font-family:var(--mono);font-weight:700;color:var(--blue)"/></div>
+    <div class="field"><label>Reason / Notes</label><textarea id="editLeaveReason" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:.9rem;font-family:var(--body);resize:vertical;min-height:70px;background:#fafaf8;color:var(--ink)"></textarea></div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeEditLeaveModal()">Cancel</button>
+      <button class="modal-btn-confirm" style="background:var(--blue)" onclick="saveEditLeave()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CANCEL LEAVE CONFIRM MODAL ════════════════════ -->
+<div id="cancelLeaveModal" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('cancelLeaveModal').classList.remove('open')">✕</button>
+    <div class="modal-title" id="cancelLeaveTitle">Cancel Leave Application</div>
+    <div class="modal-sub" id="cancelLeaveSub">Are you sure you want to cancel this leave application?</div>
+    <div class="ef-field" style="margin-bottom:14px">
+      <div class="ef-label">Application</div>
+      <div class="ef-value" id="cancelLeaveInfo">—</div>
+    </div>
+    <div id="cancelReasonWrap" style="display:none">
+      <div class="field"><label>Reason for Cancellation (required)</label>
+        <textarea class="modal-textarea" id="cancelLeaveReason" placeholder="e.g. Plans changed / No longer needed…"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="document.getElementById('cancelLeaveModal').classList.remove('open')">Keep Leave</button>
+      <button class="modal-btn-confirm" id="cancelLeaveConfirmBtn" onclick="confirmCancelLeave()">🗑️ Cancel Leave</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ LEAVE STATUS NOTIFICATION POPUP ══════════════ -->
 <div id="leaveStatusPopup" class="lsn-overlay">
   <div class="lsn-box" id="lsnBox">
@@ -1224,11 +1351,21 @@ function showScreen(id) {
       }
     }
   }
-  document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); s.style.display="none"; });
+  document.querySelectorAll(".screen").forEach(function(s){
+    s.classList.remove("active","flex-screen");
+    s.style.display = "none";
+  });
   var el = document.getElementById("screen-" + id);
   if (!el) return;
-  el.style.display = "block";
+  // Screens that need flex layout
+  var flexScreens = ["landing","admin-login"];
   el.classList.add("active");
+  if (flexScreens.indexOf(id) >= 0) {
+    el.classList.add("flex-screen");
+    el.style.display = "flex";
+  } else {
+    el.style.display = "block";
+  }
   if (id === "employee") initEmp();
   if (id === "dashboard") initDash();
 }
@@ -2257,6 +2394,10 @@ function renderLeaveTable() {
       ? '<span class="bdg bdg-pending">⏳ Pending</span>'
       : r.status==="approved"
       ? '<span class="bdg bdg-approved">✅ Approved</span>'
+      : r.status==="cancelled"
+      ? '<span class="bdg bdg-cancelled">🚫 Cancelled</span>'
+      : r.status==="cancel_requested"
+      ? '<span class="bdg bdg-cancel-req">⚠️ Cancel Requested</span>'
       : '<span class="bdg bdg-rejected">✗ Rejected</span>';
 
     var ltColor = {
@@ -2275,12 +2416,25 @@ function renderLeaveTable() {
         +'<button class="leave-act-btn leave-approve" onclick="approveLeave(\''+r.id+'\')">✓ Approve</button>'
         +'<button class="leave-act-btn leave-reject" onclick="promptReject(\''+r.id+'\')">✗ Reject</button>'
         +'</div>';
+    } else if (r.status==="approved") {
+      var decInfo = '<div style="font-size:.73rem;color:var(--ink3);line-height:1.7;margin-bottom:6px">Approved by <strong>'+(r.decidedBy||"—")+'</strong><br>'+(r.decidedDate||"—")+'</div>';
+      actions = decInfo + '<button class="leave-act-btn leave-cancel" onclick="adminCancelLeave(\''+r.id+'\')">🚫 Cancel Leave</button>';
+    } else if (r.status==="cancel_requested") {
+      var reqInfo = '<div style="font-size:.73rem;color:#c2410c;line-height:1.7;margin-bottom:6px">⚠️ Employee requested cancellation</div>';
+      actions = reqInfo
+        +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
+        +'<button class="leave-act-btn leave-approve" onclick="adminCancelLeave(\''+r.id+'\')">✓ Confirm Cancel</button>'
+        +'<button class="leave-act-btn leave-reject" onclick="adminKeepLeave(\''+r.id+'\')">✗ Keep Approved</button>'
+        +'</div>';
     } else {
-      var decInfo = '<span style="font-size:.73rem;color:var(--ink3);line-height:1.6">Decided by:<br><strong>'+(r.decidedBy||"—")+'</strong><br>'+(r.decidedDate||"—")+'</span>';
+      var decInfo2 = '<span style="font-size:.73rem;color:var(--ink3);line-height:1.6">Decided by:<br><strong>'+(r.decidedBy||"—")+'</strong><br>'+(r.decidedDate||"—")+'</span>';
       if (r.status==="rejected" && r.rejectReason) {
-        decInfo += '<br><span style="font-size:.73rem;color:var(--red)">Reason: '+r.rejectReason+'</span>';
+        decInfo2 += '<br><span style="font-size:.73rem;color:var(--red)">Reason: '+r.rejectReason+'</span>';
       }
-      actions = decInfo;
+      if (r.status==="cancelled" && r.cancelReason) {
+        decInfo2 += '<br><span style="font-size:.73rem;color:#c2410c">Cancel reason: '+r.cancelReason+'</span>';
+      }
+      actions = decInfo2;
     }
 
     var attBtn = r.attachmentBase64
@@ -2413,9 +2567,12 @@ function confirmReject() {
 
 // ── Send Leave Notification Email ───────────────────
 function sendLeaveEmail(rec, status, rejectReason) {
-  var isApproved = status === "approved";
+  var isApproved  = status === "approved";
+  var isCancelled = status === "cancelled";
   var subject = isApproved
     ? "✅ Leave Application Approved — " + rec.leaveType + " (" + rec.fromDate + " to " + rec.toDate + ")"
+    : isCancelled
+    ? "🚫 Leave Cancelled — " + rec.leaveType + " (" + rec.fromDate + " to " + rec.toDate + ")"
     : "❌ Leave Application Not Approved — " + rec.leaveType + " (" + rec.fromDate + " to " + rec.toDate + ")";
 
   var body = "Dear " + rec.empName + ",\n\n";
@@ -2434,6 +2591,22 @@ function sendLeaveEmail(rec, status, rejectReason) {
     body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
     body += "📌 IMPORTANT: You do NOT need to check in to the attendance system during your approved leave period. Your attendance will be automatically recorded as \"" + rec.leaveType + "\" for the approved dates.\n\n";
     body += "Please ensure you inform your supervisor and handover any pending tasks before your leave begins.\n\n";
+  } else if (isCancelled) {
+    body += "We wish to inform you that your approved leave has been CANCELLED.\n\n";
+    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    body += "CANCELLATION DETAILS\n";
+    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    body += "Employee ID    : " + rec.empId + "\n";
+    body += "Leave Type     : " + rec.leaveType + "\n";
+    body += "From Date      : " + rec.fromDate + "\n";
+    body += "To Date        : " + rec.toDate + "\n";
+    body += "Total Days     : " + rec.numDays + " day" + (rec.numDays!==1?"s":"") + "\n";
+    body += "Cancelled By   : " + (rec.cancelledBy||rec.decidedBy||"Admin") + "\n";
+    body += "Cancelled Date : " + (rec.cancelledDate||rec.decidedDate||"—") + "\n";
+    body += "Reason         : " + (rejectReason||rec.cancelReason||"—") + "\n";
+    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    body += "📌 IMPORTANT: Please note that your attendance will no longer be auto-marked as leave on the cancelled dates. You are required to check in as normal during this period.\n\n";
+    body += "If you believe this cancellation is in error, please contact your manager or HR immediately.\n\n";
   } else {
     body += "We regret to inform you that your leave application has NOT been approved.\n\n";
     body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
@@ -2709,10 +2882,10 @@ function checkApprovedLeaveForEmp(empId) {
     // (approved or rejected within last 30 days, plus any pending)
     var thirtyDaysAgo = Date.now() - 30*24*60*60*1000;
     var notable = recs.filter(function(r){
-      if (r.status==="approved" || r.status==="rejected") {
-        return (r.decidedAt||r.appliedAt||0) > thirtyDaysAgo;
+      if (r.status==="approved" || r.status==="rejected" || r.status==="cancelled") {
+        return (r.decidedAt||r.cancelledAt||r.appliedAt||0) > thirtyDaysAgo;
       }
-      return r.status==="pending"; // always show pending so they know it's waiting
+      return r.status==="pending" || r.status==="cancel_requested";
     });
 
     if (notable.length === 0) return;
@@ -2773,6 +2946,12 @@ function showLsnSingle(r, today) {
   } else if (r.status==="rejected") {
     skin = "lsn-rejected"; icon = "❌"; title = "Leave Not Approved";
     sub  = "Your leave application was not approved. Please check in as normal.";
+  } else if (r.status==="cancelled") {
+    skin = "lsn-rejected"; icon = "🚫"; title = "Leave Cancelled";
+    sub  = "Your approved leave has been cancelled. You are required to check in as normal.";
+  } else if (r.status==="cancel_requested") {
+    skin = "lsn-pending"; icon = "⏳"; title = "Cancellation Pending";
+    sub  = "Your cancellation request is waiting for admin confirmation.";
   } else {
     skin = "lsn-pending"; icon = "⏳"; title = "Leave Pending Review";
     sub  = "Your leave application is waiting for admin approval.";
@@ -2868,7 +3047,7 @@ function lsnRow(k, v) {
 function exportLeaveCSV() {
   var rows = filteredLeaves();
   if (!rows.length) { toast("No leave records to export", "t-err"); return; }
-  var hdr = ["Employee ID","Employee Name","Email","Site","Leave Type","From Date","To Date","Total Days","Reason","Status","Applied Date","Decided By","Decided Date","Reject Reason"].join(",");
+  var hdr = ["Employee ID","Employee Name","Email","Site","Leave Type","From Date","To Date","Total Days","Reason","Status","Applied Date","Decided By","Decided Date","Reject Reason","Cancelled By","Cancelled Date","Cancel Reason"].join(",");
   var lines = [hdr].concat(rows.map(function(r){
     return [
       '"'+(r.empId||"")+'"',
@@ -2884,7 +3063,10 @@ function exportLeaveCSV() {
       '"'+(r.appliedDate||"")+'"',
       '"'+(r.decidedBy||"")+'"',
       '"'+(r.decidedDate||"")+'"',
-      '"'+(r.rejectReason||"")+'"'
+      '"'+(r.rejectReason||"")+'"',
+      '"'+(r.cancelledBy||"")+'"',
+      '"'+(r.cancelledDate||"")+'"',
+      '"'+(r.cancelReason||"")+'"'
     ].join(",");
   }));
   var blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
@@ -2920,7 +3102,7 @@ function exportCombinedCSV() {
     ].join(","));
   });
 
-  // Approved leave records (one row per leave day)
+  // Approved (non-cancelled) leave records — one row per leave day
   leaveRecs.filter(function(r){return r.status==="approved";}).forEach(function(r){
     var from = new Date(r.fromDate), to = new Date(r.toDate);
     for (var d = new Date(from); d <= to; d.setDate(d.getDate()+1)) {
@@ -2950,6 +3132,350 @@ function exportCombinedCSV() {
 
 // ╔══════════════════════════════════════════════════════╗
 // ║  END LEAVE MODULE                                    ║
+// ╚══════════════════════════════════════════════════════╝
+
+// ╔══════════════════════════════════════════════════════╗
+// ║  MY LEAVES / EDIT / CANCEL MODULE                   ║
+// ╚══════════════════════════════════════════════════════╝
+
+// ── My Leaves Modal (employee) ──────────────────────
+function showMyLeaves() {
+  var modal = document.getElementById("myLeavesModal");
+  if (!modal) return;
+  // Pre-fill with session empId if available
+  var sess = getSess();
+  var inp = document.getElementById("myLeavesEmpId");
+  if (sess && sess.empId && inp) inp.value = sess.empId;
+  modal.classList.add("open");
+  if (inp && inp.value) loadMyLeaves();
+}
+
+function loadMyLeaves() {
+  var empId = ((document.getElementById("myLeavesEmpId")||{}).value||"").trim();
+  var list  = document.getElementById("myLeavesList");
+  var info  = document.getElementById("myLeavesEmpInfo");
+  if (!empId || !list) return;
+
+  list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink3)"><span class="spin" style="border-color:rgba(0,0,0,.15);border-top-color:var(--blue)"></span> Loading…</div>';
+
+  function renderMyList(recs) {
+    recs.sort(function(a,b){ return (b.appliedAt||0)-(a.appliedAt||0); });
+    if (info) info.textContent = "Showing " + recs.length + " application" + (recs.length!==1?"s":"") + " for " + empId;
+    if (!recs.length) {
+      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3);font-size:.88rem">No leave applications found for this Employee ID.</div>';
+      return;
+    }
+    list.innerHTML = recs.map(function(r){
+      var statusColor = {
+        pending:"#92400e", approved:"#15803d", rejected:"#b91c1c",
+        cancelled:"#6b7280", cancel_requested:"#c2410c"
+      }[r.status]||"#374151";
+      var statusLabel = {
+        pending:"⏳ Pending", approved:"✅ Approved", rejected:"❌ Rejected",
+        cancelled:"🚫 Cancelled", cancel_requested:"⚠️ Cancel Requested"
+      }[r.status]||r.status;
+
+      var btns = "";
+      if (r.status === "pending") {
+        btns = '<div style="display:flex;gap:8px;margin-top:10px">'
+          +'<button class="leave-act-btn leave-edit" style="flex:1;padding:8px;font-size:.82rem" onclick="openEditLeave(\''+r.id+'\')">✏️ Edit</button>'
+          +'<button class="leave-act-btn leave-cancel" style="flex:1;padding:8px;font-size:.82rem" onclick="empCancelLeave(\''+r.id+'\',false)">🗑️ Cancel Application</button>'
+          +'</div>';
+      } else if (r.status === "approved") {
+        btns = '<div style="margin-top:10px">'
+          +'<button class="leave-act-btn leave-cancel" style="width:100%;padding:8px;font-size:.82rem" onclick="empCancelLeave(\''+r.id+'\',true)">⚠️ Request Cancellation</button>'
+          +'</div>';
+      } else if (r.status === "cancel_requested") {
+        btns = '<div style="margin-top:8px;font-size:.78rem;color:#c2410c;background:#fff7ed;padding:8px 10px;border-radius:8px">⏳ Cancellation request sent — waiting for admin to confirm.</div>';
+      }
+
+      var decisionHtml = "";
+      if (r.decidedBy) decisionHtml += '<div style="font-size:.75rem;color:var(--ink3);margin-top:2px">Decision by: <strong>'+r.decidedBy+'</strong> · '+r.decidedDate+'</div>';
+      if (r.rejectReason) decisionHtml += '<div style="font-size:.75rem;color:var(--red);margin-top:2px">Reason: '+r.rejectReason+'</div>';
+      if (r.cancelReason) decisionHtml += '<div style="font-size:.75rem;color:#c2410c;margin-top:2px">Cancel reason: '+r.cancelReason+'</div>';
+
+      return '<div style="border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+        +'<div style="font-weight:800;font-size:.95rem">'+r.leaveType+'</div>'
+        +'<span style="font-size:.75rem;font-weight:700;color:'+statusColor+'">'+statusLabel+'</span>'
+        +'</div>'
+        +'<div style="font-size:.82rem;color:var(--ink2)">📅 '+r.fromDate+' → '+r.toDate+' <span style="background:#f3f4f6;padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:.74rem">'+r.numDays+' day'+(r.numDays!==1?'s':'')+'</span></div>'
+        +'<div style="font-size:.75rem;color:var(--ink3);margin-top:4px">Applied: '+r.appliedDate+'</div>'
+        + decisionHtml
+        + btns
+        +'</div>';
+    }).join("");
+  }
+
+  if (fbOk && db) {
+    db.collection("leaveApplications").where("empId","==",empId).get()
+      .then(function(snap){
+        var recs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+        renderMyList(recs);
+      }).catch(function(e){
+        list.innerHTML = '<div style="color:var(--red);font-size:.85rem;padding:16px">Error: '+fbErrMsg(e).split("\n")[0]+'</div>';
+      });
+  } else {
+    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+    renderMyList(ll.filter(function(r){ return r.empId===empId; }));
+  }
+}
+
+// ── Employee: Cancel a leave ────────────────────────
+var _cancelLeaveId = null;
+var _cancelIsApproved = false;
+
+function empCancelLeave(id, isApproved) {
+  _cancelLeaveId = id;
+  _cancelIsApproved = isApproved;
+
+  // Find the record to show info
+  function doShow(recs) {
+    var r = recs.find(function(x){ return x.id===id; });
+    if (!r) return;
+    var info = document.getElementById("cancelLeaveInfo");
+    if (info) info.textContent = r.leaveType + " · " + r.fromDate + " → " + r.toDate + " (" + r.numDays + " day" + (r.numDays!==1?"s":"") + ")";
+
+    var title = document.getElementById("cancelLeaveTitle");
+    var sub   = document.getElementById("cancelLeaveSub");
+    var reasonWrap = document.getElementById("cancelReasonWrap");
+    var confirmBtn = document.getElementById("cancelLeaveConfirmBtn");
+
+    if (isApproved) {
+      if (title) title.textContent = "⚠️ Request Leave Cancellation";
+      if (sub) sub.textContent = "This leave is already approved. A cancellation request will be sent to admin for confirmation. Please provide a reason.";
+      if (reasonWrap) reasonWrap.style.display = "block";
+      if (confirmBtn) confirmBtn.textContent = "⚠️ Send Cancellation Request";
+    } else {
+      if (title) title.textContent = "🗑️ Cancel Leave Application";
+      if (sub) sub.textContent = "Are you sure you want to cancel this leave application? This cannot be undone.";
+      if (reasonWrap) reasonWrap.style.display = "none";
+      if (confirmBtn) confirmBtn.textContent = "🗑️ Yes, Cancel Application";
+    }
+    // Clear reason field
+    var rf = document.getElementById("cancelLeaveReason"); if (rf) rf.value = "";
+    document.getElementById("cancelLeaveModal").classList.add("open");
+  }
+
+  // Close the My Leaves modal temporarily
+  // Find record in leaveRecs (admin) or fetch
+  if (leaveRecs.length) {
+    doShow(leaveRecs);
+  } else if (fbOk && db) {
+    db.collection("leaveApplications").doc(id).get().then(function(d){
+      if (d.exists) doShow([Object.assign({id:d.id},d.data())]);
+    });
+  } else {
+    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+    doShow(ll);
+  }
+}
+
+function confirmCancelLeave() {
+  var id = _cancelLeaveId;
+  var isApproved = _cancelIsApproved;
+
+  if (isApproved) {
+    // Need a reason
+    var reason = ((document.getElementById("cancelLeaveReason")||{}).value||"").trim();
+    if (!reason) { toast("Please enter a reason for cancellation", "t-err"); return; }
+
+    var updates = { status: "cancel_requested", cancelRequestReason: reason, cancelRequestedAt: Date.now() };
+    function onDone() {
+      document.getElementById("cancelLeaveModal").classList.remove("open");
+      toast("⚠️ Cancellation request sent to admin", "t-ok");
+      // Refresh my leaves list
+      loadMyLeaves();
+    }
+    if (fbOk && db) {
+      db.collection("leaveApplications").doc(id).update(updates).then(onDone)
+        .catch(function(e){ toast("Error: " + fbErrMsg(e).split("\n")[0], "t-err"); });
+    } else {
+      var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+      var idx = ll.findIndex(function(r){ return r.id===id; });
+      if (idx>-1) Object.assign(ll[idx], updates);
+      localStorage.setItem("at_leaves", JSON.stringify(ll));
+      onDone();
+    }
+  } else {
+    // Pending — just delete/cancel
+    var updates2 = { status: "cancelled", cancelledAt: Date.now(), cancelledBy: "Employee" };
+    function onDone2() {
+      document.getElementById("cancelLeaveModal").classList.remove("open");
+      toast("✅ Leave application cancelled", "t-ok");
+      loadMyLeaves();
+    }
+    if (fbOk && db) {
+      db.collection("leaveApplications").doc(id).update(updates2).then(onDone2)
+        .catch(function(e){ toast("Error: " + fbErrMsg(e).split("\n")[0], "t-err"); });
+    } else {
+      var ll2 = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+      var idx2 = ll2.findIndex(function(r){ return r.id===id; });
+      if (idx2>-1) Object.assign(ll2[idx2], updates2);
+      localStorage.setItem("at_leaves", JSON.stringify(ll2));
+      onDone2();
+    }
+  }
+}
+
+// ── Admin: Cancel an approved leave ────────────────
+function adminCancelLeave(id) {
+  var rec = leaveRecs.find(function(r){ return r.id===id; });
+  if (!rec) return;
+  var info = document.getElementById("cancelLeaveInfo");
+  if (info) info.textContent = (rec.empName||"—") + " (" + (rec.empId||"—") + ") · " + rec.leaveType + " · " + rec.fromDate + " → " + rec.toDate;
+
+  var title = document.getElementById("cancelLeaveTitle");
+  var sub   = document.getElementById("cancelLeaveSub");
+  var reasonWrap = document.getElementById("cancelReasonWrap");
+  var confirmBtn = document.getElementById("cancelLeaveConfirmBtn");
+  var rf = document.getElementById("cancelLeaveReason"); if (rf) rf.value = "";
+
+  if (title) title.textContent = "🚫 Cancel Approved Leave";
+  if (sub) sub.textContent = "This will cancel the approved leave and notify the employee by email. Provide a reason below.";
+  if (reasonWrap) reasonWrap.style.display = "block";
+  if (confirmBtn) confirmBtn.textContent = "🚫 Confirm Cancellation";
+
+  _cancelLeaveId = id;
+  _cancelIsApproved = false; // use a flag to know this is admin cancel
+  // Override the confirm button to call adminConfirmCancel
+  if (confirmBtn) confirmBtn.onclick = adminConfirmCancel;
+  document.getElementById("cancelLeaveModal").classList.add("open");
+}
+
+function adminConfirmCancel() {
+  var id = _cancelLeaveId;
+  var rec = leaveRecs.find(function(r){ return r.id===id; });
+  if (!rec) return;
+  var reason = ((document.getElementById("cancelLeaveReason")||{}).value||"").trim();
+  if (!reason) { toast("Please enter a cancellation reason", "t-err"); return; }
+
+  var user = (fbOk && firebase.auth().currentUser) ? firebase.auth().currentUser : null;
+  var adminEmail = user ? user.email : "Admin";
+  var now = new Date();
+  var updates = {
+    status: "cancelled",
+    cancelledAt: now.getTime(),
+    cancelledDate: now.toLocaleDateString("en-SG"),
+    cancelledBy: adminEmail,
+    cancelReason: reason
+  };
+
+  document.getElementById("cancelLeaveModal").classList.remove("open");
+  // Reset confirm button onclick back to default
+  var confirmBtn = document.getElementById("cancelLeaveConfirmBtn");
+  if (confirmBtn) confirmBtn.onclick = confirmCancelLeave;
+
+  function onDone() {
+    toast("🚫 Leave cancelled — notifying employee…", "t-ok");
+    sendLeaveEmail(Object.assign({}, rec, updates), "cancelled", reason);
+  }
+
+  if (fbOk && db) {
+    db.collection("leaveApplications").doc(id).update(updates).then(onDone)
+      .catch(function(e){ toast("Error: " + fbErrMsg(e).split("\n")[0], "t-err"); });
+  } else {
+    var idx = leaveRecs.findIndex(function(r){ return r.id===id; });
+    if (idx>-1) Object.assign(leaveRecs[idx], updates);
+    renderLeaveTable(); updateLeaveStats();
+    onDone();
+  }
+}
+
+function adminKeepLeave(id) {
+  // Admin decides to keep the approved leave despite employee's cancel request
+  var now = new Date();
+  var updates = { status: "approved", cancelRequestReason: null, cancelRequestedAt: null, keepNote: "Admin kept leave approved on " + now.toLocaleDateString("en-SG") };
+  if (fbOk && db) {
+    db.collection("leaveApplications").doc(id).update(updates)
+      .then(function(){ toast("✅ Leave kept as approved", "t-ok"); })
+      .catch(function(e){ toast("Error: " + e.message, "t-err"); });
+  } else {
+    var idx = leaveRecs.findIndex(function(r){ return r.id===id; });
+    if (idx>-1) Object.assign(leaveRecs[idx], updates);
+    renderLeaveTable(); toast("✅ Leave kept as approved", "t-ok");
+  }
+}
+
+// ── Edit Leave (employee, pending only) ─────────────
+var _editLeaveOrigRec = null;
+
+function openEditLeave(id) {
+  // Fetch the record
+  function doOpen(rec) {
+    if (!rec || rec.status !== "pending") { toast("Only pending applications can be edited", "t-err"); return; }
+    _editLeaveOrigRec = rec;
+
+    var lt = document.getElementById("editLeaveType");
+    if (lt) {
+      lt.innerHTML = "";
+      LEAVE_TYPES.forEach(function(t){ var o=document.createElement("option"); o.value=t; o.textContent=t; if(t===rec.leaveType)o.selected=true; lt.appendChild(o); });
+    }
+    var ef = document.getElementById("editLeaveFrom"); if(ef) ef.value = rec.fromDate||"";
+    var et = document.getElementById("editLeaveTo");   if(et) et.value = rec.toDate||"";
+    var er = document.getElementById("editLeaveReason"); if(er) er.value = rec.reason||"";
+    document.getElementById("editLeaveId").value = id;
+    calcEditLeaveDays();
+    document.getElementById("editLeaveModal").classList.add("open");
+  }
+
+  if (leaveRecs.length) {
+    doOpen(leaveRecs.find(function(r){ return r.id===id; }));
+  } else if (fbOk && db) {
+    db.collection("leaveApplications").doc(id).get()
+      .then(function(d){ if(d.exists) doOpen(Object.assign({id:d.id},d.data())); });
+  } else {
+    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+    doOpen(ll.find(function(r){ return r.id===id; }));
+  }
+}
+
+function calcEditLeaveDays() {
+  var f = (document.getElementById("editLeaveFrom")||{}).value;
+  var t = (document.getElementById("editLeaveTo")||{}).value;
+  var nd = document.getElementById("editLeaveNumDays");
+  if (!nd || !f || !t) return;
+  var diff = Math.round((new Date(t)-new Date(f))/(1000*60*60*24))+1;
+  nd.value = diff>0 ? diff+" day"+(diff!==1?"s":"") : "❌";
+  nd.style.color = diff>0 ? "var(--blue)" : "var(--red)";
+}
+
+function closeEditLeaveModal() {
+  document.getElementById("editLeaveModal").classList.remove("open");
+}
+
+function saveEditLeave() {
+  var id = (document.getElementById("editLeaveId")||{}).value;
+  var leaveType = (document.getElementById("editLeaveType")||{}).value;
+  var fromDate  = (document.getElementById("editLeaveFrom")||{}).value;
+  var toDate    = (document.getElementById("editLeaveTo")||{}).value;
+  var reason    = ((document.getElementById("editLeaveReason")||{}).value||"").trim();
+
+  if (!leaveType||!fromDate||!toDate) { toast("Please fill all fields", "t-err"); return; }
+  if (toDate < fromDate) { toast("To date must be after from date", "t-err"); return; }
+  var numDays = Math.round((new Date(toDate)-new Date(fromDate))/(1000*60*60*24))+1;
+
+  var updates = { leaveType:leaveType, fromDate:fromDate, toDate:toDate, numDays:numDays, reason:reason, editedAt:Date.now() };
+
+  function onDone() {
+    closeEditLeaveModal();
+    toast("✅ Leave application updated", "t-ok");
+    loadMyLeaves();
+  }
+  if (fbOk && db) {
+    db.collection("leaveApplications").doc(id).update(updates).then(onDone)
+      .catch(function(e){ toast("Error: "+fbErrMsg(e).split("\n")[0],"t-err"); });
+  } else {
+    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+    var idx = ll.findIndex(function(r){ return r.id===id; });
+    if (idx>-1) Object.assign(ll[idx], updates);
+    localStorage.setItem("at_leaves",JSON.stringify(ll));
+    onDone();
+  }
+}
+
+// ╔══════════════════════════════════════════════════════╗
+// ║  END MY LEAVES / EDIT / CANCEL MODULE               ║
 // ╚══════════════════════════════════════════════════════╝
 
 initFirebase();
