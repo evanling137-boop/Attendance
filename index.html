@@ -586,100 +586,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <div class="leave-banner-detail" id="leaveBannerDetail"></div>
     </div>
 
-    <!-- Apply Leave Button row -->
-    <div style="display:flex;gap:10px">
-      <button class="apply-leave-btn" id="applyLeaveBtn" onclick="showLeaveSection(true)" style="flex:1;margin-bottom:0">
-        📋 Apply for Leave
-      </button>
-      <button class="my-leaves-btn" id="myLeavesBtn" onclick="showMyLeaves()" style="flex:1;margin-bottom:0">
-        📁 My Leaves
-      </button>
-    </div>
-    <div style="margin-bottom:16px"></div>
-
-    <!-- ── LEAVE APPLICATION FORM ──────────────────── -->
-    <div id="leaveSection" style="display:none">
-
-      <div class="card">
-        <div class="card-lbl" style="color:var(--blue)">📋 Leave Application Form</div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="field">
-            <label>Engineer ID <span style="color:var(--red)">*</span></label>
-            <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;background:#fafaf8" id="leaveEngIdWrap">
-              <span style="padding:11px 10px 11px 14px;font-weight:800;font-family:var(--mono);font-size:.95rem;color:var(--blue);background:#eff6ff;border-right:1.5px solid var(--border);white-space:nowrap;user-select:none">Eng</span>
-              <input type="text" id="leaveEmpId" placeholder="01" inputmode="numeric" pattern="[0-9]*" maxlength="10"
-                style="border:none;background:transparent;padding:11px 14px;font-size:.95rem;font-family:var(--mono);width:100%;outline:none;color:var(--ink)"
-                oninput="engIdInput(this)"/>
-            </div>
-          </div>
-          </div>
-          <div class="field">
-            <label>Full Name <span style="color:var(--red)">*</span></label>
-            <input type="text" id="leaveEmpName" placeholder="e.g. Ahmad Bin Ali" maxlength="60"/>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Email Address <span style="color:var(--red)">*</span></label>
-          <input type="email" id="leaveEmail" placeholder="your.email@company.com"/>
-        </div>
-
-        <div class="field">
-          <label>Work Site <span style="color:var(--red)">*</span></label>
-          <select id="leaveSite"></select>
-        </div>
-
-        <div class="field">
-          <label>Leave Type <span style="color:var(--red)">*</span></label>
-          <select id="leaveType"></select>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-lbl">📅 Leave Period</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 90px;gap:12px;align-items:end">
-          <div class="field" style="margin-bottom:0">
-            <label>From Date <span style="color:var(--red)">*</span></label>
-            <input type="date" id="leaveFrom" onchange="calcLeaveDays()"/>
-          </div>
-          <div class="field" style="margin-bottom:0">
-            <label>To Date <span style="color:var(--red)">*</span></label>
-            <input type="date" id="leaveTo" onchange="calcLeaveDays()"/>
-          </div>
-          <div class="field" style="margin-bottom:0">
-            <label>Days</label>
-            <input type="text" id="leaveNumDays" readonly placeholder="Auto" style="background:#f3f4f6;text-align:center;font-family:var(--mono);font-weight:700;color:var(--blue)"/>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-lbl">📎 Supporting Documents <span style="color:var(--red);font-size:.75rem;font-weight:800">REQUIRED</span></div>
-        <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">Upload a photo or screenshot of your physical leave application form / MC slip. <strong style="color:var(--red)">This is mandatory</strong> — leave applications without an attachment will not be accepted. (Max 700 KB — JPG, PNG, or PDF)</p>
-        <div class="file-upload-wrap" id="leaveAttWrap">
-          <div class="fu-icon">📄</div>
-          <div class="fu-txt">Tap to upload<br><strong>Leave Form / MC / Supporting Document</strong></div>
-          <input type="file" id="leaveAttachment" accept="image/*,.pdf" onchange="handleLeaveAttachment(this)"/>
-        </div>
-        <div id="leaveAttName"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-lbl">✏️ Reason / Notes (Optional)</div>
-        <div class="field" style="margin-bottom:0">
-          <textarea id="leaveReason" placeholder="Provide any additional notes or reason for your leave…"></textarea>
-        </div>
-      </div>
-
-      <button class="act-btn" id="leaveSubmitBtn" onclick="submitLeave()" style="background:linear-gradient(135deg,#0077ff,#005acc);margin-bottom:10px">
-        📩 Submit Leave Application
-      </button>
-      <button onclick="showLeaveSection(false)" style="width:100%;padding:12px;border-radius:12px;background:transparent;border:1.5px solid var(--border);font-weight:600;color:var(--ink2);font-family:var(--body);cursor:pointer;font-size:.9rem;margin-bottom:16px">
-        ✕ Cancel
-      </button>
-    </div>
-
     <!-- Active session badge -->
     <div class="sess" id="sessBadge" style="display:none">
       <div class="sess-hdr">
@@ -769,6 +675,102 @@ tr.on-leave-row td{background:#f0f9ff!important}
     <div class="card" id="resultCard" style="display:none;margin-top:8px">
       <div class="card-lbl" id="resultTitle">Record</div>
       <div id="resultBody"></div>
+    </div>
+
+    <!-- ── DIVIDER ─────────────────────────────────── -->
+    <div style="height:1px;background:var(--border);margin:20px 0"></div>
+
+    <!-- Apply Leave Button row (second priority) -->
+    <div style="display:flex;gap:10px">
+      <button class="apply-leave-btn" id="applyLeaveBtn" onclick="showLeaveSection(true)" style="flex:1;margin-bottom:0">
+        📋 Apply for Leave
+      </button>
+      <button class="my-leaves-btn" id="myLeavesBtn" onclick="showMyLeaves()" style="flex:1;margin-bottom:0">
+        📁 My Leaves
+      </button>
+    </div>
+    <div style="margin-bottom:16px"></div>
+
+    <!-- ── LEAVE APPLICATION FORM ──────────────────── -->
+    <div id="leaveSection" style="display:none">
+
+      <div class="card">
+        <div class="card-lbl" style="color:var(--blue)">📋 Leave Application Form</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field">
+            <label>Engineer ID <span style="color:var(--red)">*</span></label>
+            <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;background:#fafaf8" id="leaveEngIdWrap">
+              <span style="padding:11px 10px 11px 14px;font-weight:800;font-family:var(--mono);font-size:.95rem;color:var(--blue);background:#eff6ff;border-right:1.5px solid var(--border);white-space:nowrap;user-select:none">Eng</span>
+              <input type="text" id="leaveEmpId" placeholder="01" inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                style="border:none;background:transparent;padding:11px 14px;font-size:.95rem;font-family:var(--mono);width:100%;outline:none;color:var(--ink)"
+                oninput="engIdInput(this)"/>
+            </div>
+          </div>
+          <div class="field">
+            <label>Full Name <span style="color:var(--red)">*</span></label>
+            <input type="text" id="leaveEmpName" placeholder="e.g. Ahmad Bin Ali" maxlength="60"/>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email Address <span style="color:var(--red)">*</span></label>
+          <input type="email" id="leaveEmail" placeholder="your.email@company.com"/>
+        </div>
+
+        <div class="field">
+          <label>Work Site <span style="color:var(--red)">*</span></label>
+          <select id="leaveSite"></select>
+        </div>
+
+        <div class="field">
+          <label>Leave Type <span style="color:var(--red)">*</span></label>
+          <select id="leaveType"></select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">📅 Leave Period</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 90px;gap:12px;align-items:end">
+          <div class="field" style="margin-bottom:0">
+            <label>From Date <span style="color:var(--red)">*</span></label>
+            <input type="date" id="leaveFrom" onchange="calcLeaveDays()"/>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>To Date <span style="color:var(--red)">*</span></label>
+            <input type="date" id="leaveTo" onchange="calcLeaveDays()"/>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Days</label>
+            <input type="text" id="leaveNumDays" readonly placeholder="Auto" style="background:#f3f4f6;text-align:center;font-family:var(--mono);font-weight:700;color:var(--blue)"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">📎 Supporting Documents <span style="color:var(--red);font-size:.75rem;font-weight:800">REQUIRED</span></div>
+        <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">Upload a photo or screenshot of your physical leave application form / MC slip. <strong style="color:var(--red)">This is mandatory</strong> — leave applications without an attachment will not be accepted. (Max 700 KB — JPG, PNG, or PDF)</p>
+        <div class="file-upload-wrap" id="leaveAttWrap">
+          <div class="fu-icon">📄</div>
+          <div class="fu-txt">Tap to upload<br><strong>Leave Form / MC / Supporting Document</strong></div>
+          <input type="file" id="leaveAttachment" accept="image/*,.pdf" onchange="handleLeaveAttachment(this)"/>
+        </div>
+        <div id="leaveAttName"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">✏️ Reason / Notes (Optional)</div>
+        <div class="field" style="margin-bottom:0">
+          <textarea id="leaveReason" placeholder="Provide any additional notes or reason for your leave…"></textarea>
+        </div>
+      </div>
+
+      <button class="act-btn" id="leaveSubmitBtn" onclick="submitLeave()" style="background:linear-gradient(135deg,#0077ff,#005acc);margin-bottom:10px">
+        📩 Submit Leave Application
+      </button>
+      <button onclick="showLeaveSection(false)" style="width:100%;padding:12px;border-radius:12px;background:transparent;border:1.5px solid var(--border);font-weight:600;color:var(--ink2);font-family:var(--body);cursor:pointer;font-size:.9rem;margin-bottom:16px">
+        ✕ Cancel
+      </button>
     </div>
 
   </div>
@@ -1596,10 +1598,11 @@ function initEmp() {
     document.getElementById("coSection").style.display = "none";
     document.getElementById("sessBadge").style.display = "none";
     document.getElementById("resultCard").style.display= "none";
-    // Show leave section hidden
-    var ls = document.getElementById("leaveSection"); if(ls) ls.style.display="none";
-    var ab = document.getElementById("applyLeaveBtn"); if(ab) ab.style.display="flex";
   }
+  // Always reset leave section to hidden, show buttons
+  var ls = document.getElementById("leaveSection"); if(ls) ls.style.display="none";
+  var ab = document.getElementById("applyLeaveBtn"); if(ab) ab.style.display="flex";
+  var mb = document.getElementById("myLeavesBtn"); if(mb) mb.style.display="flex";
 }
 
 function updateDur() {
@@ -2159,23 +2162,24 @@ function initEmailJS() {
 // ── Engineer: Show/Hide Leave Section ───────────────
 function showLeaveSection(show) {
   var ls = document.getElementById("leaveSection");
-  var cf = document.getElementById("ciForm");
   var ab = document.getElementById("applyLeaveBtn");
-  var cs = document.getElementById("coSection");
-  if (ls) ls.style.display = show ? "block" : "none";
-  if (ab) ab.style.display = show ? "none" : "flex";
-  if (!show && cf) {
-    // Only show ciForm if not checked in
-    var sess = getSess();
-    var isCheckedIn = sess && sess.checkinTimestamp && !sess.checkoutTimestamp;
-    cf.style.display = isCheckedIn ? "none" : "block";
-    if (cs) cs.style.display = isCheckedIn ? "block" : "none";
-  } else if (show && cf) {
-    cf.style.display = "none";
-    if (cs) cs.style.display = "none";
+  var mb = document.getElementById("myLeavesBtn");
+
+  if (show) {
+    // Hide attendance, show leave form
+    if (ls) ls.style.display = "block";
+    if (ab) ab.style.display = "none";
+    if (mb) mb.style.display = "none";
+    initLeaveForm();
+  } else {
+    // Show leave buttons, hide form
+    if (ls) ls.style.display = "none";
+    if (ab) ab.style.display = "flex";
+    if (mb) mb.style.display = "flex";
   }
-  if (show) initLeaveForm();
-  // reset result card
+  // Clear any error box
+  clearLeaveError();
+  // Reset result card
   var rc = document.getElementById("resultCard"); if(rc) rc.style.display = "none";
 }
 
@@ -2931,20 +2935,34 @@ function checkApprovedLeaveForEmp(empId) {
     // Sort: most recently applied first
     recs.sort(function(a,b){ return (b.appliedAt||0)-(a.appliedAt||0); });
 
-    // Check if on approved leave today → show banner + block check-in
+    // Check if on approved leave TODAY → show banner + block check-in
     var onLeaveToday = recs.find(function(r){
       return r.status==="approved" && today>=r.fromDate && today<=r.toDate;
     });
     if (onLeaveToday) showLeaveBanner(onLeaveToday);
 
-    // Show popup for any decisions the engineer may not have seen yet
-    // (approved or rejected within last 30 days, plus any pending)
-    var thirtyDaysAgo = Date.now() - 30*24*60*60*1000;
+    // Show popup only for leaves that are still relevant:
+    // - pending / cancel_requested: always show (engineer is waiting for a decision)
+    // - approved: only if leave is today or in the future (not expired)
+    // - rejected / cancelled: only if decided within last 7 days AND leave end date is not past
+    //   (so the engineer sees the rejection once, but it won't pop forever)
+    var sevenDaysAgo = Date.now() - 7*24*60*60*1000;
     var notable = recs.filter(function(r){
-      if (r.status==="approved" || r.status==="rejected" || r.status==="cancelled") {
-        return (r.decidedAt||r.cancelledAt||r.appliedAt||0) > thirtyDaysAgo;
+      // Never pop expired leaves — toDate is in the past
+      var isExpired = r.toDate && r.toDate < today;
+
+      if (r.status === "pending" || r.status === "cancel_requested") {
+        return true; // Always show — engineer needs to know it's waiting
       }
-      return r.status==="pending" || r.status==="cancel_requested";
+      if (r.status === "approved") {
+        return !isExpired; // Only show if leave hasn't ended yet
+      }
+      if (r.status === "rejected" || r.status === "cancelled") {
+        // Show only if decision was recent (last 7 days) — once seen, stop showing
+        var decidedRecently = (r.decidedAt||r.cancelledAt||0) > sevenDaysAgo;
+        return decidedRecently && !isExpired;
+      }
+      return false;
     });
 
     if (notable.length === 0) return;
