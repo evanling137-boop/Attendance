@@ -13,7 +13,7 @@
   img-src 'self' data: https://maps.google.com;
   frame-src https://attendtrack-94b96.firebaseapp.com;
 ">
-<title>AttendTrack — Smart Attendance System</title>
+<title>Attendance System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
@@ -250,7 +250,7 @@ tr:hover td{background:#fafdf8}
 #toast.t-ok{background:linear-gradient(135deg,#00c896,#00a878)}
 #toast.t-err{background:linear-gradient(135deg,#ff3b5c,#e02040)}
 
-/* Employee container */
+/* Engineer container */
 .emp-wrap{max-width:480px;margin:0 auto;padding:20px 16px 60px}
 
 /* ── SELFIE ── */
@@ -321,7 +321,7 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 #leaveSubmitBtn{background:linear-gradient(135deg,#0077ff,#005acc)}
 #leaveSubmitBtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,119,255,.35)}
 
-/* Leave status banner (employee) */
+/* Leave status banner (engineer) */
 .leave-active-banner{
   background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1.5px solid #93c5fd;
   border-radius:var(--r2);padding:20px;margin-bottom:16px;
@@ -391,7 +391,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
   padding:2px 8px;min-width:32px;
 }
 
-/* Leave info card (employee — pending applications) */
+/* Leave info card (engineer — pending applications) */
 .leave-info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.83rem}
 .leave-info-row:last-child{border:none}
 
@@ -463,7 +463,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
 .bdg-cancelled{background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db}
 .bdg-cancel-req{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
 
-/* My Leaves button (employee screen) */
+/* My Leaves button (engineer screen) */
 .my-leaves-btn{
   width:100%;padding:11px;border-radius:12px;font-size:.88rem;font-weight:700;
   background:transparent;border:1.5px solid var(--border);color:var(--ink2);
@@ -525,18 +525,18 @@ tr.on-leave-row td{background:#f0f9ff!important}
      LANDING
 ══════════════════════════════════════════ -->
 <div id="screen-landing" class="screen active flex-screen">
-  <div class="land-mono">⚡ AttendTrack</div>
+  <div class="land-mono">⚡ Attendance System</div>
   <h1 class="land-h1">Smart Attendance<br><span>Made Simple</span></h1>
-  <p class="land-sub">GPS-verified check-ins, live employer dashboard, and real-time tracking — all from a single link.</p>
+  <p class="land-sub">GPS-verified check-ins, live admin dashboard, and real-time tracking — all from a single link.</p>
   <div class="land-cards">
-    <div class="land-card" onclick="showScreen('employee')">
+    <div class="land-card" onclick="showScreen('engineer')">
       <div class="land-card-icon">📲</div>
-      <div class="land-card-title">Employee</div>
+      <div class="land-card-title">Engineer</div>
       <div class="land-card-desc">Check in &amp; out with GPS location verification</div>
     </div>
     <div class="land-card" onclick="showScreen('admin-login')">
       <div class="land-card-icon">📊</div>
-      <div class="land-card-title">Employer Dashboard</div>
+      <div class="land-card-title">Admin Dashboard</div>
       <div class="land-card-desc">Track all staff in real-time, view reports &amp; history</div>
     </div>
   </div>
@@ -548,7 +548,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
 <div id="screen-admin-login" class="screen">
   <div class="login-card">
     <div class="login-h">Dashboard Login</div>
-    <div class="login-sub">Enter your employer credentials</div>
+    <div class="login-sub">Enter your admin credentials</div>
     <div class="lf"><label>Email</label><input type="email" id="adminUser" placeholder="admin@yourcompany.com" autocomplete="off"/></div>
     <div class="lf"><label>Password</label><input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
     <button class="login-btn" onclick="doLogin()">Access Dashboard →</button>
@@ -560,9 +560,9 @@ tr.on-leave-row td{background:#f0f9ff!important}
 </div>
 
 <!-- ══════════════════════════════════════════
-     EMPLOYEE APP
+     ENGINEER APP
 ══════════════════════════════════════════ -->
-<div id="screen-employee" class="screen">
+<div id="screen-engineer" class="screen">
   <div class="topbar">
     <span class="tb-logo">AT</span>
     <span class="tb-title">Check Attendance</span>
@@ -580,7 +580,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <div class="emp-clock-date" id="empDate">Loading…</div>
     </div>
 
-    <!-- Leave active banner (shown when employee is on approved leave today) -->
+    <!-- Leave active banner (shown when engineer is on approved leave today) -->
     <div id="leaveActiveBanner" style="display:none" class="leave-active-banner">
       <div class="leave-banner-title" id="leaveBannerTitle">🌴 You are on leave today</div>
       <div class="leave-banner-detail" id="leaveBannerDetail"></div>
@@ -605,8 +605,14 @@ tr.on-leave-row td{background:#f0f9ff!important}
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div class="field">
-            <label>Employee ID <span style="color:var(--red)">*</span></label>
-            <input type="text" id="leaveEmpId" placeholder="e.g. EMP001" maxlength="20"/>
+            <label>Engineer ID <span style="color:var(--red)">*</span></label>
+            <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;background:#fafaf8" id="leaveEngIdWrap">
+              <span style="padding:11px 10px 11px 14px;font-weight:800;font-family:var(--mono);font-size:.95rem;color:var(--blue);background:#eff6ff;border-right:1.5px solid var(--border);white-space:nowrap;user-select:none">Eng</span>
+              <input type="text" id="leaveEmpId" placeholder="01" inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                style="border:none;background:transparent;padding:11px 14px;font-size:.95rem;font-family:var(--mono);width:100%;outline:none;color:var(--ink)"
+                oninput="engIdInput(this)"/>
+            </div>
+          </div>
           </div>
           <div class="field">
             <label>Full Name <span style="color:var(--red)">*</span></label>
@@ -680,7 +686,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <span style="color:#9ca3af;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px">Active Session</span>
         <span class="sess-tag sess-in">✅ CHECKED IN</span>
       </div>
-      <div class="sess-row"><span class="sess-k">Employee</span><span class="sess-v" id="sb-emp">—</span></div>
+      <div class="sess-row"><span class="sess-k">Engineer</span><span class="sess-v" id="sb-emp">—</span></div>
       <div class="sess-row"><span class="sess-k">Site</span><span class="sess-v" id="sb-site">—</span></div>
       <div class="sess-row"><span class="sess-k">Checked in at</span><span class="sess-v" id="sb-cin">—</span></div>
       <div class="sess-row"><span class="sess-k">Duration</span><span class="sess-v" id="sb-dur">—</span></div>
@@ -689,8 +695,15 @@ tr.on-leave-row td{background:#f0f9ff!important}
     <!-- Check-in form -->
     <div id="ciForm">
       <div class="card">
-        <div class="card-lbl">Employee Details</div>
-        <div class="field"><label>Employee ID</label><input type="text" id="empId" placeholder="e.g. EMP001" oninput="chkBtn()" onblur="if(this.value.trim()){checkApprovedLeaveForEmp(this.value.trim())}"/></div>
+        <div class="card-lbl">Engineer Details</div>
+        <div class="field"><label>Engineer ID</label>
+          <div style="display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;background:#fafaf8;transition:border .2s,box-shadow .2s" id="engIdWrap">
+            <span style="padding:11px 10px 11px 14px;font-weight:800;font-family:var(--mono);font-size:.95rem;color:var(--blue);background:#eff6ff;border-right:1.5px solid var(--border);white-space:nowrap;user-select:none">Eng</span>
+            <input type="text" id="empId" placeholder="01" inputmode="numeric" pattern="[0-9]*" maxlength="10"
+              style="border:none;background:transparent;padding:11px 14px;font-size:.95rem;font-family:var(--mono);width:100%;outline:none;color:var(--ink)"
+              oninput="engIdInput(this)" onblur="if(getEngId()){checkApprovedLeaveForEmp(getEngId())}"/>
+          </div>
+        </div>
         <div class="field"><label>Full Name</label><input type="text" id="empName" placeholder="e.g. Ahmad Bin Ali" oninput="chkBtn()"/></div>
         <div class="field"><label>Work Site</label>
           <select id="empSite" onchange="chkBtn();resetGps('in')">
@@ -709,7 +722,15 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <!-- Selfie verification card -->
       <div class="card">
         <div class="card-lbl">🤳 Identity Selfie <span style="color:var(--red);font-size:.75rem;font-weight:800">REQUIRED</span></div>
-        <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">Take a clear selfie of your face to verify your identity. Admin will review all photos.</p>
+        <div style="background:linear-gradient(135deg,#0d1117,#1a2233);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+          <div style="color:#fff;font-size:.82rem;font-weight:700;margin-bottom:6px">📸 Selfie Requirements:</div>
+          <div style="color:#9ca3af;font-size:.79rem;line-height:1.7">
+            ① <strong style="color:#e5e7eb">Face clearly visible</strong> — no mask, no sunglasses, face centred<br>
+            ② <strong style="color:#e5e7eb">Show your location</strong> — your surroundings must be recognisable (worksite, building, signage)<br>
+            ③ <strong style="color:#e5e7eb">Good lighting</strong> — avoid dark or blurry photos<br>
+            <span style="color:var(--orange);font-weight:700">⚠ Selfies that do not show a clear location will be flagged by admin.</span>
+          </div>
+        </div>
         <div class="selfie-wrap" id="selfieWrap">
           <div class="selfie-placeholder" id="selfiePlaceholder">📷<br><br>Tap "Open Camera" below</div>
           <video id="selfieVideo" autoplay playsinline style="display:none"></video>
@@ -759,7 +780,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
 <div id="screen-dashboard" class="screen">
   <div class="topbar">
     <span class="tb-logo">AT</span>
-    <span class="tb-title">Employer Dashboard</span>
+    <span class="tb-title">Admin Dashboard</span>
     <span class="live-dot" style="margin-left:4px">LIVE</span>
     <button class="tb-back" onclick="doSignOut()" style="margin-left:auto">Sign Out</button>
   </div>
@@ -808,7 +829,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <div style="overflow-x:auto">
           <table>
             <thead><tr>
-              <th>Employee</th><th>Selfie</th><th>Site</th><th>Status</th>
+              <th>Engineer</th><th>Selfie</th><th>Site</th><th>Status</th>
               <th>Check-In</th><th>Check-Out</th><th>Duration</th>
               <th>GPS In</th><th>GPS Out</th><th>Device</th><th>Date</th>
             </tr></thead>
@@ -818,7 +839,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <div id="tblEmpty" class="empty" style="display:none">
           <div class="empty-icon">📋</div>
           <div class="empty-t">No records yet</div>
-          <div>Records appear here in real time once employees check in</div>
+          <div>Records appear here in real time once engineers check in</div>
         </div>
       </div>
     </div>
@@ -867,7 +888,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <div style="overflow-x:auto">
           <table>
             <thead><tr>
-              <th>Employee</th>
+              <th>Engineer</th>
               <th>Leave Type</th>
               <th>Period</th>
               <th>Days</th>
@@ -882,7 +903,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <div id="leaveTblEmpty" class="empty" style="display:none">
           <div class="empty-icon">🗓️</div>
           <div class="empty-t">No leave applications yet</div>
-          <div>Leave applications from employees will appear here</div>
+          <div>Leave applications from engineers will appear here</div>
         </div>
       </div>
 
@@ -898,8 +919,8 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <div style="background:linear-gradient(135deg,#0d1117,#1a2233);border-radius:var(--r2);padding:18px 20px;margin-bottom:18px;display:flex;align-items:flex-start;gap:14px">
         <div style="font-size:2rem;flex-shrink:0">🔒</div>
         <div>
-          <div style="color:#fff;font-weight:800;font-size:1rem;margin-bottom:4px">Device–Employee Binding</div>
-          <div style="color:#9ca3af;font-size:.83rem;line-height:1.6">Each employee's phone generates a unique <strong style="color:#e5e7eb">Device ID</strong> on first use. It is saved with every check-in record. If one device is used to check in <strong style="color:var(--orange)">more than one employee on the same date</strong>, it is automatically flagged as a suspected buddy-punch attempt.</div>
+          <div style="color:#fff;font-weight:800;font-size:1rem;margin-bottom:4px">Device–Engineer Binding</div>
+          <div style="color:#9ca3af;font-size:.83rem;line-height:1.6">Each engineer's phone generates a unique <strong style="color:#e5e7eb">Device ID</strong> on first use. It is saved with every check-in record. If one device is used to check in <strong style="color:var(--orange)">more than one engineer on the same date</strong>, it is automatically flagged as a suspected buddy-punch attempt.</div>
         </div>
       </div>
 
@@ -909,14 +930,14 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <!-- All device bindings table -->
       <div class="tbl-wrap">
         <div class="tbl-hdr">
-          <span class="tbl-hdr-t">📱 Device — Employee Registry</span>
+          <span class="tbl-hdr-t">📱 Device — Engineer Registry</span>
           <span class="tbl-count" id="deviceCount">—</span>
         </div>
         <div style="overflow-x:auto">
           <table>
             <thead><tr>
               <th>Device ID</th>
-              <th>Employee(s) on This Device</th>
+              <th>Engineer(s) on This Device</th>
               <th>Last Check-In</th>
               <th>Total Check-Ins</th>
               <th>Flag</th>
@@ -934,8 +955,8 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:var(--r);padding:14px 16px;margin-top:16px;font-size:.82rem;color:#0369a1;line-height:1.7">
         <strong>💡 How to investigate a flagged device:</strong><br>
         1. Note the Device ID from the flagged row above<br>
-        2. Go to <strong>Live Status</strong> tab and search for the Employee ID of any suspicious record<br>
-        3. Compare the selfie photos for each employee who used that device — if the same face appears, it confirms buddy punching<br>
+        2. Go to <strong>Live Status</strong> tab and search for the Engineer ID of any suspicious record<br>
+        3. Compare the selfie photos for each engineer who used that device — if the same face appears, it confirms buddy punching<br>
         4. Cross-reference GPS check-in locations if needed
       </div>
     </div>
@@ -950,7 +971,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
           <div class="gs-body"><ol>
             <li>Open <strong>console.firebase.google.com</strong> in your browser</li>
             <li>Sign in with your Google account</li>
-            <li>Click <strong>"Add project"</strong> → name it <strong>AttendTrack</strong></li>
+            <li>Click <strong>"Add project"</strong> → name it <strong>Attendance System</strong></li>
             <li>Disable Google Analytics → click <strong>"Create project"</strong></li>
             <li>Wait ~30 seconds for it to be ready, then click <strong>"Continue"</strong></li>
           </ol></div>
@@ -1020,7 +1041,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
 service cloud.firestore {
   match /databases/{database}/documents {
     match /attendance/{docId} {
-      // Employees can check in (create record) without login
+      // Engineers can check in (create record) without login
       allow create: if request.resource.data.keys().hasAll([
                       'empId','empName','site','checkinTimestamp','status'])
                     && request.resource.data.empId is string
@@ -1031,7 +1052,7 @@ service cloud.firestore {
                     && request.resource.data.empName.size() &lt;= 60
                     && request.resource.data.status == 'in';
 
-      // Employees can check out (update only allowed fields)
+      // Engineers can check out (update only allowed fields)
       allow update: if request.resource.data.diff(resource.data)
                       .affectedKeys().hasOnly([
                         'checkoutTime','checkoutISO','checkoutTimestamp',
@@ -1044,7 +1065,7 @@ service cloud.firestore {
     }
   }
 }</pre>
-            <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This ensures only your admin can view data. Employees can only write their own records.</p>
+            <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This ensures only your admin can view data. Engineers can only write their own records.</p>
           </div>
         </div>
 
@@ -1069,7 +1090,7 @@ service cloud.firestore {
             <li>Go to <strong>app.netlify.com/drop</strong></li>
             <li>Drag and drop your <code>attendance_system.html</code> file onto the page</li>
             <li>Wait 10 seconds — you'll get a free URL like <code>https://amazing-name-123.netlify.app</code></li>
-            <li>Share that URL with all your employees!</li>
+            <li>Share that URL with all your engineers!</li>
           </ol>
           <p style="margin-top:10px;color:#15803d;font-weight:600">✅ That's it! No coding skills needed. Completely free.</p>
           </div>
@@ -1077,7 +1098,7 @@ service cloud.firestore {
 
         <div style="background:#fffbeb;border-radius:var(--r);padding:16px 18px;border:1px solid #fde68a;font-size:.84rem;color:#78350f">
           <strong>Firebase Free Tier limits</strong> (Spark plan — always free):<br>
-          1 GB storage · 50,000 reads/day · 20,000 writes/day — more than enough for 100 employees.
+          1 GB storage · 50,000 reads/day · 20,000 writes/day — more than enough for 100 engineers.
         </div>
 
         <div class="guide-step" style="margin-top:20px;border-left:4px solid var(--blue)">
@@ -1085,7 +1106,7 @@ service cloud.firestore {
           <div class="gs-body">
             <p>In Firebase Console → <strong>Firestore Database</strong> → <strong>Rules</strong> tab, add the <code>leaveApplications</code> collection rules inside the existing <code>match /databases/{database}/documents</code> block:</p>
             <pre>match /leaveApplications/{docId} {
-  // Any employee can submit a leave application
+  // Any engineer can submit a leave application
   allow create: if request.resource.data.keys().hasAll([
                   'empId','empName','empEmail','leaveType',
                   'fromDate','toDate','numDays','status'])
@@ -1093,13 +1114,13 @@ service cloud.firestore {
                 && request.resource.data.empId.size() > 0
                 && request.resource.data.status == 'pending';
 
-  // Employees can read leave records (to check status)
+  // Engineers can read leave records (to check status)
   allow read: if true;
 
   // Only signed-in admin can update (approve/reject) or delete
   allow update, delete: if request.auth != null;
 }</pre>
-            <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This allows employees to submit and view leave applications. Only your admin can approve or reject them.</p>
+            <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This allows engineers to submit and view leave applications. Only your admin can approve or reject them.</p>
           </div>
         </div>
 
@@ -1129,17 +1150,22 @@ service cloud.firestore {
   <button onclick="document.getElementById('selfieLightbox').style.display='none'" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:10px 28px;border-radius:30px;font-size:.9rem;cursor:pointer">✕ Close</button>
 </div>
 
-<!-- ══ MY LEAVES MODAL (employee) ════════════════════ -->
+<!-- ══ MY LEAVES MODAL (engineer) ════════════════════ -->
 <div id="myLeavesModal" class="modal-overlay">
   <div class="modal-box" style="max-width:540px;max-height:90vh;overflow-y:auto">
     <button class="modal-close" onclick="document.getElementById('myLeavesModal').classList.remove('open')">✕</button>
     <div class="modal-title">📁 My Leave Applications</div>
-    <div class="modal-sub" id="myLeavesEmpInfo">Enter your Employee ID to view your leaves</div>
+    <div class="modal-sub" id="myLeavesEmpInfo">Enter your Engineer ID to view your leaves</div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
-      <input type="text" id="myLeavesEmpId" placeholder="Employee ID (e.g. EMP001)" style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:.9rem;font-family:var(--body)"/>
+      <div style="flex:1;display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;background:#fafaf8">
+        <span style="padding:10px 8px 10px 14px;font-weight:800;font-family:var(--mono);font-size:.9rem;color:var(--blue);background:#eff6ff;border-right:1.5px solid var(--border);white-space:nowrap;user-select:none">Eng</span>
+        <input type="text" id="myLeavesEmpId" placeholder="01" inputmode="numeric" pattern="[0-9]*" maxlength="10"
+          style="border:none;background:transparent;padding:10px 12px;font-size:.9rem;font-family:var(--mono);width:100%;outline:none;color:var(--ink)"
+          oninput="engIdInput(this)" onkeydown="if(event.key==='Enter')loadMyLeaves()"/>
+      </div>
       <button onclick="loadMyLeaves()" style="padding:10px 18px;border-radius:var(--r);background:var(--blue);color:#fff;border:none;font-weight:700;font-family:var(--body);cursor:pointer;font-size:.88rem">Search</button>
     </div>
-    <div id="myLeavesList"><div style="text-align:center;padding:30px;color:var(--ink3);font-size:.88rem">Enter your Employee ID above and tap Search</div></div>
+    <div id="myLeavesList"><div style="text-align:center;padding:30px;color:var(--ink3);font-size:.88rem">Enter your Engineer ID above and tap Search</div></div>
   </div>
 </div>
 
@@ -1201,9 +1227,9 @@ service cloud.firestore {
   <div class="modal-box">
     <button class="modal-close" onclick="closeRejectModal()">✕</button>
     <div class="modal-title">✗ Reject Leave Application</div>
-    <div class="modal-sub">Please provide a reason — this will be included in the notification email to the employee.</div>
+    <div class="modal-sub">Please provide a reason — this will be included in the notification email to the engineer.</div>
     <div class="ef-field">
-      <div class="ef-label">Employee</div>
+      <div class="ef-label">Engineer</div>
       <div class="ef-value" id="rejectEmpInfo" style="margin-bottom:12px">—</div>
     </div>
     <textarea class="modal-textarea" id="rejectReasonInput" placeholder="e.g. Insufficient leave balance / Operational requirements during this period / Please reapply with supporting documents…"></textarea>
@@ -1366,7 +1392,7 @@ function showScreen(id) {
   } else {
     el.style.display = "block";
   }
-  if (id === "employee") initEmp();
+  if (id === "engineer") initEmp();
   if (id === "dashboard") initDash();
 }
 
@@ -1483,19 +1509,49 @@ function setSess(d) { localStorage.setItem("at_sess", d ? JSON.stringify(d) : "n
 function getSessDocId() { return localStorage.getItem("at_sess_doc") || null; }
 function setSessDocId(id) { if(id) localStorage.setItem("at_sess_doc",id); else localStorage.removeItem("at_sess_doc"); }
 
-// ── Enable/disable buttons ─────────────────────────
+// ── Engineer ID prefix helpers ──────────────────────
+// All Engineer IDs are stored as "Eng" + whatever the user types (e.g. "Eng01")
+function engIdInput(input) {
+  // Strip any non-alphanumeric characters; prevent user from typing "Eng" prefix manually
+  var val = input.value.replace(/^[Ee][Nn][Gg]*/,"").replace(/[^a-zA-Z0-9]/g,"");
+  input.value = val;
+  chkBtn();
+}
+
+// Returns the full ID with Eng prefix, or "" if input is empty
+function getEngId(inputId) {
+  var el = document.getElementById(inputId || "empId");
+  if (!el) return "";
+  var val = (el.value || "").trim();
+  if (!val) return "";
+  // Already has Eng prefix (safety guard)
+  if (/^[Ee][Nn][Gg]/i.test(val)) return "Eng" + val.replace(/^[Ee][Nn][Gg]*/i,"");
+  return "Eng" + val;
+}
+
+// Focus styling for the Eng prefix input wrapper
+document.addEventListener("DOMContentLoaded", function(){
+  ["engIdWrap","leaveEngIdWrap"].forEach(function(wrapId){
+    var wrap = document.getElementById(wrapId);
+    if (!wrap) return;
+    var inp = wrap.querySelector("input");
+    if (!inp) return;
+    inp.addEventListener("focus", function(){ wrap.style.borderColor="var(--blue)"; wrap.style.boxShadow="0 0 0 3px rgba(0,119,255,.1)"; });
+    inp.addEventListener("blur",  function(){ wrap.style.borderColor=""; wrap.style.boxShadow=""; });
+  });
+});
+
 function chkBtn() {
-  var id   = (document.getElementById("empId")   ||{}).value||"";
+  var id   = getEngId("empId");
   var name = (document.getElementById("empName") ||{}).value||"";
   var site = (document.getElementById("empSite") ||{}).value||"";
   var ci = document.getElementById("ciBtn");
-  // ✅ ANTI-BUDDY-PUNCH: selfie is now required to enable check-in
-  if (ci) ci.disabled = !(id.trim() && name.trim() && site && GPS.in && GPS.in.ok && selfieData);
+  if (ci) ci.disabled = !(id && name.trim() && site && GPS.in && GPS.in.ok && selfieData);
   var co = document.getElementById("coBtn");
   if (co) co.disabled = !(GPS.out && GPS.out.ok);
 }
 
-// ── Init employee screen ───────────────────────────
+// ── Init engineer screen ───────────────────────────
 function initEmp() {
   // Populate site dropdown
   var sel = document.getElementById("empSite");
@@ -1533,7 +1589,7 @@ function initEmp() {
     document.getElementById("sb-site").textContent = sess.site;
     document.getElementById("sb-cin").textContent  = sess.checkinTime;
     updateDur();
-    // Also check if checked-in employee has leave (just for info)
+    // Also check if checked-in engineer has leave (just for info)
     checkApprovedLeaveForEmp(sess.empId);
   } else {
     document.getElementById("ciForm").style.display    = "block";
@@ -1596,7 +1652,7 @@ function startCamera() {
       document.getElementById("selfieCamBtn").style.display = "none";
       document.getElementById("selfieSnapBtn").style.display = "flex";
       document.getElementById("selfieRetakeBtn").style.display = "none";
-      document.getElementById("selfieStatus").innerHTML = '<div class="pill pill-info" style="margin-top:8px">📷 Camera active — look straight at the camera</div>';
+      document.getElementById("selfieStatus").innerHTML = '<div class="pill pill-info" style="margin-top:8px">📷 Camera active — face + visible location in frame, then tap Take Photo</div>';
       selfieData = null;
       chkBtn();
     })
@@ -1679,15 +1735,15 @@ function recordDeviceCheckin(empId) {
 
 // ── Check-in ───────────────────────────────────────
 function doCheckin() {
-  // ✅ SECURITY: Sanitize all employee inputs before saving to Firestore
-  var empId   = sanitize(document.getElementById("empId").value, 20);
+  // Build full Engineer ID with "Eng" prefix
+  var empId   = sanitize(getEngId("empId"), 20);
   var empName = sanitize(document.getElementById("empName").value, 60);
   var siteIdx = document.getElementById("empSite").value;
 
   // Validate inputs
-  if (!empId || !empName) { toast("Invalid employee details", "t-err"); return; }
-  if (!/^[a-zA-Z0-9\-_]+$/.test(empId)) { toast("Employee ID: letters, numbers, hyphens only", "t-err"); return; }
-  if (empName.length < 2) { toast("Please enter a valid full name", "t-err"); return; }
+  if (!empId || empId === "Eng") { toast("Please enter your Engineer number", "t-err"); return; }
+  if (!/^Eng[a-zA-Z0-9]+$/.test(empId)) { toast("Engineer ID must start with Eng followed by your number (e.g. Eng01)", "t-err"); return; }
+  if (!empName || empName.length < 2) { toast("Please enter a valid full name", "t-err"); return; }
 
   // ✅ ANTI-BUDDY-PUNCH: Require selfie photo
   if (!selfieData) { toast("📷 Please take a selfie first", "t-err"); return; }
@@ -1698,7 +1754,7 @@ function doCheckin() {
     toast("⛔ This device already checked in " + alreadyCheckedIn + " today", "t-err");
     document.getElementById("ciBtn").disabled = true;
     setTimeout(function(){
-      alert("⛔ Buddy Punching Detected!\n\nThis device was already used to check in employee: " + alreadyCheckedIn + "\n\nEach employee must check in from their own phone.");
+      alert("⛔ Buddy Punching Detected!\n\nThis device was already used to check in engineer: " + alreadyCheckedIn + "\n\nEach engineer must check in from their own phone.");
     }, 300);
     return;
   }
@@ -1735,7 +1791,7 @@ function doCheckin() {
     btn.innerHTML = "✅ Check In";
     showResult("ci", rec, isLate, false);
     toast("✅ Checked in successfully!", "t-ok");
-    // Check if this employee has any leave decisions to show
+    // Check if this engineer has any leave decisions to show
     setTimeout(function(){ checkApprovedLeaveForEmp(empId); }, 1800);
     setTimeout(function(){
       document.getElementById("ciForm").style.display    = "none";
@@ -1788,7 +1844,7 @@ function doCheckout() {
     toast("👋 Checked out! Have a great day.", "t-ok");
     document.getElementById("sessBadge").style.display = "none";
     document.getElementById("coSection").style.display = "none";
-    // Show any pending leave decisions for this employee
+    // Show any pending leave decisions for this engineer
     setTimeout(function(){ checkApprovedLeaveForEmp(sess.empId); }, 1200);
   }
 
@@ -1812,7 +1868,7 @@ function showResult(type, rec, isLate, isOT) {
                 : (isOT ?"⏰ Checked Out (Overtime)":"🔴 Check-Out Recorded");
   var html = '';
   if (type==="ci") {
-    html  = row("Employee", rec.empName+" · "+rec.empId);
+    html  = row("Engineer", rec.empName+" · "+rec.empId);
     html += row("Site", rec.site);
     html += row("Time", '<span style="font-family:var(--mono)">'+rec.checkinTime+'</span>');
     html += row("Date", rec.checkinDate);
@@ -1977,13 +2033,13 @@ function renderTable() {
       ? '<img src="'+r.selfiePhoto+'" class="selfie-thumb" title="Click to enlarge" onclick="showSelfie(\''+r.id+'\')" style="cursor:pointer"/>'
       : '<span style="font-size:.75rem;color:var(--red);font-weight:700">⚠ No photo</span>';
 
-    // Device cell — show short ID + flag if same device used by another employee same day
+    // Device cell — show short ID + flag if same device used by another engineer same day
     var devId = r.deviceId || "";
     var devShort = devId ? devId.slice(-8) : "—";
     var isSuspicious = devId ? isBuddyPunch(devId, r.empId, r.checkinDate) : false;
     var devCell = devId
       ? '<span style="font-family:var(--mono);font-size:.72rem;background:#f3f4f6;padding:2px 6px;border-radius:4px;color:var(--ink2)" title="'+devId+'">…'+devShort+'</span>'
-        + (isSuspicious ? ' <span class="bdg" style="background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;font-size:.68rem" title="Same device used by another employee on this date">⚠ Flagged</span>' : '')
+        + (isSuspicious ? ' <span class="bdg" style="background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;font-size:.68rem" title="Same device used by another engineer on this date">⚠ Flagged</span>' : '')
       : '<span style="font-size:.75rem;color:var(--ink3)">—</span>';
 
     return '<tr' + (isSuspicious ? ' style="background:#fff5f5"' : '') + '>'
@@ -2051,7 +2107,7 @@ function dTab(id, el) {
 // ── CSV export ─────────────────────────────────────
 function exportCSV() {
   var rows = filtered();
-  var hdr = ["Employee ID","Name","Site","Date","Check-In","Check-Out","Duration","Status","Late","Overtime","Lat In","Lng In","Dist In","Lat Out","Lng Out","Dist Out"].join(",");
+  var hdr = ["Engineer ID","Name","Site","Date","Check-In","Check-Out","Duration","Status","Late","Overtime","Lat In","Lng In","Dist In","Lat Out","Lng Out","Dist Out"].join(",");
   var lines = [hdr].concat(rows.map(function(r){
     return [r.empId,r.empName,'"'+(r.site||"")+'"',r.checkinDate,r.checkinTime,r.checkoutTime||"",r.duration||"",r.status,r.isLate?"Yes":"No",r.isOvertime?"Yes":"No",r.checkinLat,r.checkinLng,r.checkinDist,r.checkoutLat||"",r.checkoutLng||"",r.checkoutDist||""].join(",");
   }));
@@ -2100,7 +2156,7 @@ function initEmailJS() {
   }
 }
 
-// ── Employee: Show/Hide Leave Section ───────────────
+// ── Engineer: Show/Hide Leave Section ───────────────
 function showLeaveSection(show) {
   var ls = document.getElementById("leaveSection");
   var cf = document.getElementById("ciForm");
@@ -2149,10 +2205,13 @@ function initLeaveForm() {
   var ra = document.getElementById("leaveReason"); if(ra) ra.value = "";
   var lf2 = document.getElementById("leaveFrom"); if(lf2) lf2.value = "";
   var lt3 = document.getElementById("leaveTo"); if(lt3) lt3.value = "";
-  // Pre-fill from session
+  // Pre-fill from session — strip "Eng" prefix since input only takes the number
   var sess = getSess();
   var ei = document.getElementById("leaveEmpId"), en = document.getElementById("leaveEmpName");
-  if (sess && sess.empId && ei && !ei.value) ei.value = sess.empId;
+  if (sess && sess.empId && ei && !ei.value) {
+    // empId stored as "Eng01" → strip prefix → show "01" in the number field
+    ei.value = sess.empId.replace(/^[Ee][Nn][Gg]/i, "");
+  }
   if (sess && sess.empName && en && !en.value) en.value = sess.empName;
 }
 
@@ -2232,7 +2291,7 @@ function clearLeaveError() {
 // ── Submit Leave Application ────────────────────────
 function submitLeave() {
   clearLeaveError();
-  var empId    = sanitize((document.getElementById("leaveEmpId")||{}).value||"", 20);
+  var empId    = sanitize(getEngId("leaveEmpId"), 20);
   var empName  = sanitize((document.getElementById("leaveEmpName")||{}).value||"", 60);
   var empEmail = ((document.getElementById("leaveEmail")||{}).value||"").trim();
   var site     = (document.getElementById("leaveSite")||{}).value||"";
@@ -2241,7 +2300,7 @@ function submitLeave() {
   var toDate   = (document.getElementById("leaveTo")||{}).value||"";
   var reason   = sanitize((document.getElementById("leaveReason")||{}).value||"", 500);
 
-  if (!empId)   { showLeaveError("Employee ID is required."); return; }
+  if (!empId || empId === "Eng") { showLeaveError("Engineer ID is required. Enter your number in the Eng__ field (e.g. 01)."); return; }
   if (!empName) { showLeaveError("Full Name is required."); return; }
   if (!empEmail){ showLeaveError("Email address is required — the decision will be sent here."); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(empEmail)) { showLeaveError("Email format is invalid. Example: john@company.com"); return; }
@@ -2289,7 +2348,7 @@ function submitLeave() {
       rc2.style.display="block";
       document.getElementById("resultTitle").textContent="📋 Leave Saved Locally";
       document.getElementById("resultBody").innerHTML=
-        row("Employee",empName+" · "+empId)+row("Leave Type",leaveType)+
+        row("Engineer",empName+" · "+empId)+row("Leave Type",leaveType)+
         row("From",fromDate)+row("To",toDate)+row("Days",numDays+"d")+
         '<div class="pill pill-warn" style="margin-top:10px">⚠️ Firebase not configured — stored locally only.</div>';
     }
@@ -2320,7 +2379,7 @@ function submitLeave() {
         rc.style.display="block";
         document.getElementById("resultTitle").textContent="📋 Leave Application Submitted";
         document.getElementById("resultBody").innerHTML=
-          row("Employee",empName+" · "+empId)+
+          row("Engineer",empName+" · "+empId)+
           row("Leave Type",leaveType)+
           row("From Date",fromDate)+row("To Date",toDate)+
           row("Total Days",numDays+" day"+(numDays!==1?"s":""))+
@@ -2420,7 +2479,7 @@ function renderLeaveTable() {
       var decInfo = '<div style="font-size:.73rem;color:var(--ink3);line-height:1.7;margin-bottom:6px">Approved by <strong>'+(r.decidedBy||"—")+'</strong><br>'+(r.decidedDate||"—")+'</div>';
       actions = decInfo + '<button class="leave-act-btn leave-cancel" onclick="adminCancelLeave(\''+r.id+'\')">🚫 Cancel Leave</button>';
     } else if (r.status==="cancel_requested") {
-      var reqInfo = '<div style="font-size:.73rem;color:#c2410c;line-height:1.7;margin-bottom:6px">⚠️ Employee requested cancellation</div>';
+      var reqInfo = '<div style="font-size:.73rem;color:#c2410c;line-height:1.7;margin-bottom:6px">⚠️ Engineer requested cancellation</div>';
       actions = reqInfo
         +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
         +'<button class="leave-act-btn leave-approve" onclick="adminCancelLeave(\''+r.id+'\')">✓ Confirm Cancel</button>'
@@ -2492,7 +2551,7 @@ function approveLeave(id) {
   };
 
   function onDone() {
-    toast("✅ Leave approved — notifying employee…", "t-ok");
+    toast("✅ Leave approved — notifying engineer…", "t-ok");
     sendLeaveEmail(Object.assign({}, rec, updates), "approved", null);
   }
 
@@ -2549,7 +2608,7 @@ function confirmReject() {
   closeRejectModal();
 
   function onDone() {
-    toast("Leave application rejected — notifying employee…", "t-ok");
+    toast("Leave application rejected — notifying engineer…", "t-ok");
     sendLeaveEmail(Object.assign({}, rec, updates), "rejected", reason);
   }
 
@@ -2581,7 +2640,7 @@ function sendLeaveEmail(rec, status, rejectReason) {
     body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
     body += "LEAVE APPROVAL DETAILS\n";
     body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    body += "Employee ID   : " + rec.empId + "\n";
+    body += "Engineer ID   : " + rec.empId + "\n";
     body += "Leave Type    : " + rec.leaveType + "\n";
     body += "From Date     : " + rec.fromDate + "\n";
     body += "To Date       : " + rec.toDate + "\n";
@@ -2596,7 +2655,7 @@ function sendLeaveEmail(rec, status, rejectReason) {
     body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
     body += "CANCELLATION DETAILS\n";
     body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    body += "Employee ID    : " + rec.empId + "\n";
+    body += "Engineer ID    : " + rec.empId + "\n";
     body += "Leave Type     : " + rec.leaveType + "\n";
     body += "From Date      : " + rec.fromDate + "\n";
     body += "To Date        : " + rec.toDate + "\n";
@@ -2612,7 +2671,7 @@ function sendLeaveEmail(rec, status, rejectReason) {
     body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
     body += "APPLICATION DETAILS\n";
     body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    body += "Employee ID   : " + rec.empId + "\n";
+    body += "Engineer ID   : " + rec.empId + "\n";
     body += "Leave Type    : " + rec.leaveType + "\n";
     body += "From Date     : " + rec.fromDate + "\n";
     body += "To Date       : " + rec.toDate + "\n";
@@ -2623,7 +2682,7 @@ function sendLeaveEmail(rec, status, rejectReason) {
     body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
     body += "If you have any questions, please speak with your manager or HR.\n\n";
   }
-  body += "This is an automated notification from the AttendTrack system.\n\nBest regards,\nAttendTrack System";
+  body += "This is an automated notification from the Attendance System.\n\nBest regards,\nAttendance System";
 
   if (emailjsReady) {
     emailjs.send(EMAILJS_SVC, EMAILJS_TPL, {
@@ -2741,7 +2800,7 @@ function isBuddyPunch(deviceId, empId, date) {
 }
 
 function renderDeviceAudit() {
-  // Build a map: deviceId → { employees: Set, records: [], lastCheckin, lastDate }
+  // Build a map: deviceId → { engineers: Set, records: [], lastCheckin, lastDate }
   var devMap = {};
   allRecs.forEach(function(r){
     if (!r.deviceId) return;
@@ -2759,12 +2818,12 @@ function renderDeviceAudit() {
   var cnt   = document.getElementById("deviceCount");
   if (!body) return;
 
-  // Find suspicious devices: same device, different employees on the SAME date
+  // Find suspicious devices: same device, different engineers on the SAME date
   var suspiciousDevices = devices.filter(function(devId){
     var d = devMap[devId];
     var empIds = Object.keys(d.emps);
     if (empIds.length < 2) return false;
-    // Check if any two employees used this device on the same calendar date
+    // Check if any two engineers used this device on the same calendar date
     var dateToEmps = {};
     d.records.forEach(function(r){
       if (!dateToEmps[r.checkinDate]) dateToEmps[r.checkinDate] = new Set ? new Set() : {};
@@ -2790,7 +2849,7 @@ function renderDeviceAudit() {
         + suspiciousDevices.map(function(devId){
           var d = devMap[devId];
           var empIds = Object.keys(d.emps);
-          // Find the dates with multiple employees
+          // Find the dates with multiple engineers
           var dateToEmps = {};
           d.records.forEach(function(r){
             if (!dateToEmps[r.checkinDate]) dateToEmps[r.checkinDate] = {};
@@ -2861,8 +2920,8 @@ function renderDeviceAudit() {
   }).join("");
 }
 
-// ── Check ALL Leave Status for Employee ─────────────
-// Called when employee types their ID — shows a popup for any
+// ── Check ALL Leave Status for Engineer ─────────────
+// Called when engineer types their ID — shows a popup for any
 // approved, rejected, or pending applications so they know instantly.
 function checkApprovedLeaveForEmp(empId) {
   if (!empId) return;
@@ -2878,7 +2937,7 @@ function checkApprovedLeaveForEmp(empId) {
     });
     if (onLeaveToday) showLeaveBanner(onLeaveToday);
 
-    // Show popup for any decisions the employee may not have seen yet
+    // Show popup for any decisions the engineer may not have seen yet
     // (approved or rejected within last 30 days, plus any pending)
     var thirtyDaysAgo = Date.now() - 30*24*60*60*1000;
     var notable = recs.filter(function(r){
@@ -3047,7 +3106,7 @@ function lsnRow(k, v) {
 function exportLeaveCSV() {
   var rows = filteredLeaves();
   if (!rows.length) { toast("No leave records to export", "t-err"); return; }
-  var hdr = ["Employee ID","Employee Name","Email","Site","Leave Type","From Date","To Date","Total Days","Reason","Status","Applied Date","Decided By","Decided Date","Reject Reason","Cancelled By","Cancelled Date","Cancel Reason"].join(",");
+  var hdr = ["Engineer ID","Engineer Name","Email","Site","Leave Type","From Date","To Date","Total Days","Reason","Status","Applied Date","Decided By","Decided Date","Reject Reason","Cancelled By","Cancelled Date","Cancel Reason"].join(",");
   var lines = [hdr].concat(rows.map(function(r){
     return [
       '"'+(r.empId||"")+'"',
@@ -3079,7 +3138,7 @@ function exportLeaveCSV() {
 
 // ── Export Combined (Attendance + Approved Leaves) ─
 function exportCombinedCSV() {
-  var attHdr = ["Type","Employee ID","Name","Site","Date","Check-In","Check-Out","Duration","Status","Leave Type","Decided By","Late","Overtime","GPS In","GPS Out"];
+  var attHdr = ["Type","Engineer ID","Name","Site","Date","Check-In","Check-Out","Duration","Status","Leave Type","Decided By","Late","Overtime","GPS In","GPS Out"];
   var lines = [attHdr.join(",")];
 
   // Attendance records
@@ -3138,23 +3197,28 @@ function exportCombinedCSV() {
 // ║  MY LEAVES / EDIT / CANCEL MODULE                   ║
 // ╚══════════════════════════════════════════════════════╝
 
-// ── My Leaves Modal (employee) ──────────────────────
+// ── My Leaves Modal (engineer) ──────────────────────
 function showMyLeaves() {
   var modal = document.getElementById("myLeavesModal");
   if (!modal) return;
-  // Pre-fill with session empId if available
+  // Pre-fill with session empId — strip "Eng" prefix for number-only input
   var sess = getSess();
   var inp = document.getElementById("myLeavesEmpId");
-  if (sess && sess.empId && inp) inp.value = sess.empId;
+  if (sess && sess.empId && inp) {
+    inp.value = sess.empId.replace(/^[Ee][Nn][Gg]/i, "");
+  }
   modal.classList.add("open");
   if (inp && inp.value) loadMyLeaves();
 }
 
 function loadMyLeaves() {
-  var empId = ((document.getElementById("myLeavesEmpId")||{}).value||"").trim();
+  var empId = getEngId("myLeavesEmpId");
   var list  = document.getElementById("myLeavesList");
   var info  = document.getElementById("myLeavesEmpInfo");
-  if (!empId || !list) return;
+  if (!empId || empId === "Eng" || !list) {
+    if (list) list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--red);font-size:.88rem">Please enter your Engineer number (e.g. type <strong>01</strong> for Eng01).</div>';
+    return;
+  }
 
   list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink3)"><span class="spin" style="border-color:rgba(0,0,0,.15);border-top-color:var(--blue)"></span> Loading…</div>';
 
@@ -3162,7 +3226,7 @@ function loadMyLeaves() {
     recs.sort(function(a,b){ return (b.appliedAt||0)-(a.appliedAt||0); });
     if (info) info.textContent = "Showing " + recs.length + " application" + (recs.length!==1?"s":"") + " for " + empId;
     if (!recs.length) {
-      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3);font-size:.88rem">No leave applications found for this Employee ID.</div>';
+      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3);font-size:.88rem">No leave applications found for this Engineer ID.</div>';
       return;
     }
     list.innerHTML = recs.map(function(r){
@@ -3221,7 +3285,7 @@ function loadMyLeaves() {
   }
 }
 
-// ── Employee: Cancel a leave ────────────────────────
+// ── Engineer: Cancel a leave ────────────────────────
 var _cancelLeaveId = null;
 var _cancelIsApproved = false;
 
@@ -3299,7 +3363,7 @@ function confirmCancelLeave() {
     }
   } else {
     // Pending — just delete/cancel
-    var updates2 = { status: "cancelled", cancelledAt: Date.now(), cancelledBy: "Employee" };
+    var updates2 = { status: "cancelled", cancelledAt: Date.now(), cancelledBy: "Engineer" };
     function onDone2() {
       document.getElementById("cancelLeaveModal").classList.remove("open");
       toast("✅ Leave application cancelled", "t-ok");
@@ -3332,7 +3396,7 @@ function adminCancelLeave(id) {
   var rf = document.getElementById("cancelLeaveReason"); if (rf) rf.value = "";
 
   if (title) title.textContent = "🚫 Cancel Approved Leave";
-  if (sub) sub.textContent = "This will cancel the approved leave and notify the employee by email. Provide a reason below.";
+  if (sub) sub.textContent = "This will cancel the approved leave and notify the engineer by email. Provide a reason below.";
   if (reasonWrap) reasonWrap.style.display = "block";
   if (confirmBtn) confirmBtn.textContent = "🚫 Confirm Cancellation";
 
@@ -3367,7 +3431,7 @@ function adminConfirmCancel() {
   if (confirmBtn) confirmBtn.onclick = confirmCancelLeave;
 
   function onDone() {
-    toast("🚫 Leave cancelled — notifying employee…", "t-ok");
+    toast("🚫 Leave cancelled — notifying engineer…", "t-ok");
     sendLeaveEmail(Object.assign({}, rec, updates), "cancelled", reason);
   }
 
@@ -3383,7 +3447,7 @@ function adminConfirmCancel() {
 }
 
 function adminKeepLeave(id) {
-  // Admin decides to keep the approved leave despite employee's cancel request
+  // Admin decides to keep the approved leave despite engineer's cancel request
   var now = new Date();
   var updates = { status: "approved", cancelRequestReason: null, cancelRequestedAt: null, keepNote: "Admin kept leave approved on " + now.toLocaleDateString("en-SG") };
   if (fbOk && db) {
@@ -3397,7 +3461,7 @@ function adminKeepLeave(id) {
   }
 }
 
-// ── Edit Leave (employee, pending only) ─────────────
+// ── Edit Leave (engineer, pending only) ─────────────
 var _editLeaveOrigRec = null;
 
 function openEditLeave(id) {
