@@ -517,6 +517,36 @@ tr.on-leave-row td{background:#f0f9ff!important}
   .act-btn{font-size:.92rem;padding:13px}
   .card{padding:18px 14px}
 }
+
+/* ── EMAIL–DEVICE BINDING ──────────────────────────── */
+.binding-section-hdr{
+  background:linear-gradient(135deg,#0d1117,#1a2233);
+  border-radius:var(--r2);padding:18px 20px;margin-bottom:18px;
+  display:flex;align-items:flex-start;gap:14px;margin-top:24px;
+}
+.binding-email-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;
+  border-radius:20px;padding:3px 10px;font-size:.74rem;font-weight:700;
+}
+.binding-email-badge.changed{background:#fffbeb;color:#92400e;border-color:#fde68a}
+.binding-email-badge.conflict{background:#fef2f2;color:#b91c1c;border-color:#fca5a5}
+.binding-act-btn{
+  padding:5px 12px;border-radius:7px;font-size:.74rem;font-weight:700;
+  cursor:pointer;font-family:var(--body);transition:all .2s;border:none;
+}
+.ba-reset{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
+.ba-reset:hover{background:#b91c1c;color:#fff}
+.ba-approve{background:#f0fdf4;color:#15803d;border:1px solid #86efac}
+.ba-approve:hover{background:#15803d;color:#fff}
+.ba-history{background:#f3f4f6;color:var(--ink2);border:1px solid var(--border)}
+.ba-history:hover{background:var(--ink);color:#fff}
+
+/* Binding history modal */
+.hist-entry{padding:10px 14px;border-bottom:1px solid var(--border);font-size:.83rem}
+.hist-entry:last-child{border:none}
+.hist-email{font-family:var(--mono);font-size:.8rem;font-weight:700;color:var(--ink);margin-bottom:2px}
+.hist-meta{font-size:.74rem;color:var(--ink3)}
 </style>
 </head>
 <body>
@@ -611,6 +641,10 @@ tr.on-leave-row td{background:#f0f9ff!important}
           </div>
         </div>
         <div class="field"><label>Full Name</label><input type="text" id="empName" placeholder="e.g. Ahmad Bin Ali" oninput="chkBtn()"/></div>
+        <div class="field"><label>Email Address <span style="color:var(--red);font-size:.75rem">REQUIRED</span></label>
+          <input type="email" id="empEmail" placeholder="your.email@company.com" oninput="chkBtn()" autocomplete="email"/>
+          <div id="emailBindStatus" style="margin-top:6px"></div>
+        </div>
         <div class="field"><label>Work Site</label>
           <select id="empSite" onchange="chkBtn();resetGps('in')">
             <option value="">— Select your work site —</option>
@@ -961,6 +995,50 @@ tr.on-leave-row td{background:#f0f9ff!important}
         3. Compare the selfie photos for each engineer who used that device — if the same face appears, it confirms buddy punching<br>
         4. Cross-reference GPS check-in locations if needed
       </div>
+
+      <!-- EMAIL–DEVICE BINDING REGISTRY -->
+      <div class="binding-section-hdr">
+        <div style="font-size:2rem;flex-shrink:0">📧</div>
+        <div>
+          <div style="color:#fff;font-weight:800;font-size:1rem;margin-bottom:4px">Email–Device Binding Registry</div>
+          <div style="color:#9ca3af;font-size:.83rem;line-height:1.6">Each engineer's device is permanently linked to their email on first check-in. If the same device later reports a <strong style="color:var(--orange)">different email</strong>, it is flagged here so you can decide whether to approve the change (new email) or investigate (possible account sharing).</div>
+        </div>
+      </div>
+
+      <div id="emailBindFlagsWrap" style="margin-bottom:14px"></div>
+
+      <div class="tbl-wrap">
+        <div class="tbl-hdr">
+          <span class="tbl-hdr-t">📧 Email — Device Registry</span>
+          <span class="tbl-count" id="emailBindCount">—</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr>
+              <th>Device ID</th>
+              <th>Registered Email</th>
+              <th>Engineer</th>
+              <th>Registered</th>
+              <th>Last Seen Email</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr></thead>
+            <tbody id="emailBindTblBody"></tbody>
+          </table>
+        </div>
+        <div id="emailBindTblEmpty" class="empty" style="display:none">
+          <div class="empty-icon">📧</div>
+          <div class="empty-t">No email bindings yet</div>
+          <div>Email–Device links are created automatically on an engineer's first check-in</div>
+        </div>
+      </div>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:var(--r);padding:14px 16px;margin-top:14px;font-size:.82rem;color:#78350f;line-height:1.7">
+        <strong>⚙️ Admin actions:</strong><br>
+        • <strong>Reset Binding</strong> — Clears the email link. The next check-in from that device will register a fresh email.<br>
+        • <strong>Approve Email Change</strong> — Updates the registered email to the latest one seen, clearing the flag.<br>
+        • <strong>View History</strong> — Shows all past emails ever used on that device.
+      </div>
     </div>
 
     <!-- SETUP TAB -->
@@ -1145,6 +1223,37 @@ service cloud.firestore {
   </div>
 </div>
 
+<!-- ══ EMAIL BINDING HISTORY MODAL ═══════════════════ -->
+<div id="emailBindHistModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:500px;max-height:90vh;overflow-y:auto">
+    <button class="modal-close" onclick="document.getElementById('emailBindHistModal').classList.remove('open')">✕</button>
+    <div class="modal-title">📧 Email History for Device</div>
+    <div class="modal-sub" id="emailBindHistDeviceId" style="font-family:var(--mono);font-size:.78rem;word-break:break-all;color:var(--ink3)">—</div>
+    <div id="emailBindHistList" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<!-- ══ EMAIL BINDING RESET CONFIRM MODAL ════════════ -->
+<div id="emailBindResetModal" class="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('emailBindResetModal').classList.remove('open')">✕</button>
+    <div class="modal-title">🔄 Reset Email Binding</div>
+    <div class="modal-sub">This will clear the registered email for this device. The next check-in from this device will register a new email.</div>
+    <div class="ef-field" style="margin-bottom:16px">
+      <div class="ef-label">Device</div>
+      <div class="ef-value" id="emailBindResetInfo" style="font-family:var(--mono);font-size:.8rem;word-break:break-all">—</div>
+    </div>
+    <div class="field">
+      <label>Admin Note (optional)</label>
+      <textarea class="modal-textarea" id="emailBindResetNote" placeholder="e.g. Engineer changed phone / Approved by manager…" style="min-height:60px"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="document.getElementById('emailBindResetModal').classList.remove('open')">Cancel</button>
+      <button class="modal-btn-confirm" style="background:var(--red)" onclick="confirmEmailBindReset()">🔄 Confirm Reset</button>
+    </div>
+  </div>
+</div>
+
 <!-- Selfie lightbox -->
 <div id="selfieLightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9998;align-items:center;justify-content:center;flex-direction:column;gap:16px" onclick="this.style.display='none'">
   <img id="lightboxImg" style="max-width:90vw;max-height:80vh;border-radius:16px;transform:scaleX(-1)" alt="Selfie"/>
@@ -1298,14 +1407,13 @@ service cloud.firestore {
 // ║  CONFIGURATION — edit these values           ║
 // ╚══════════════════════════════════════════════╝
 var FIREBASE_CONFIG = {
-    apiKey: "AIzaSyA1VY1pdnjRnBfSFglztje8Xs36KFFQgBg",
-    authDomain: "attendancetracker-4fbae.firebaseapp.com",
-    projectId: "attendancetracker-4fbae",
-    storageBucket: "attendancetracker-4fbae.firebasestorage.app",
-    messagingSenderId: "759301832044",
-    appId: "1:759301832044:web:cc3d682c41806635800749"
+  apiKey: "AIzaSyA95l3GQUnPI1-gw9k4RQhh5ecPB78npuA",
+  authDomain: "attendtrack-94b96.firebaseapp.com",
+  projectId: "attendtrack-94b96",
+  storageBucket: "attendtrack-94b96.firebasestorage.app",
+  messagingSenderId: "190906997661",
+  appId: "1:190906997661:web:1729577b9ea5f5e18e2d74"
 };
-
 
 // ✅ SECURITY: Admin credentials are now managed by Firebase Authentication.
 // Go to Firebase Console → Authentication → Users → Add user (email + password)
@@ -1545,13 +1653,42 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 
 function chkBtn() {
-  var id   = getEngId("empId");
-  var name = (document.getElementById("empName") ||{}).value||"";
-  var site = (document.getElementById("empSite") ||{}).value||"";
+  var id    = getEngId("empId");
+  var name  = (document.getElementById("empName") ||{}).value||"";
+  var site  = (document.getElementById("empSite") ||{}).value||"";
+  var email = (document.getElementById("empEmail")||{}).value||"";
+  var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+  // Show real-time binding status pill
+  var statusEl = document.getElementById("emailBindStatus");
+  if (statusEl && email.trim().length > 0) {
+    if (!emailOk) {
+      statusEl.innerHTML = '<div class="pill pill-bad" style="margin-top:4px">✗ Invalid email format</div>';
+    } else {
+      var devId = getDeviceId();
+      var binding = getEmailBinding(devId);
+      if (!binding) {
+        statusEl.innerHTML = '<div class="pill pill-info" style="margin-top:4px">🔗 This device will be linked to <strong>'+sanitizeHtml(email.trim())+'</strong> on check-in</div>';
+      } else if (binding.email === email.trim().toLowerCase()) {
+        statusEl.innerHTML = '<div class="pill pill-ok" style="margin-top:4px">✅ Device recognised — linked to <strong>'+sanitizeHtml(binding.email)+'</strong></div>';
+      } else {
+        statusEl.innerHTML = '<div class="pill pill-bad" style="margin-top:4px">⚠️ This device is registered to <strong>'+sanitizeHtml(binding.email)+'</strong>. Admin will be notified of the email change.</div>';
+      }
+    }
+  } else if (statusEl) {
+    statusEl.innerHTML = "";
+  }
+
   var ci = document.getElementById("ciBtn");
-  if (ci) ci.disabled = !(id && name.trim() && site && GPS.in && GPS.in.ok && selfieData);
+  if (ci) ci.disabled = !(id && name.trim() && site && emailOk && GPS.in && GPS.in.ok && selfieData);
   var co = document.getElementById("coBtn");
   if (co) co.disabled = !(GPS.out && GPS.out.ok);
+}
+
+function sanitizeHtml(str) {
+  return String(str).replace(/[<>"'&]/g, function(c){
+    return {"<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;","&":"&amp;"}[c];
+  });
 }
 
 // ── Init engineer screen ───────────────────────────
@@ -1743,11 +1880,13 @@ function doCheckin() {
   var empId   = sanitize(getEngId("empId"), 20);
   var empName = sanitize(document.getElementById("empName").value, 60);
   var siteIdx = document.getElementById("empSite").value;
+  var empEmail = sanitize(((document.getElementById("empEmail")||{}).value||"").trim().toLowerCase(), 120);
 
   // Validate inputs
   if (!empId || empId === "Eng") { toast("Please enter your Engineer number", "t-err"); return; }
   if (!/^Eng[a-zA-Z0-9]+$/.test(empId)) { toast("Engineer ID must start with Eng followed by your number (e.g. Eng01)", "t-err"); return; }
   if (!empName || empName.length < 2) { toast("Please enter a valid full name", "t-err"); return; }
+  if (!empEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(empEmail)) { toast("Please enter a valid email address", "t-err"); return; }
 
   // ✅ ANTI-BUDDY-PUNCH: Require selfie photo
   if (!selfieData) { toast("📷 Please take a selfie first", "t-err"); return; }
@@ -1763,13 +1902,19 @@ function doCheckin() {
     return;
   }
 
+  // ✅ EMAIL–DEVICE BINDING: check & record
+  var devId = getDeviceId();
+  var emailConflict = checkAndRecordEmailBinding(devId, empEmail, empId, empName);
+    return;
+  }
+
   var site    = WORK_SITES[parseInt(siteIdx)];
   var gps     = GPS.in;
   var now     = new Date();
   var isLate  = now.getHours() >= WORK_HOUR_LATE + 1;
 
   var rec = {
-    empId:empId, empName:empName, site:site.name,
+    empId:empId, empName:empName, empEmail:empEmail, site:site.name,
     checkinTime:now.toLocaleTimeString("en-SG"),
     checkinDate:now.toLocaleDateString("en-SG"),
     checkinISO:now.toISOString(),
@@ -1780,7 +1925,9 @@ function doCheckin() {
     status:"in", isLate:isLate, isOvertime:false, duration:null,
     // ✅ ANTI-BUDDY-PUNCH: Store selfie photo and device ID
     selfiePhoto: selfieData,
-    deviceId: getDeviceId(),
+    deviceId: devId,
+    // ✅ EMAIL–DEVICE: flag if email mismatch on this device
+    emailConflict: emailConflict || false,
     // ✅ SECURITY: Track submission source for audit purposes
     _source: "web", _userAgent: navigator.userAgent.slice(0, 100)
   };
@@ -2135,9 +2282,9 @@ function toast(msg, cls) {
 // ╚══════════════════════════════════════════════════════╝
 
 // ── Leave Configuration (edit these) ───────────────
-var EMAILJS_KEY = "JzcIzX9qDreMEunJ0";     // from emailjs.com → Account → Public Key
-var EMAILJS_SVC = "service_8f50fon";     // EmailJS Service ID
-var EMAILJS_TPL = "template_gds7pf1";    // EmailJS Template ID
+var EMAILJS_KEY = "YOUR_EMAILJS_PUBLIC_KEY";     // from emailjs.com → Account → Public Key
+var EMAILJS_SVC = "YOUR_EMAILJS_SERVICE_ID";     // EmailJS Service ID
+var EMAILJS_TPL = "YOUR_EMAILJS_TEMPLATE_ID";    // EmailJS Template ID
 var emailjsReady = false;
 
 var LEAVE_TYPES = [
@@ -2923,6 +3070,249 @@ function renderDeviceAudit() {
       +'<td>'+flagCell+'</td>'
       +'</tr>';
   }).join("");
+
+  // ✅ Render email–device binding registry below the device table
+  renderEmailBindings();
+}
+
+// ══════════════════════════════════════════════════════
+// EMAIL–DEVICE BINDING  (localStorage + Firestore mirror)
+// Key: "at_email_bindings"  →  { [deviceId]: BindingObject }
+// BindingObject: { email, empId, empName, registeredAt, registeredIso,
+//                  lastSeenEmail, lastSeenAt, lastSeenIso,
+//                  history:[{email,empId,empName,ts,iso,note}],
+//                  status:"ok"|"conflict"|"approved" }
+// ══════════════════════════════════════════════════════
+function loadEmailBindings() {
+  try { return JSON.parse(localStorage.getItem("at_email_bindings") || "{}"); } catch(e){ return {}; }
+}
+function saveEmailBindings(bindings) {
+  localStorage.setItem("at_email_bindings", JSON.stringify(bindings));
+}
+function getEmailBinding(devId) {
+  return loadEmailBindings()[devId] || null;
+}
+
+// Called on each check-in. Returns true if there is an email conflict (different email seen).
+function checkAndRecordEmailBinding(devId, email, empId, empName) {
+  var bindings = loadEmailBindings();
+  var now = new Date();
+  var ts  = now.getTime();
+  var iso = now.toISOString();
+
+  if (!bindings[devId]) {
+    // First time this device checks in — register the binding
+    bindings[devId] = {
+      email: email, empId: empId, empName: empName,
+      registeredAt: ts, registeredIso: iso,
+      lastSeenEmail: email, lastSeenAt: ts, lastSeenIso: iso,
+      history: [{ email: email, empId: empId, empName: empName, ts: ts, iso: iso, note: "First registration" }],
+      status: "ok"
+    };
+    saveEmailBindings(bindings);
+
+    // Mirror to Firestore if available
+    if (fbOk && db) {
+      db.collection("deviceBindings").doc(devId).set(bindings[devId]).catch(function(e){ console.warn("binding save:", e); });
+    }
+    return false; // no conflict
+  }
+
+  var b = bindings[devId];
+  b.lastSeenEmail = email;
+  b.lastSeenAt    = ts;
+  b.lastSeenIso   = iso;
+
+  if (b.email !== email) {
+    // Email changed — flag it
+    b.status = "conflict";
+    b.history.push({ email: email, empId: empId, empName: empName, ts: ts, iso: iso, note: "New email detected (was: " + b.email + ")" });
+    saveEmailBindings(bindings);
+
+    // Mirror to Firestore
+    if (fbOk && db) {
+      db.collection("deviceBindings").doc(devId).set(b).catch(function(e){ console.warn("binding update:", e); });
+    }
+    return true; // conflict!
+  }
+
+  // Same email — just update last-seen
+  b.history.push({ email: email, empId: empId, empName: empName, ts: ts, iso: iso, note: "Regular check-in" });
+  // Keep history trimmed to 50 entries
+  if (b.history.length > 50) b.history = b.history.slice(-50);
+  saveEmailBindings(bindings);
+
+  if (fbOk && db) {
+    db.collection("deviceBindings").doc(devId).set(b).catch(function(e){ console.warn("binding update:", e); });
+  }
+  return false;
+}
+
+// ── Admin: render email binding registry table ─────────
+var _emailBindResetDevId = null; // temp state for reset modal
+
+function renderEmailBindings() {
+  var bindings = loadEmailBindings();
+  var devIds   = Object.keys(bindings);
+  var body     = document.getElementById("emailBindTblBody");
+  var empty    = document.getElementById("emailBindTblEmpty");
+  var cnt      = document.getElementById("emailBindCount");
+  var flagsWrap= document.getElementById("emailBindFlagsWrap");
+  if (!body) return;
+
+  var conflicts = devIds.filter(function(d){ return bindings[d].status === "conflict"; });
+
+  // Summary flags banner
+  if (flagsWrap) {
+    if (conflicts.length > 0) {
+      flagsWrap.innerHTML = '<div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:2px solid #fde68a;border-radius:var(--r2);padding:18px 20px;margin-bottom:4px">'
+        +'<div style="font-weight:800;color:#92400e;font-size:1rem;margin-bottom:10px">🔔 ' + conflicts.length + ' Email Change' + (conflicts.length>1?"s":"") + ' Awaiting Admin Review</div>'
+        + conflicts.map(function(dId){
+            var b = bindings[dId];
+            return '<div style="background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #fde68a">'
+              +'<div style="font-family:var(--mono);font-size:.75rem;color:#6b7280;margin-bottom:4px">Device: …' + dId.slice(-12) + '</div>'
+              +'<div style="font-size:.84rem;color:#92400e">Registered: <strong>' + b.email + '</strong></div>'
+              +'<div style="font-size:.84rem;color:#b45309">Last seen: <strong>' + b.lastSeenEmail + '</strong></div>'
+              +'<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">'
+              +'<button class="binding-act-btn ba-approve" onclick="adminApproveEmailChange(\''+dId+'\')">✅ Approve Change</button>'
+              +'<button class="binding-act-btn ba-reset" onclick="adminResetEmailBind(\''+dId+'\')">🔄 Reset Binding</button>'
+              +'</div></div>';
+          }).join("")
+        +'</div>';
+    } else if (devIds.length > 0) {
+      flagsWrap.innerHTML = '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:var(--r2);padding:14px 18px;margin-bottom:4px;font-size:.85rem;color:#15803d;font-weight:600">✅ All email–device bindings are clean — no conflicts detected.</div>';
+    } else {
+      flagsWrap.innerHTML = "";
+    }
+  }
+
+  if (!devIds.length) {
+    if (cnt)   cnt.textContent = "0 bindings";
+    body.innerHTML = "";
+    if (empty) empty.style.display = "block";
+    return;
+  }
+  if (empty) empty.style.display = "none";
+  if (cnt)   cnt.textContent = devIds.length + " device" + (devIds.length!==1?"s":"") + (conflicts.length ? " · " + conflicts.length + " conflict" + (conflicts.length!==1?"s":"") : "");
+
+  // Sort: conflicts first, then newest registration
+  devIds.sort(function(a,b){
+    var ac = bindings[a].status==="conflict", bc = bindings[b].status==="conflict";
+    if (ac && !bc) return -1; if (!ac && bc) return 1;
+    return (bindings[b].registeredAt||0) - (bindings[a].registeredAt||0);
+  });
+
+  body.innerHTML = devIds.map(function(dId){
+    var b = bindings[dId];
+    var isConflict = b.status === "conflict";
+    var isApproved = b.status === "approved";
+
+    var statusBadge = isConflict
+      ? '<span class="binding-email-badge conflict">⚠️ Email Changed</span>'
+      : isApproved
+        ? '<span class="binding-email-badge changed">✅ Change Approved</span>'
+        : '<span class="binding-email-badge">🔗 Bound</span>';
+
+    var lastSeenCell = b.lastSeenEmail !== b.email
+      ? '<span style="font-family:var(--mono);font-size:.76rem;color:#b45309;font-weight:700">' + sanitizeHtml(b.lastSeenEmail) + '</span>'
+      : '<span style="font-size:.76rem;color:var(--ink3)">Same</span>';
+
+    var actions = '<div style="display:flex;gap:6px;flex-wrap:wrap">'
+      + (isConflict
+          ? '<button class="binding-act-btn ba-approve" onclick="adminApproveEmailChange(\''+dId+'\')">✅ Approve</button>'
+            + '<button class="binding-act-btn ba-reset" onclick="adminResetEmailBind(\''+dId+'\')">🔄 Reset</button>'
+          : '<button class="binding-act-btn ba-reset" onclick="adminResetEmailBind(\''+dId+'\')">🔄 Reset</button>'
+        )
+      + '<button class="binding-act-btn ba-history" onclick="adminShowEmailHistory(\''+dId+'\')">📋 History</button>'
+      + '</div>';
+
+    var regDate = b.registeredIso ? new Date(b.registeredIso).toLocaleDateString("en-SG") : "—";
+
+    return '<tr' + (isConflict ? ' style="background:#fffbeb"' : '') + '>'
+      + '<td style="font-family:var(--mono);font-size:.73rem;color:var(--ink3);max-width:110px;word-break:break-all">…' + dId.slice(-16) + '</td>'
+      + '<td><span style="font-family:var(--mono);font-size:.8rem;font-weight:700">' + sanitizeHtml(b.email) + '</span>'
+        + '<br><span style="font-size:.72rem;color:var(--ink3)">' + sanitizeHtml(b.empName||"") + ' · ' + sanitizeHtml(b.empId||"") + '</span></td>'
+      + '<td style="font-size:.78rem">' + sanitizeHtml(b.empName||"—") + '</td>'
+      + '<td style="font-size:.78rem;color:var(--ink3)">' + regDate + '</td>'
+      + '<td>' + lastSeenCell + '</td>'
+      + '<td>' + statusBadge + '</td>'
+      + '<td>' + actions + '</td>'
+      + '</tr>';
+  }).join("");
+}
+
+// ── Admin actions ──────────────────────────────────────
+function adminApproveEmailChange(devId) {
+  var bindings = loadEmailBindings();
+  var b = bindings[devId]; if (!b) return;
+  var oldEmail = b.email;
+  b.email  = b.lastSeenEmail;
+  b.status = "approved";
+  b.history.push({ email: b.email, empId: b.empId, empName: b.empName, ts: Date.now(), iso: new Date().toISOString(), note: "Admin approved email change (was: " + oldEmail + ")" });
+  saveEmailBindings(bindings);
+
+  if (fbOk && db) {
+    db.collection("deviceBindings").doc(devId).set(b).catch(function(e){ console.warn(e); });
+  }
+  toast("✅ Email change approved — binding updated to " + b.email, "t-ok");
+  renderEmailBindings();
+}
+
+function adminResetEmailBind(devId) {
+  _emailBindResetDevId = devId;
+  var bindings = loadEmailBindings();
+  var b = bindings[devId];
+  var el = document.getElementById("emailBindResetInfo");
+  if (el) el.textContent = "Device: …" + devId.slice(-16) + (b ? " | Current email: " + b.email : "");
+  var note = document.getElementById("emailBindResetNote");
+  if (note) note.value = "";
+  document.getElementById("emailBindResetModal").classList.add("open");
+}
+
+function confirmEmailBindReset() {
+  var devId = _emailBindResetDevId; if (!devId) return;
+  var bindings = loadEmailBindings();
+  var b = bindings[devId];
+  var noteEl = document.getElementById("emailBindResetNote");
+  var note = noteEl ? noteEl.value.trim() : "";
+
+  if (b) {
+    // Keep history, mark as reset
+    b.history.push({ email: b.email, empId: b.empId, empName: b.empName, ts: Date.now(), iso: new Date().toISOString(), note: "Admin reset binding" + (note ? ": " + note : "") });
+    delete bindings[devId];
+    saveEmailBindings(bindings);
+    if (fbOk && db) {
+      db.collection("deviceBindings").doc(devId).delete().catch(function(e){ console.warn(e); });
+    }
+  }
+  document.getElementById("emailBindResetModal").classList.remove("open");
+  toast("🔄 Binding reset — next check-in from this device will register a fresh email", "t-ok");
+  renderEmailBindings();
+  _emailBindResetDevId = null;
+}
+
+function adminShowEmailHistory(devId) {
+  var bindings = loadEmailBindings();
+  var b = bindings[devId]; if (!b) return;
+
+  document.getElementById("emailBindHistDeviceId").textContent = devId;
+  var listEl = document.getElementById("emailBindHistList");
+  if (!b.history || !b.history.length) {
+    listEl.innerHTML = '<div class="hist-entry" style="color:var(--ink3)">No history entries yet.</div>';
+  } else {
+    // Show newest first
+    var sorted = b.history.slice().reverse();
+    listEl.innerHTML = sorted.map(function(h, i){
+      var date = h.iso ? new Date(h.iso).toLocaleString("en-SG") : "—";
+      var isFirst = i === sorted.length - 1;
+      return '<div class="hist-entry">'
+        + '<div class="hist-email">' + sanitizeHtml(h.email) + (isFirst ? ' <span style="font-size:.68rem;color:#15803d;font-weight:600">ORIGINAL</span>' : '') + '</div>'
+        + '<div class="hist-meta">' + sanitizeHtml(h.empId||"") + ' · ' + sanitizeHtml(h.empName||"") + ' · ' + date + '</div>'
+        + '<div style="font-size:.74rem;color:var(--ink3);margin-top:2px">' + sanitizeHtml(h.note||"") + '</div>'
+        + '</div>';
+    }).join("");
+  }
+  document.getElementById("emailBindHistModal").classList.add("open");
 }
 
 // ── Check ALL Leave Status for Engineer ─────────────
