@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<!-- ✅ SECURITY: Content Security Policy — blocks XSS and unauthorized scripts -->
 <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
   script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com;
@@ -17,12 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-<!-- Firebase Compat SDK (no module needed) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<!-- ✅ SECURITY: Firebase Authentication SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<!-- EmailJS for leave notification emails -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <style>
@@ -41,12 +37,10 @@ html,body{height:100%;font-family:var(--body);background:var(--paper);color:var(
 button{font-family:var(--body);cursor:pointer;border:none;outline:none}
 input,select{font-family:var(--body);outline:none}
 
-/* ── SCREENS ── */
 .screen{display:none;min-height:100vh}
 .screen.active{display:block}
 .screen.active.flex-screen{display:flex}
 
-/* ── LANDING ── */
 #screen-landing{
   flex-direction:column;align-items:center;justify-content:center;
   min-height:100vh;padding:40px 20px;
@@ -68,7 +62,6 @@ input,select{font-family:var(--body);outline:none}
 .land-card-title{color:#fff;font-size:1.05rem;font-weight:700;margin-bottom:6px}
 .land-card-desc{color:#6b7280;font-size:.82rem;line-height:1.5}
 
-/* ── TOPBAR ── */
 .topbar{
   position:sticky;top:0;z-index:100;
   background:rgba(247,246,243,.92);backdrop-filter:blur(12px);
@@ -86,11 +79,9 @@ input,select{font-family:var(--body);outline:none}
 .live-dot::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
 
-/* ── SHARED CARD ── */
 .card{background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);padding:22px 20px;margin-bottom:16px;border:1px solid var(--border)}
 .card-lbl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--ink3);margin-bottom:14px}
 
-/* ── FIELD ── */
 .field{margin-bottom:14px}
 .field label{font-size:.82rem;font-weight:600;color:var(--ink2);display:block;margin-bottom:6px}
 .field input,.field select{
@@ -104,7 +95,6 @@ input,select{font-family:var(--body);outline:none}
   background-repeat:no-repeat;background-position:right 14px center;
 }
 
-/* ── GPS BTN ── */
 .gps-btn{
   width:100%;padding:12px;border-radius:var(--r);
   background:#f0fdf4;border:1.5px dashed #86efac;
@@ -116,14 +106,12 @@ input,select{font-family:var(--body);outline:none}
 .gps-btn.ok{background:#f0fdf4;border-color:var(--green);border-style:solid;color:#15803d}
 .gps-btn.fail{background:#fef2f2;border-color:#fca5a5;border-style:solid;color:#b91c1c}
 
-/* ── PILLS ── */
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:30px;padding:7px 14px;font-size:.82rem;font-weight:600;margin-top:10px;width:100%;justify-content:center}
 .pill-info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
 .pill-ok{background:#f0fdf4;color:#15803d;border:1px solid #86efac}
 .pill-bad{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
 .pill-warn{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
 
-/* ── ACTION BTNS ── */
 .act-btn{
   width:100%;padding:15px;border-radius:14px;font-size:1rem;font-weight:700;color:#fff;
   transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;
@@ -134,12 +122,10 @@ input,select{font-family:var(--body);outline:none}
 .btn-co{background:linear-gradient(135deg,#ff3b5c,#e02040)}
 .btn-co:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,59,92,.35)}
 
-/* ── CLOCK ── */
 .emp-clock{background:var(--ink);border-radius:var(--r2);padding:20px 24px;margin-bottom:20px;text-align:center}
 .emp-clock-time{font-family:var(--mono);font-size:2.5rem;font-weight:700;color:var(--green);letter-spacing:3px;line-height:1}
 .emp-clock-date{color:#6b7280;font-size:.82rem;margin-top:6px;letter-spacing:.5px}
 
-/* ── SESSION BADGE ── */
 .sess{background:linear-gradient(135deg,#0d1117,#1a2233);border-radius:var(--r2);padding:18px 20px;margin-bottom:16px}
 .sess-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .sess-tag{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;border-radius:20px}
@@ -148,12 +134,10 @@ input,select{font-family:var(--body);outline:none}
 .sess-row:last-child{border:none}
 .sess-k{color:#6b7280}.sess-v{color:#e5e7eb;font-weight:600;font-family:var(--mono);font-size:.8rem}
 
-/* ── RESULT ROW ── */
 .res-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:.86rem}
 .res-row:last-child{border:none}
 .res-k{color:var(--ink3)}.res-v{font-weight:700}
 
-/* ── SETUP BANNER ── */
 .setup-ban{
   background:linear-gradient(135deg,#fffbeb,#fef9c3);
   border:1.5px solid #fde68a;border-radius:var(--r2);
@@ -162,7 +146,6 @@ input,select{font-family:var(--body);outline:none}
 .setup-ban strong{color:#92400e}
 .setup-ban code{background:#fef3c7;padding:1px 5px;border-radius:4px;font-size:.79rem;font-family:var(--mono)}
 
-/* ── ADMIN LOGIN ── */
 #screen-admin-login{
   flex-direction:column;align-items:center;justify-content:center;
   min-height:100vh;background:var(--ink);padding:40px 20px;
@@ -178,7 +161,6 @@ input,select{font-family:var(--body);outline:none}
 .login-btn:hover{background:#00e5aa;transform:translateY(-1px)}
 .login-err{color:#ff3b5c;font-size:.82rem;margin-top:10px;text-align:center}
 
-/* ── DASHBOARD ── */
 .dash-wrap{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
 .stat{background:var(--card);border-radius:var(--r2);padding:18px 20px;border:1px solid var(--border);box-shadow:var(--sh)}
@@ -221,7 +203,6 @@ tr:hover td{background:#fafdf8}
 .map-lnk:hover{color:var(--green)}
 .dur{font-family:var(--mono);font-size:.78rem;background:#f3f4f6;padding:2px 8px;border-radius:6px;color:var(--ink2)}
 
-/* Activity feed */
 .feed-item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
 .feed-item:last-child{border:none}
 .fd{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0}
@@ -230,16 +211,13 @@ tr:hover td{background:#fafdf8}
 .fd2{font-size:.78rem;color:var(--ink3);margin-top:2px}
 .ft{font-family:var(--mono);font-size:.8rem;color:var(--ink2);font-weight:600}
 
-/* Empty */
 .empty{text-align:center;padding:60px 20px;color:var(--ink3)}
 .empty-icon{font-size:3rem;margin-bottom:12px}
 .empty-t{font-size:1rem;font-weight:700;color:var(--ink2);margin-bottom:6px}
 
-/* Spinner */
 .spin{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 
-/* Toast */
 #toast{
   position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
   background:var(--ink);color:#fff;padding:12px 24px;border-radius:30px;
@@ -250,10 +228,8 @@ tr:hover td{background:#fafdf8}
 #toast.t-ok{background:linear-gradient(135deg,#00c896,#00a878)}
 #toast.t-err{background:linear-gradient(135deg,#ff3b5c,#e02040)}
 
-/* Engineer container */
 .emp-wrap{max-width:480px;margin:0 auto;padding:20px 16px 60px}
 
-/* ── SELFIE ── */
 .selfie-wrap{position:relative;width:100%;background:#0d1117;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
 .selfie-wrap video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
 .selfie-wrap canvas{display:none}
@@ -269,7 +245,6 @@ tr:hover td{background:#fafdf8}
 .selfie-btn-retake:hover{background:var(--ink);color:#fff}
 .selfie-thumb{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--green);transform:scaleX(-1)}
 
-/* Setup guide */
 .guide-step{background:#f8fafc;border-radius:var(--r);padding:18px 20px;border:1px solid var(--border);margin-bottom:14px}
 .gs-title{font-weight:800;color:var(--ink);margin-bottom:10px;font-size:.95rem}
 .gs-body{font-size:.85rem;color:var(--ink2);line-height:1.8}
@@ -280,14 +255,12 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 @media(max-width:768px){th:nth-child(n+8),td:nth-child(n+8){display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:500px){th:nth-child(n+6),td:nth-child(n+6){display:none}}
 
-/* ══ LEAVE MODULE CSS ══════════════════════════════ */
-/* Leave badges */
+/* Leave CSS */
 .bdg-pending  {background:#fffbeb;color:#92400e;border:1px solid #fde68a}
 .bdg-approved {background:#f0fdf4;color:#15803d;border:1px solid #86efac}
 .bdg-rejected {background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
 .bdg-leave    {background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
 
-/* Apply leave toggle btn */
 .apply-leave-btn{
   width:100%;padding:13px;border-radius:14px;font-size:.95rem;font-weight:700;
   background:linear-gradient(135deg,#0077ff,#005acc);color:#fff;
@@ -296,7 +269,6 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 }
 .apply-leave-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,119,255,.35)}
 
-/* Leave form section */
 #leaveSection .card{border-left:4px solid var(--blue)}
 #leaveSection .field textarea{
   width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);
@@ -305,7 +277,6 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 }
 #leaveSection .field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,119,255,.1);background:#fff;outline:none}
 
-/* File upload */
 .file-upload-wrap{
   position:relative;border:2px dashed var(--border);border-radius:var(--r);
   padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:#fafaf8;
@@ -317,11 +288,9 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 .file-upload-wrap .fu-txt strong{color:var(--blue)}
 #leaveAttName{font-size:.82rem;color:var(--green);font-weight:600;margin-top:6px;min-height:18px}
 
-/* Leave submit btn */
 #leaveSubmitBtn{background:linear-gradient(135deg,#0077ff,#005acc)}
 #leaveSubmitBtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,119,255,.35)}
 
-/* Leave status banner (engineer) */
 .leave-active-banner{
   background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1.5px solid #93c5fd;
   border-radius:var(--r2);padding:20px;margin-bottom:16px;
@@ -329,7 +298,6 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 .leave-banner-title{font-size:1.1rem;font-weight:800;color:#1d4ed8;margin-bottom:8px}
 .leave-banner-detail{font-size:.85rem;color:#1e40af;line-height:1.8}
 
-/* Leave action buttons (admin table) */
 .leave-act-btn{
   padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;
   font-family:var(--body);transition:all .15s;border:none;
@@ -339,7 +307,6 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 .leave-reject{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
 .leave-reject:hover{background:#b91c1c;color:#fff}
 
-/* Modals */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
   z-index:9995;display:none;align-items:center;justify-content:center;padding:20px;
@@ -368,7 +335,6 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 .modal-btn-confirm{flex:2;padding:11px;border-radius:var(--r);background:var(--red);color:#fff;font-weight:700;font-size:.9rem;font-family:var(--body);cursor:pointer;border:none}
 .modal-btn-confirm:hover{background:#e02040}
 
-/* Email fallback modal */
 .ef-field{margin-bottom:12px}
 .ef-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:4px}
 .ef-value{font-size:.88rem;color:var(--ink);background:#f3f4f6;padding:10px 14px;border-radius:8px;line-height:1.6;word-break:break-word}
@@ -380,10 +346,8 @@ pre{background:#1a2233;color:#e5e7eb;padding:14px;border-radius:8px;font-size:.7
 }
 .mailto-btn:hover{background:#005acc}
 
-/* Leave tab in attendance - on-leave row highlight */
 tr.on-leave-row td{background:#f0f9ff!important}
 
-/* Days counter badge */
 .days-badge{
   display:inline-flex;align-items:center;justify-content:center;
   background:var(--ink);color:#fff;border-radius:8px;
@@ -391,11 +355,9 @@ tr.on-leave-row td{background:#f0f9ff!important}
   padding:2px 8px;min-width:32px;
 }
 
-/* Leave info card (engineer — pending applications) */
 .leave-info-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.83rem}
 .leave-info-row:last-child{border:none}
 
-/* ── LEAVE STATUS NOTIFICATION POPUP ───────────── */
 .lsn-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);
   z-index:9996;display:none;align-items:center;justify-content:center;padding:20px;
@@ -429,24 +391,20 @@ tr.on-leave-row td{background:#f0f9ff!important}
 }
 .lsn-btn-secondary:hover{background:rgba(0,0,0,.06)}
 
-/* Approved skin */
 .lsn-approved .lsn-header{background:linear-gradient(145deg,#00c896,#00a878)}
 .lsn-approved .lsn-title,.lsn-approved .lsn-sub{color:#fff}
 .lsn-approved .lsn-btn-primary{background:linear-gradient(135deg,#00c896,#00a878);color:#0d1117}
 .lsn-approved .lsn-btn-primary:hover{box-shadow:0 6px 20px rgba(0,200,150,.4)}
 
-/* Rejected skin */
 .lsn-rejected .lsn-header{background:linear-gradient(145deg,#ff3b5c,#e02040)}
 .lsn-rejected .lsn-title,.lsn-rejected .lsn-sub{color:#fff}
 .lsn-rejected .lsn-btn-primary{background:linear-gradient(135deg,#ff3b5c,#e02040);color:#fff}
 .lsn-rejected .lsn-btn-primary:hover{box-shadow:0 6px 20px rgba(255,59,92,.4)}
 
-/* Pending skin */
 .lsn-pending .lsn-header{background:linear-gradient(145deg,#f59e0b,#d97706)}
 .lsn-pending .lsn-title,.lsn-pending .lsn-sub{color:#fff}
 .lsn-pending .lsn-btn-primary{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
 
-/* Multiple notices — list mode */
 .lsn-list-item{
   border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .2s;
 }
@@ -455,7 +413,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
 .lsn-list-item.rejected{border-color:#fca5a5;background:#fef2f2}
 .lsn-list-item.pending {border-color:#fde68a;background:#fffbeb}
 
-/* ── LEAVE CANCEL / EDIT BUTTONS ───────────────── */
 .leave-cancel{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
 .leave-cancel:hover{background:#c2410c;color:#fff}
 .leave-edit{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
@@ -463,7 +420,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
 .bdg-cancelled{background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db}
 .bdg-cancel-req{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
 
-/* My Leaves button (engineer screen) */
 .my-leaves-btn{
   width:100%;padding:11px;border-radius:12px;font-size:.88rem;font-weight:700;
   background:transparent;border:1.5px solid var(--border);color:var(--ink2);
@@ -472,7 +428,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
 }
 .my-leaves-btn:hover{border-color:var(--blue);color:var(--blue);background:#eff6ff}
 
-/* ── RESPONSIVE OVERHAUL ─────────────────────────*/
 @media(max-width:900px){
   .dash-wrap{padding:16px 12px 60px}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
@@ -521,9 +476,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-     LANDING
-══════════════════════════════════════════ -->
 <div id="screen-landing" class="screen active flex-screen">
   <div class="land-mono">⚡ Attendance System</div>
   <h1 class="land-h1">Smart Attendance<br><span>Made Simple</span></h1>
@@ -532,19 +484,16 @@ tr.on-leave-row td{background:#f0f9ff!important}
     <div class="land-card" onclick="showScreen('engineer')">
       <div class="land-card-icon">📲</div>
       <div class="land-card-title">Engineer</div>
-      <div class="land-card-desc">Check in &amp; out with GPS location verification</div>
+      <div class="land-card-desc">Check in & out with GPS location verification</div>
     </div>
     <div class="land-card" onclick="showScreen('admin-login')">
       <div class="land-card-icon">📊</div>
       <div class="land-card-title">Admin Dashboard</div>
-      <div class="land-card-desc">Track all staff in real-time, view reports &amp; history</div>
+      <div class="land-card-desc">Track all staff in real-time, view reports & history</div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     ADMIN LOGIN
-══════════════════════════════════════════ -->
 <div id="screen-admin-login" class="screen">
   <div class="login-card">
     <div class="login-h">Dashboard Login</div>
@@ -559,9 +508,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     ENGINEER APP
-══════════════════════════════════════════ -->
 <div id="screen-engineer" class="screen">
   <div class="topbar">
     <span class="tb-logo">AT</span>
@@ -574,19 +520,16 @@ tr.on-leave-row td{background:#f0f9ff!important}
       ⚠️ <strong>Demo mode.</strong> Firebase not configured yet — records saved locally. See <strong>Setup Guide</strong> in the dashboard to connect a database.
     </div>
 
-    <!-- Clock -->
     <div class="emp-clock">
       <div class="emp-clock-time" id="empTime">--:--:--</div>
       <div class="emp-clock-date" id="empDate">Loading…</div>
     </div>
 
-    <!-- Leave active banner (shown when engineer is on approved leave today) -->
     <div id="leaveActiveBanner" style="display:none" class="leave-active-banner">
       <div class="leave-banner-title" id="leaveBannerTitle">🌴 You are on leave today</div>
       <div class="leave-banner-detail" id="leaveBannerDetail"></div>
     </div>
 
-    <!-- Active session badge -->
     <div class="sess" id="sessBadge" style="display:none">
       <div class="sess-hdr">
         <span style="color:#9ca3af;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px">Active Session</span>
@@ -598,7 +541,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <div class="sess-row"><span class="sess-k">Duration</span><span class="sess-v" id="sb-dur">—</span></div>
     </div>
 
-    <!-- Check-in form -->
     <div id="ciForm">
       <div class="card">
         <div class="card-lbl">Engineer Details</div>
@@ -611,6 +553,11 @@ tr.on-leave-row td{background:#f0f9ff!important}
           </div>
         </div>
         <div class="field"><label>Full Name</label><input type="text" id="empName" placeholder="e.g. Ahmad Bin Ali" oninput="chkBtn()"/></div>
+        
+        <div class="field"><label>Email Account <span style="font-size:0.75rem; color:var(--ink3); font-weight:normal">(Locks device to this email)</span></label>
+            <input type="email" id="empEmail" placeholder="your.email@company.com" oninput="chkBtn()"/>
+        </div>
+
         <div class="field"><label>Work Site</label>
           <select id="empSite" onchange="chkBtn();resetGps('in')">
             <option value="">— Select your work site —</option>
@@ -625,7 +572,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <div id="gpsCiStatus"></div>
       </div>
 
-      <!-- Selfie verification card -->
       <div class="card">
         <div class="card-lbl">🤳 Identity Selfie <span style="color:var(--red);font-size:.75rem;font-weight:800">REQUIRED</span></div>
         <div style="background:linear-gradient(135deg,#0d1117,#1a2233);border-radius:10px;padding:12px 14px;margin-bottom:12px">
@@ -634,7 +580,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
             ① <strong style="color:#e5e7eb">Face clearly visible</strong> — no mask, no sunglasses, face centred<br>
             ② <strong style="color:#e5e7eb">Show your location</strong> — your surroundings must be recognisable (worksite, building, signage)<br>
             ③ <strong style="color:#e5e7eb">Good lighting</strong> — avoid dark or blurry photos<br>
-            <span style="color:var(--orange);font-weight:700">⚠ Selfies that do not show a clear location will be flagged by admin.</span>
           </div>
         </div>
         <div class="selfie-wrap" id="selfieWrap">
@@ -656,7 +601,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
       </button>
     </div>
 
-    <!-- Check-out section -->
     <div id="coSection" style="display:none">
       <div class="card">
         <div class="card-lbl">🚪 Ready to Leave?</div>
@@ -671,16 +615,13 @@ tr.on-leave-row td{background:#f0f9ff!important}
       </button>
     </div>
 
-    <!-- Result card -->
     <div class="card" id="resultCard" style="display:none;margin-top:8px">
       <div class="card-lbl" id="resultTitle">Record</div>
       <div id="resultBody"></div>
     </div>
 
-    <!-- ── DIVIDER ─────────────────────────────────── -->
     <div style="height:1px;background:var(--border);margin:20px 0"></div>
 
-    <!-- Apply Leave Button row (second priority) -->
     <div style="display:flex;gap:10px">
       <button class="apply-leave-btn" id="applyLeaveBtn" onclick="showLeaveSection(true)" style="flex:1;margin-bottom:0">
         📋 Apply for Leave
@@ -691,12 +632,9 @@ tr.on-leave-row td{background:#f0f9ff!important}
     </div>
     <div style="margin-bottom:16px"></div>
 
-    <!-- ── LEAVE APPLICATION FORM ──────────────────── -->
     <div id="leaveSection" style="display:none">
-
       <div class="card">
         <div class="card-lbl" style="color:var(--blue)">📋 Leave Application Form</div>
-
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div class="field">
             <label>Engineer ID <span style="color:var(--red)">*</span></label>
@@ -749,7 +687,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
 
       <div class="card">
         <div class="card-lbl">📎 Supporting Documents <span style="color:var(--red);font-size:.75rem;font-weight:800">REQUIRED</span></div>
-        <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">Upload a photo or screenshot of your physical leave application form / MC slip. <strong style="color:var(--red)">This is mandatory</strong> — leave applications without an attachment will not be accepted. (Max 700 KB — JPG, PNG, or PDF)</p>
+        <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">Upload a photo or screenshot of your physical leave application form / MC slip. (Max 700 KB)</p>
         <div class="file-upload-wrap" id="leaveAttWrap">
           <div class="fu-icon">📄</div>
           <div class="fu-txt">Tap to upload<br><strong>Leave Form / MC / Supporting Document</strong></div>
@@ -776,9 +714,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     DASHBOARD
-══════════════════════════════════════════ -->
 <div id="screen-dashboard" class="screen">
   <div class="topbar">
     <span class="tb-logo">AT</span>
@@ -792,7 +727,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
       ⚙️ <strong>Setup needed:</strong> Replace <code>FIREBASE_CONFIG</code> in the script with your Firebase credentials for live data. Click <strong>Setup Guide</strong> tab below for instructions.
     </div>
 
-    <!-- Stats -->
     <div class="stats-grid">
       <div class="stat g"><div class="stat-n" id="s-in">0</div><div class="stat-l">Checked In</div></div>
       <div class="stat r"><div class="stat-n" id="s-out">0</div><div class="stat-l">Checked Out</div></div>
@@ -800,16 +734,14 @@ tr.on-leave-row td{background:#f0f9ff!important}
       <div class="stat b"><div class="stat-n" id="s-all">0</div><div class="stat-l">All Records</div></div>
     </div>
 
-    <!-- Tabs -->
     <div class="dash-tabs">
       <div class="dash-tab on" onclick="dTab('live',this)">Live Status</div>
       <div class="dash-tab" onclick="dTab('feed',this)">Activity Feed</div>
       <div class="dash-tab" onclick="dTab('leave',this)" id="leaveTabBtn">🗓️ Leave Mgmt <span id="leavePendingBadge" style="display:none;background:var(--orange);color:#fff;border-radius:30px;padding:1px 7px;font-size:.7rem;margin-left:4px;font-family:var(--mono)">0</span></div>
-      <div class="dash-tab" onclick="dTab('device',this)">🔒 Device Audit <span id="suspiciousBadge" style="display:none;background:var(--red);color:#fff;border-radius:30px;padding:1px 7px;font-size:.7rem;margin-left:4px;font-family:var(--mono)">!</span></div>
+      <div class="dash-tab" onclick="dTab('device',this)">🔒 Device Audit</div>
       <div class="dash-tab" onclick="dTab('setup',this)">⚙️ Setup Guide</div>
     </div>
 
-    <!-- LIVE TAB -->
     <div id="dTab-live">
       <div class="toolbar">
         <input type="text" id="fSearch" placeholder="Search name / ID…" oninput="renderTable()"/>
@@ -833,7 +765,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
             <thead><tr>
               <th>Engineer</th><th>Selfie</th><th>Site</th><th>Status</th>
               <th>Check-In</th><th>Check-Out</th><th>Duration</th>
-              <th>GPS In</th><th>GPS Out</th><th>Device</th><th>Date</th>
+              <th>GPS In</th><th>GPS Out</th><th>Date</th>
             </tr></thead>
             <tbody id="tblBody"></tbody>
           </table>
@@ -846,7 +778,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
       </div>
     </div>
 
-    <!-- FEED TAB -->
     <div id="dTab-feed" style="display:none">
       <div class="tbl-wrap" style="padding:20px">
         <div class="card-lbl" style="margin-bottom:16px">Recent Activity</div>
@@ -854,10 +785,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
       </div>
     </div>
 
-    <!-- LEAVE MANAGEMENT TAB -->
     <div id="dTab-leave" style="display:none">
-
-      <!-- Leave Stats -->
       <div class="stats-grid" style="margin-bottom:18px">
         <div class="stat o"><div class="stat-n" id="ls-pending">0</div><div class="stat-l">⏳ Pending</div></div>
         <div class="stat g"><div class="stat-n" id="ls-approved">0</div><div class="stat-l">✅ Approved</div></div>
@@ -865,7 +793,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <div class="stat b"><div class="stat-n" id="ls-total">0</div><div class="stat-l">Total</div></div>
       </div>
 
-      <!-- Filters -->
       <div class="toolbar">
         <input type="text" id="lSearch" placeholder="Search name / ID…" oninput="renderLeaveTable()"/>
         <select id="lStatus" onchange="renderLeaveTable()">
@@ -881,7 +808,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <button class="tb-btn tb-out" onclick="exportCombinedCSV()">⬇ Full Report</button>
       </div>
 
-      <!-- Leave Table -->
       <div class="tbl-wrap">
         <div class="tbl-hdr">
           <span class="tbl-hdr-t">🗓️ Leave Applications</span>
@@ -905,65 +831,47 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <div id="leaveTblEmpty" class="empty" style="display:none">
           <div class="empty-icon">🗓️</div>
           <div class="empty-t">No leave applications yet</div>
-          <div>Leave applications from engineers will appear here</div>
         </div>
-      </div>
-
-      <!-- Firestore Rules Reminder -->
-      <div style="background:#fffbeb;border-radius:var(--r);padding:14px 16px;border:1px solid #fde68a;font-size:.82rem;color:#78350f;margin-top:16px">
-        <strong>⚙️ Remember:</strong> Add the <code style="background:#fef3c7;padding:1px 5px;border-radius:4px;font-family:var(--mono)">leaveApplications</code> Firestore rules from the Setup Guide → Step 10 for this feature to work.
       </div>
     </div>
 
-    <!-- DEVICE AUDIT TAB -->
     <div id="dTab-device" style="display:none">
 
       <div style="background:linear-gradient(135deg,#0d1117,#1a2233);border-radius:var(--r2);padding:18px 20px;margin-bottom:18px;display:flex;align-items:flex-start;gap:14px">
         <div style="font-size:2rem;flex-shrink:0">🔒</div>
         <div>
-          <div style="color:#fff;font-weight:800;font-size:1rem;margin-bottom:4px">Device–Engineer Binding</div>
-          <div style="color:#9ca3af;font-size:.83rem;line-height:1.6">Each engineer's phone generates a unique <strong style="color:#e5e7eb">Device ID</strong> on first use. It is saved with every check-in record. If one device is used to check in <strong style="color:var(--orange)">more than one engineer on the same date</strong>, it is automatically flagged as a suspected buddy-punch attempt.</div>
+          <div style="color:#fff;font-weight:800;font-size:1rem;margin-bottom:4px">Strict Device-to-Email Binding</div>
+          <div style="color:#9ca3af;font-size:.83rem;line-height:1.6">Each device is permanently locked to <strong>one email address</strong>. An engineer cannot use multiple devices, and a device cannot be shared by multiple engineers. If an engineer changes their phone or email, click <strong>Unbind</strong> below.</div>
         </div>
       </div>
 
-      <!-- Suspicious flags summary -->
-      <div id="deviceFlagsWrap" style="margin-bottom:18px"></div>
-
-      <!-- All device bindings table -->
       <div class="tbl-wrap">
         <div class="tbl-hdr">
-          <span class="tbl-hdr-t">📱 Device — Engineer Registry</span>
-          <span class="tbl-count" id="deviceCount">—</span>
+          <span class="tbl-hdr-t">📱 Registered Devices Registry</span>
+          <span class="tbl-count" id="deviceCount">0 devices</span>
         </div>
         <div style="overflow-x:auto">
           <table>
             <thead><tr>
               <th>Device ID</th>
-              <th>Engineer(s) on This Device</th>
+              <th>Bound Email Account</th>
+              <th>Engineer</th>
+              <th>Registered On</th>
               <th>Last Check-In</th>
-              <th>Total Check-Ins</th>
-              <th>Flag</th>
+              <th>Action</th>
             </tr></thead>
             <tbody id="deviceTblBody"></tbody>
           </table>
         </div>
         <div id="deviceTblEmpty" class="empty" style="display:none">
           <div class="empty-icon">📱</div>
-          <div class="empty-t">No device records yet</div>
-          <div>Device IDs are recorded automatically with every check-in</div>
+          <div class="empty-t">No devices registered yet</div>
+          <div>Devices are registered permanently on an engineer's first check-in.</div>
         </div>
       </div>
 
-      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:var(--r);padding:14px 16px;margin-top:16px;font-size:.82rem;color:#0369a1;line-height:1.7">
-        <strong>💡 How to investigate a flagged device:</strong><br>
-        1. Note the Device ID from the flagged row above<br>
-        2. Go to <strong>Live Status</strong> tab and search for the Engineer ID of any suspicious record<br>
-        3. Compare the selfie photos for each engineer who used that device — if the same face appears, it confirms buddy punching<br>
-        4. Cross-reference GPS check-in locations if needed
-      </div>
     </div>
 
-    <!-- SETUP TAB -->
     <div id="dTab-setup" style="display:none">
       <div class="tbl-wrap" style="padding:28px">
         <h2 style="font-size:1.2rem;margin-bottom:20px">⚙️ Setup Guide — Connect Firebase (Free)</h2>
@@ -984,7 +892,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
           <div class="gs-body"><ol>
             <li>In the left sidebar, click <strong>"Firestore Database"</strong></li>
             <li>Click <strong>"Create database"</strong></li>
-            <li>Choose <strong>"Start in production mode"</strong> (we'll add proper rules in Step 7)</li>
+            <li>Choose <strong>"Start in production mode"</strong></li>
             <li>Select your nearest region (e.g. <code>asia-southeast1</code> for Singapore) → click <strong>"Enable"</strong></li>
           </ol></div>
         </div>
@@ -997,7 +905,6 @@ tr.on-leave-row td{background:#f0f9ff!important}
             <li>Under <strong>"Sign-in method"</strong>, enable <strong>"Email/Password"</strong></li>
             <li>Go to the <strong>"Users"</strong> tab → click <strong>"Add user"</strong></li>
             <li>Enter your admin email and a strong password (min 12 chars) → click <strong>"Add user"</strong></li>
-            <li>This email/password is what you use to log into the dashboard. <strong>No credentials are stored in the HTML file.</strong></li>
           </ol></div>
         </div>
 
@@ -1006,7 +913,7 @@ tr.on-leave-row td{background:#f0f9ff!important}
           <div class="gs-body"><ol>
             <li>Click the ⚙️ gear icon (top-left) → <strong>"Project settings"</strong></li>
             <li>Scroll down to <strong>"Your apps"</strong> section</li>
-            <li>Click the <strong>&lt;/&gt; Web</strong> icon → type any app name → click <strong>"Register app"</strong></li>
+            <li>Click the <strong></> Web</strong> icon → type any app name → click <strong>"Register app"</strong></li>
             <li>You'll see a <code>firebaseConfig</code> block — copy the whole object</li>
           </ol></div>
         </div>
@@ -1014,145 +921,84 @@ tr.on-leave-row td{background:#f0f9ff!important}
         <div class="guide-step">
           <div class="gs-title">Step 5 — Paste Config Into This File</div>
           <div class="gs-body">
-            <p>Open <code>attendance_system.html</code> in Notepad (or any text editor). Find <code>var FIREBASE_CONFIG = {</code> near the bottom of the file and replace the placeholder values with your actual Firebase config.</p>
-            <pre>var FIREBASE_CONFIG = {
-  apiKey: "AIzaSy...",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123"
-};</pre>
-            <p style="margin-top:10px">⚠️ <strong>Never share your HTML file publicly</strong> with the real API key visible — restrict it in Google Cloud Console to your domain only (see security guide).</p>
+            <p>Find <code>var FIREBASE_CONFIG = {</code> near the bottom of this file and replace the values with your config.</p>
           </div>
         </div>
 
         <div class="guide-step">
           <div class="gs-title">Step 6 — Update Your Work Sites</div>
           <div class="gs-body">
-            <p>In the same file, find <code>const WORK_SITES = [...]</code> and edit each entry with your actual site names and GPS coordinates.</p>
-            <p style="margin-top:6px">To get GPS coordinates: open <strong>Google Maps</strong> → right-click on your site location → the first line shown is <code>latitude, longitude</code>.</p>
+            <p>In the script, find <code>const WORK_SITES = [...]</code> and edit your sites and GPS coordinates.</p>
           </div>
         </div>
 
         <div class="guide-step">
           <div class="gs-title">Step 7 — Set Firestore Security Rules (🔒 Critical)</div>
           <div class="gs-body">
-            <p>In Firebase Console → <strong>Firestore Database</strong> → <strong>Rules</strong> tab, replace all existing rules with:</p>
+            <p>In Firebase Console → <strong>Firestore Database</strong> → <strong>Rules</strong> tab, replace existing rules with:</p>
             <pre>rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /attendance/{docId} {
-      // Engineers can check in (create record) without login
-      allow create: if request.resource.data.keys().hasAll([
-                      'empId','empName','site','checkinTimestamp','status'])
+      allow create: if request.resource.data.keys().hasAll(['empId','empName','empEmail','site','checkinTimestamp','status'])
                     && request.resource.data.empId is string
-                    && request.resource.data.empId.size() &gt; 0
-                    && request.resource.data.empId.size() &lt;= 20
+                    && request.resource.data.empId.size() > 0
+                    && request.resource.data.empId.size() <= 20
                     && request.resource.data.empName is string
-                    && request.resource.data.empName.size() &gt; 0
-                    && request.resource.data.empName.size() &lt;= 60
                     && request.resource.data.status == 'in';
-
-      // Engineers can check out (update only allowed fields)
-      allow update: if request.resource.data.diff(resource.data)
-                      .affectedKeys().hasOnly([
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly([
                         'checkoutTime','checkoutISO','checkoutTimestamp',
                         'checkoutLat','checkoutLng','checkoutDist',
                         'checkoutAcc','status','duration','isOvertime'])
                     && request.resource.data.status == 'out';
-
-      // Only signed-in admin can read or delete records
       allow read, delete: if request.auth != null;
     }
   }
 }</pre>
-            <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This ensures only your admin can view data. Engineers can only write their own records.</p>
           </div>
         </div>
 
-        <div class="guide-step">
-          <div class="gs-title">Step 8 — Restrict Your Firebase API Key to Your Domain</div>
-          <div class="gs-body"><ol>
-            <li>Go to <strong>console.cloud.google.com</strong></li>
-            <li>Select your Firebase project from the top dropdown</li>
-            <li>Navigate to <strong>APIs &amp; Services → Credentials</strong></li>
-            <li>Click on your <strong>Browser key (auto created by Firebase)</strong></li>
-            <li>Under <strong>"Application restrictions"</strong>, select <strong>"HTTP referrers"</strong></li>
-            <li>Add your domain: <code>https://YOUR_USERNAME.github.io/*</code></li>
-            <li>Click <strong>Save</strong></li>
-          </ol>
-          <p style="margin-top:8px">This prevents anyone from using your API key on other websites.</p>
-          </div>
-        </div>
-
-        <div class="guide-step">
-          <div class="gs-title">Step 9 — Host for Free (Get a Shareable URL)</div>
-          <div class="gs-body"><ol>
-            <li>Go to <strong>app.netlify.com/drop</strong></li>
-            <li>Drag and drop your <code>attendance_system.html</code> file onto the page</li>
-            <li>Wait 10 seconds — you'll get a free URL like <code>https://amazing-name-123.netlify.app</code></li>
-            <li>Share that URL with all your engineers!</li>
-          </ol>
-          <p style="margin-top:10px;color:#15803d;font-weight:600">✅ That's it! No coding skills needed. Completely free.</p>
-          </div>
-        </div>
-
-        <div style="background:#fffbeb;border-radius:var(--r);padding:16px 18px;border:1px solid #fde68a;font-size:.84rem;color:#78350f">
-          <strong>Firebase Free Tier limits</strong> (Spark plan — always free):<br>
-          1 GB storage · 50,000 reads/day · 20,000 writes/day — more than enough for 100 engineers.
-        </div>
-
-        <div class="guide-step" style="margin-top:20px;border-left:4px solid var(--blue)">
-          <div class="gs-title">Step 10 — Add Leave Application Firestore Rules</div>
+        <div class="guide-step" style="border-left:4px solid var(--blue)">
+          <div class="gs-title">Step 8 — Add Leave Application Firestore Rules</div>
           <div class="gs-body">
-            <p>In Firebase Console → <strong>Firestore Database</strong> → <strong>Rules</strong> tab, add the <code>leaveApplications</code> collection rules inside the existing <code>match /databases/{database}/documents</code> block:</p>
+            <p>Add these <code>leaveApplications</code> rules inside the <code>match /databases/{database}/documents</code> block:</p>
             <pre>match /leaveApplications/{docId} {
-  // Any engineer can submit a leave application
-  allow create: if request.resource.data.keys().hasAll([
-                  'empId','empName','empEmail','leaveType',
-                  'fromDate','toDate','numDays','status'])
-                && request.resource.data.empId is string
-                && request.resource.data.empId.size() > 0
+  allow create: if request.resource.data.keys().hasAll(['empId','empName','empEmail','leaveType','fromDate','toDate','numDays','status'])
                 && request.resource.data.status == 'pending';
-
-  // Engineers can read leave records (to check status)
   allow read: if true;
-
-  // Only signed-in admin can update (approve/reject) or delete
   allow update, delete: if request.auth != null;
 }</pre>
-            <p style="margin-top:10px;color:#15803d;font-weight:600">✅ This allows engineers to submit and view leave applications. Only your admin can approve or reject them.</p>
           </div>
         </div>
 
-        <div class="guide-step" style="border-left:4px solid #f59e0b">
-          <div class="gs-title">Step 11 — Configure Email Notifications (Optional)</div>
+        <div class="guide-step" style="border-left:4px solid var(--green)">
+          <div class="gs-title">Step 9 — Add Device Binding Firestore Rules (For Account Locking)</div>
           <div class="gs-body">
-            <p>To enable automatic email notifications when leaves are approved/rejected:</p>
-            <ol>
-              <li>Sign up for free at <strong>emailjs.com</strong></li>
-              <li>Create an <strong>Email Service</strong> (connect your Gmail)</li>
-              <li>Create an <strong>Email Template</strong> with variables: <code>{{to_email}}</code>, <code>{{to_name}}</code>, <code>{{message}}</code>, <code>{{leave_type}}</code>, <code>{{status}}</code></li>
-              <li>Get your <strong>Public Key</strong>, <strong>Service ID</strong>, and <strong>Template ID</strong></li>
-              <li>In this file, find <code>var EMAILJS_KEY</code> near the top of the script and replace the placeholder values</li>
-            </ol>
-            <p style="margin-top:8px">If EmailJS is not configured, the system will show a <strong>"Send via Email Client"</strong> fallback button that opens your email app with the notification pre-filled.</p>
+            <p>Add these rules inside the <code>match /databases/{database}/documents</code> block. Because engineers are unauthenticated, we must allow public read/write to this specific registry for the locking to work during check-in:</p>
+            <pre>match /deviceBindings/{deviceId} {
+  allow read, write: if true;
+}</pre>
           </div>
         </div>
+        
+        <div class="guide-step">
+          <div class="gs-title">Step 10 — Restrict Your Firebase API Key to Your Domain</div>
+          <div class="gs-body">
+            Go to <strong>console.cloud.google.com</strong> → APIs & Services → Credentials. Click your Browser key and add your website URL under HTTP referrers.
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 </div>
 
-<!-- Selfie lightbox -->
 <div id="selfieLightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9998;align-items:center;justify-content:center;flex-direction:column;gap:16px" onclick="this.style.display='none'">
   <img id="lightboxImg" style="max-width:90vw;max-height:80vh;border-radius:16px;transform:scaleX(-1)" alt="Selfie"/>
   <div id="lightboxInfo" style="color:#fff;font-size:.9rem;text-align:center"></div>
   <button onclick="document.getElementById('selfieLightbox').style.display='none'" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:10px 28px;border-radius:30px;font-size:.9rem;cursor:pointer">✕ Close</button>
 </div>
 
-<!-- ══ MY LEAVES MODAL (engineer) ════════════════════ -->
 <div id="myLeavesModal" class="modal-overlay">
   <div class="modal-box" style="max-width:540px;max-height:90vh;overflow-y:auto">
     <button class="modal-close" onclick="document.getElementById('myLeavesModal').classList.remove('open')">✕</button>
@@ -1171,7 +1017,6 @@ service cloud.firestore {
   </div>
 </div>
 
-<!-- ══ EDIT LEAVE MODAL ════════════════════════════ -->
 <div id="editLeaveModal" class="modal-overlay">
   <div class="modal-box" style="max-width:480px;max-height:90vh;overflow-y:auto">
     <button class="modal-close" onclick="closeEditLeaveModal()">✕</button>
@@ -1192,7 +1037,6 @@ service cloud.firestore {
   </div>
 </div>
 
-<!-- ══ CANCEL LEAVE CONFIRM MODAL ════════════════════ -->
 <div id="cancelLeaveModal" class="modal-overlay">
   <div class="modal-box">
     <button class="modal-close" onclick="document.getElementById('cancelLeaveModal').classList.remove('open')">✕</button>
@@ -1214,17 +1058,12 @@ service cloud.firestore {
   </div>
 </div>
 
-<!-- ══ LEAVE STATUS NOTIFICATION POPUP ══════════════ -->
 <div id="leaveStatusPopup" class="lsn-overlay">
-  <div class="lsn-box" id="lsnBox">
-    <!-- injected dynamically -->
-  </div>
+  <div class="lsn-box" id="lsnBox"></div>
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
-<!-- ══ REJECT REASON MODAL ══════════════════════════ -->
 <div id="rejectModal" class="modal-overlay">
   <div class="modal-box">
     <button class="modal-close" onclick="closeRejectModal()">✕</button>
@@ -1242,12 +1081,11 @@ service cloud.firestore {
   </div>
 </div>
 
-<!-- ══ EMAIL FALLBACK MODAL ═════════════════════════ -->
 <div id="emailFallbackModal" class="modal-overlay">
   <div class="modal-box" style="max-width:540px">
     <button class="modal-close" onclick="document.getElementById('emailFallbackModal').classList.remove('open')">✕</button>
     <div class="modal-title">📧 Send Notification Email</div>
-    <div class="modal-sub">EmailJS is not configured. Use the button below to open your email client with the message pre-filled, or copy the content manually.</div>
+    <div class="modal-sub">EmailJS is not configured. Use the button below to open your email client with the message pre-filled.</div>
     <div class="ef-field">
       <div class="ef-label">To</div>
       <div class="ef-value" id="efTo">—</div>
@@ -1268,9 +1106,7 @@ service cloud.firestore {
   </div>
 </div>
 
-<!-- ══ LEAVE ATTACHMENT VIEWER ══════════════════════ -->
 <div id="leaveAttModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9997;flex-direction:column">
-  <!-- Sticky header — always visible -->
   <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);flex-shrink:0;gap:12px;border-bottom:1px solid rgba(255,255,255,.1)">
     <div style="color:#fff;font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="leaveAttModalTitle">📎 Leave Attachment</div>
     <div style="display:flex;gap:8px;flex-shrink:0">
@@ -1278,11 +1114,7 @@ service cloud.firestore {
       <button onclick="closeLeaveAttModal()" style="background:rgba(255,59,92,.8);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:var(--body)">✕ Close</button>
     </div>
   </div>
-  <!-- Scrollable image area -->
-  <div id="leaveAttModalContent" style="flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:16px">
-    <!-- injected by viewLeaveAtt() -->
-  </div>
-  <!-- Sticky footer — always visible -->
+  <div id="leaveAttModalContent" style="flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:16px"></div>
   <div style="padding:12px 18px;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;gap:10px;align-items:center;flex-shrink:0;border-top:1px solid rgba(255,255,255,.1)">
     <div id="attFileName" style="color:#9ca3af;font-size:.8rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
     <a id="attDownloadBtn" href="#" download="" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:none;font-family:var(--body)">⬇ Download</a>
@@ -1290,12 +1122,9 @@ service cloud.firestore {
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     SCRIPT  (plain script tag — no module)
-══════════════════════════════════════════ -->
 <script>
 // ╔══════════════════════════════════════════════╗
-// ║  CONFIGURATION — edit these values           ║
+// ║  CONFIGURATION                               ║
 // ╚══════════════════════════════════════════════╝
 var FIREBASE_CONFIG = {
     apiKey: "AIzaSyA1VY1pdnjRnBfSFglztje8Xs36KFFQgBg",
@@ -1306,32 +1135,15 @@ var FIREBASE_CONFIG = {
     appId: "1:759301832044:web:cc3d682c41806635800749"
 };
 
-
-// ✅ SECURITY: Admin credentials are now managed by Firebase Authentication.
-// Go to Firebase Console → Authentication → Users → Add user (email + password)
-// NO username/password stored in code anymore.
-
-var WORK_HOUR_LATE = 09;          // hour (24h) considered "late" arrival
-var MAX_HOURS_OT   = 18;         // hours before overtime flag
+var WORK_HOUR_LATE = 09;         
+var MAX_HOURS_OT   = 18;         
 
 var WORK_SITES = [
   { name:"HQ - Elementum",  lat:1.3065232058219243, lng:103.79258262698083 },
-  { name:"Site A - NUH",    lat:1.2941060351075837, lng:103.78314248180223 },
-  { name:"Site B - NTFGH",  lat:1.3340183111776367,  lng:103.74533785581737 },
-  { name:"Site C - TTSH",   lat:1.3215956826375057,  lng:103.84600588650957 },
-  { name:"Site D - WH",     lat:1.4255730640948574, lng:103.79358640285662 },
-  { name:"Site E - NSC",    lat:1.3221829783973038, lng:103.84933935706384 },
-  { name:"Site F - Bizit Office",   lat:1.3529846010135893, lng:103.84316689510088 },
-  { name:"Site G - Bishan MRT",       lat:1.351292939593891, lng:103.84870003652243 },
-  { name:"Site H - Orchard Central",        lat:1.3010213243802298, lng:103.83972359419455 },
-  { name:"Site I - Ronald Home",        lat:1.4247928457305246, lng:103.83180977959292 },
-  { name:"Site J - Evan Home",        lat:1.3069090997407309, lng:103.79446133317231 }
+  { name:"Site A - NUH",    lat:1.2941060351075837, lng:103.78314248180223 }
 ];
 
 var GEOFENCE_M = 500;
-// ╔══════════════════════════════════════════════╗
-// ║  END CONFIGURATION                           ║
-// ╚══════════════════════════════════════════════╝
 
 // ── Firebase ──────────────────────────────────────
 var db = null;
@@ -1347,11 +1159,9 @@ function initFirebase() {
     document.getElementById("empBanner").style.display = "none";
     document.getElementById("dashBanner").style.display = "none";
 
-    // ✅ SECURITY: Listen to auth state — only show dashboard if truly signed in
     firebase.auth().onAuthStateChanged(function(user) {
       authReady = true;
       if (!user) {
-        // If someone navigated to dashboard without auth, boot them
         var dash = document.getElementById("screen-dashboard");
         if (dash && dash.classList.contains("active")) {
           showScreen("admin-login");
@@ -1362,22 +1172,15 @@ function initFirebase() {
   } catch(e) { console.warn("Firebase init:", e); }
 }
 
-// ── Local fallback ─────────────────────────────────
 var localRecs = JSON.parse(localStorage.getItem("at_recs") || "[]");
 function saveLocal(r) { localRecs.push(r); localStorage.setItem("at_recs", JSON.stringify(localRecs)); }
 
-// ── Screen router ──────────────────────────────────
 function showScreen(id) {
-  // ✅ SECURITY: Block dashboard access unless authenticated via Firebase
   if (id === "dashboard") {
     if (!fbOk) {
-      // fallback: still allow if no Firebase (demo mode)
     } else {
       var user = firebase.auth().currentUser;
-      if (!user) {
-        showScreen("admin-login");
-        return;
-      }
+      if (!user) { showScreen("admin-login"); return; }
     }
   }
   document.querySelectorAll(".screen").forEach(function(s){
@@ -1386,7 +1189,6 @@ function showScreen(id) {
   });
   var el = document.getElementById("screen-" + id);
   if (!el) return;
-  // Screens that need flex layout
   var flexScreens = ["landing","admin-login"];
   el.classList.add("active");
   if (flexScreens.indexOf(id) >= 0) {
@@ -1399,7 +1201,6 @@ function showScreen(id) {
   if (id === "dashboard") initDash();
 }
 
-// ── Clock ──────────────────────────────────────────
 function tick() {
   var now = new Date();
   var te = document.getElementById("empTime"), de = document.getElementById("empDate");
@@ -1409,7 +1210,6 @@ function tick() {
 }
 setInterval(tick, 1000); tick();
 
-// ── Haversine ──────────────────────────────────────
 function haversine(la1,lo1,la2,lo2) {
   var R=6371000, r=Math.PI/180;
   var dLa=(la2-la1)*r, dLo=(lo2-lo1)*r;
@@ -1417,7 +1217,6 @@ function haversine(la1,lo1,la2,lo2) {
   return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
 }
 
-// ── GPS state ──────────────────────────────────────
 var GPS = { in: null, out: null };
 
 function resetGps(dir) {
@@ -1473,7 +1272,7 @@ function verifyGps(dir) {
       chkBtn();
     },
     function(err) {
-      var msgs = {1:"Permission denied. Enable location in your browser.",2:"Location unavailable.",3:"Request timed out."};
+      var msgs = {1:"Permission denied. Enable location.",2:"Location unavailable.",3:"Request timed out."};
       setGpsUI(dir,"error", msgs[err.code]||"Location error.", null);
     },
     { enableHighAccuracy:true, timeout:20000, maximumAge:0 }
@@ -1506,33 +1305,26 @@ function setGpsUI(dir, state, name, dist) {
   }
 }
 
-// ── Session helpers ────────────────────────────────
 function getSess() { try { return JSON.parse(localStorage.getItem("at_sess")||"null"); } catch(e){ return null; } }
 function setSess(d) { localStorage.setItem("at_sess", d ? JSON.stringify(d) : "null"); }
 function getSessDocId() { return localStorage.getItem("at_sess_doc") || null; }
 function setSessDocId(id) { if(id) localStorage.setItem("at_sess_doc",id); else localStorage.removeItem("at_sess_doc"); }
 
-// ── Engineer ID prefix helpers ──────────────────────
-// All Engineer IDs are stored as "Eng" + whatever the user types (e.g. "Eng01")
 function engIdInput(input) {
-  // Strip any non-alphanumeric characters; prevent user from typing "Eng" prefix manually
   var val = input.value.replace(/^[Ee][Nn][Gg]*/,"").replace(/[^a-zA-Z0-9]/g,"");
   input.value = val;
   chkBtn();
 }
 
-// Returns the full ID with Eng prefix, or "" if input is empty
 function getEngId(inputId) {
   var el = document.getElementById(inputId || "empId");
   if (!el) return "";
   var val = (el.value || "").trim();
   if (!val) return "";
-  // Already has Eng prefix (safety guard)
   if (/^[Ee][Nn][Gg]/i.test(val)) return "Eng" + val.replace(/^[Ee][Nn][Gg]*/i,"");
   return "Eng" + val;
 }
 
-// Focus styling for the Eng prefix input wrapper
 document.addEventListener("DOMContentLoaded", function(){
   ["engIdWrap","leaveEngIdWrap"].forEach(function(wrapId){
     var wrap = document.getElementById(wrapId);
@@ -1547,24 +1339,21 @@ document.addEventListener("DOMContentLoaded", function(){
 function chkBtn() {
   var id   = getEngId("empId");
   var name = (document.getElementById("empName") ||{}).value||"";
+  var email= (document.getElementById("empEmail")||{}).value||"";
   var site = (document.getElementById("empSite") ||{}).value||"";
   var ci = document.getElementById("ciBtn");
-  if (ci) ci.disabled = !(id && name.trim() && site && GPS.in && GPS.in.ok && selfieData);
+  if (ci) ci.disabled = !(id && name.trim() && email.trim() && site && GPS.in && GPS.in.ok && selfieData);
   var co = document.getElementById("coBtn");
   if (co) co.disabled = !(GPS.out && GPS.out.ok);
 }
 
-// ── Init engineer screen ───────────────────────────
 function initEmp() {
-  // Populate site dropdown
   var sel = document.getElementById("empSite");
   sel.innerHTML = '<option value="">— Select your work site —</option>';
   WORK_SITES.forEach(function(s,i){ var o=document.createElement("option"); o.value=i; o.textContent=s.name; sel.appendChild(o); });
 
-  // Reset leave banner
   var lb = document.getElementById("leaveActiveBanner"); if(lb) lb.style.display="none";
 
-  // Reset selfie state
   selfieData = null;
   if (selfieStream) { selfieStream.getTracks().forEach(function(t){ t.stop(); }); selfieStream = null; }
   var preview = document.getElementById("selfiePreview");
@@ -1584,7 +1373,6 @@ function initEmp() {
 
   var sess = getSess();
   if (sess && sess.checkinTimestamp && !sess.checkoutTimestamp) {
-    // Already checked in — show checkout mode
     document.getElementById("ciForm").style.display   = "none";
     document.getElementById("coSection").style.display = "block";
     document.getElementById("sessBadge").style.display = "block";
@@ -1592,7 +1380,6 @@ function initEmp() {
     document.getElementById("sb-site").textContent = sess.site;
     document.getElementById("sb-cin").textContent  = sess.checkinTime;
     updateDur();
-    // Also check if checked-in engineer has leave (just for info)
     checkApprovedLeaveForEmp(sess.empId);
   } else {
     document.getElementById("ciForm").style.display    = "block";
@@ -1600,7 +1387,6 @@ function initEmp() {
     document.getElementById("sessBadge").style.display = "none";
     document.getElementById("resultCard").style.display= "none";
   }
-  // Always reset leave section to hidden, show buttons
   var ls = document.getElementById("leaveSection"); if(ls) ls.style.display="none";
   var ab = document.getElementById("applyLeaveBtn"); if(ab) ab.style.display="flex";
   var mb = document.getElementById("myLeavesBtn"); if(mb) mb.style.display="flex";
@@ -1615,7 +1401,6 @@ function updateDur() {
 }
 function pad(n){ return String(n).padStart(2,"0"); }
 
-// ── Sign Out ───────────────────────────────────────
 function doSignOut() {
   if (fbOk) {
     firebase.auth().signOut().then(function() {
@@ -1627,20 +1412,18 @@ function doSignOut() {
   }
 }
 
-// ✅ SECURITY: Input sanitizer — strips HTML tags and limits length to prevent XSS / injection
 function sanitize(str, maxLen) {
   if (typeof str !== "string") return "";
   return str
     .replace(/[<>"'`&]/g, function(c) {
-      return {"<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;","`":"&#96;","&":"&amp;"}[c];
+      return {"<":"<",">":">",'"':""","'":"'","`":"`","&":"&"}[c];
     })
     .trim()
     .slice(0, maxLen || 100);
 }
 
-// ── Selfie camera ──────────────────────────────────
 var selfieStream = null;
-var selfieData = null; // base64 JPEG
+var selfieData = null; 
 
 function startCamera() {
   var constraints = { video: { facingMode: "user", width: 320, height: 240 }, audio: false };
@@ -1670,15 +1453,12 @@ function takeSelfie() {
   var canvas = document.getElementById("selfieCanvas");
   canvas.width = 320; canvas.height = 240;
   var ctx = canvas.getContext("2d");
-  // Mirror horizontally to match preview
   ctx.translate(320, 0); ctx.scale(-1, 1);
   ctx.drawImage(video, 0, 0, 320, 240);
-  selfieData = canvas.toDataURL("image/jpeg", 0.6); // ~15-25KB compressed
+  selfieData = canvas.toDataURL("image/jpeg", 0.6); 
 
-  // Stop camera stream
   if (selfieStream) { selfieStream.getTracks().forEach(function(t){ t.stop(); }); selfieStream = null; }
 
-  // Show preview
   var preview = document.getElementById("selfiePreview");
   preview.src = selfieData;
   preview.style.display = "block";
@@ -1700,7 +1480,6 @@ function retakeSelfie() {
   startCamera();
 }
 
-// ── Selfie lightbox (admin) ────────────────────────
 function showSelfie(recordId) {
   var rec = allRecs.find(function(r){ return r.id === recordId; });
   if (!rec || !rec.selfiePhoto) return;
@@ -1710,7 +1489,6 @@ function showSelfie(recordId) {
   lb.style.display = "flex";
 }
 
-// ── Device fingerprint (anti-buddy-punch) ──────────
 function getDeviceId() {
   var id = localStorage.getItem("_at_device");
   if (!id) {
@@ -1720,56 +1498,27 @@ function getDeviceId() {
   return id;
 }
 
-// Check if this device already checked in someone today
-function deviceAlreadyCheckedIn(empId) {
-  var today = new Date().toLocaleDateString("en-SG");
-  var key = "_at_ci_" + today;
-  var existing = localStorage.getItem(key);
-  if (existing && existing !== empId) {
-    return existing; // returns the empId that already used this device
-  }
-  return null;
-}
-
-function recordDeviceCheckin(empId) {
-  var today = new Date().toLocaleDateString("en-SG");
-  var key = "_at_ci_" + today;
-  localStorage.setItem(key, empId);
-}
-
-// ── Check-in ───────────────────────────────────────
+// ── Check-in with 1-to-1 Email Locking ───────────────────────────────
 function doCheckin() {
-  // Build full Engineer ID with "Eng" prefix
   var empId   = sanitize(getEngId("empId"), 20);
   var empName = sanitize(document.getElementById("empName").value, 60);
+  var empEmail= sanitize(document.getElementById("empEmail").value, 100).toLowerCase();
   var siteIdx = document.getElementById("empSite").value;
 
-  // Validate inputs
   if (!empId || empId === "Eng") { toast("Please enter your Engineer number", "t-err"); return; }
   if (!/^Eng[a-zA-Z0-9]+$/.test(empId)) { toast("Engineer ID must start with Eng followed by your number (e.g. Eng01)", "t-err"); return; }
   if (!empName || empName.length < 2) { toast("Please enter a valid full name", "t-err"); return; }
-
-  // ✅ ANTI-BUDDY-PUNCH: Require selfie photo
+  if (!empEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(empEmail)) { toast("Please enter a valid email", "t-err"); return; }
   if (!selfieData) { toast("📷 Please take a selfie first", "t-err"); return; }
-
-  // ✅ ANTI-BUDDY-PUNCH: Block if this device already checked in a different person today
-  var alreadyCheckedIn = deviceAlreadyCheckedIn(empId);
-  if (alreadyCheckedIn) {
-    toast("⛔ This device already checked in " + alreadyCheckedIn + " today", "t-err");
-    document.getElementById("ciBtn").disabled = true;
-    setTimeout(function(){
-      alert("⛔ Buddy Punching Detected!\n\nThis device was already used to check in engineer: " + alreadyCheckedIn + "\n\nEach engineer must check in from their own phone.");
-    }, 300);
-    return;
-  }
 
   var site    = WORK_SITES[parseInt(siteIdx)];
   var gps     = GPS.in;
   var now     = new Date();
   var isLate  = now.getHours() >= WORK_HOUR_LATE + 1;
+  var deviceId= getDeviceId();
 
   var rec = {
-    empId:empId, empName:empName, site:site.name,
+    empId:empId, empName:empName, empEmail:empEmail, site:site.name,
     checkinTime:now.toLocaleTimeString("en-SG"),
     checkinDate:now.toLocaleDateString("en-SG"),
     checkinISO:now.toISOString(),
@@ -1778,24 +1527,20 @@ function doCheckin() {
     checkoutTime:null, checkoutTimestamp:null,
     checkoutLat:null, checkoutLng:null, checkoutDist:null,
     status:"in", isLate:isLate, isOvertime:false, duration:null,
-    // ✅ ANTI-BUDDY-PUNCH: Store selfie photo and device ID
     selfiePhoto: selfieData,
-    deviceId: getDeviceId(),
-    // ✅ SECURITY: Track submission source for audit purposes
+    deviceId: deviceId,
     _source: "web", _userAgent: navigator.userAgent.slice(0, 100)
   };
 
   var btn = document.getElementById("ciBtn");
   btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span> Saving…';
+  btn.innerHTML = '<span class="spin"></span> Verifying Device…';
 
   function onSaved(docId) {
-    recordDeviceCheckin(empId); // ✅ ANTI-BUDDY-PUNCH: mark this device as used today
     setSess(rec); setSessDocId(docId);
     btn.innerHTML = "✅ Check In";
     showResult("ci", rec, isLate, false);
     toast("✅ Checked in successfully!", "t-ok");
-    // Check if this engineer has any leave decisions to show
     setTimeout(function(){ checkApprovedLeaveForEmp(empId); }, 1800);
     setTimeout(function(){
       document.getElementById("ciForm").style.display    = "none";
@@ -1807,16 +1552,69 @@ function doCheckin() {
     }, 1600);
   }
 
+  function performFinalCheckin() {
+      btn.innerHTML = '<span class="spin"></span> Saving…';
+      if(fbOk && db) {
+          db.collection("attendance").add(rec)
+            .then(function(ref){ onSaved(ref.id); })
+            .catch(function(e){ console.warn(e); saveLocal(rec); onSaved(null); });
+      } else {
+          saveLocal(rec); onSaved(null);
+      }
+  }
+
   if (fbOk && db) {
-    db.collection("attendance").add(rec)
-      .then(function(ref){ onSaved(ref.id); })
-      .catch(function(e){ console.warn(e); saveLocal(rec); onSaved(null); });
+    // 1. Verify this Device is not bound to a different email
+    var devRef = db.collection("deviceBindings").doc(deviceId);
+    devRef.get().then(function(doc) {
+        if (doc.exists && doc.data().email && doc.data().email !== empEmail) {
+            btn.disabled = false; btn.innerHTML = "✅ Check In";
+            toast("⛔ Device is bound to: " + doc.data().email, "t-err");
+            alert("⛔ Device Lock Active\n\nThis device is permanently bound to another email account ("+doc.data().email+").\n\nYou cannot use this device to check in. If you are sharing a device or changed your email, please contact the Admin to unbind it.");
+            return;
+        }
+
+        // 2. Verify this Email is not bound to a different device
+        db.collection("deviceBindings").where("email", "==", empEmail).get().then(function(snap) {
+            var boundToOther = false;
+            snap.forEach(function(s) { if (s.id !== deviceId) boundToOther = true; });
+
+            if (boundToOther) {
+                btn.disabled = false; btn.innerHTML = "✅ Check In";
+                toast("⛔ Email bound to another device", "t-err");
+                alert("⛔ Account Lock Active\n\nYour email ("+empEmail+") is already bound to a different device.\n\nPlease use your original device or contact Admin to unbind your account before you can check in here.");
+                return;
+            }
+
+            // 3. Register/Update Device Binding and Check in
+            devRef.set({
+                email: empEmail,
+                empId: empId,
+                empName: empName,
+                registeredAt: Date.now(),
+                registeredDate: new Date().toLocaleDateString("en-SG"),
+                lastUsed: Date.now()
+            }, {merge: true}).then(function() {
+                 performFinalCheckin();
+            }).catch(function(e) {
+                 btn.disabled = false; btn.innerHTML = "✅ Check In";
+                 toast("Error saving device binding", "t-err");
+            });
+        }).catch(function(e){ btn.disabled = false; btn.innerHTML = "✅ Check In"; alert("Error verifying email lock: " + e.message); });
+    }).catch(function(e){ btn.disabled = false; btn.innerHTML = "✅ Check In"; alert("Error verifying device lock: " + e.message); });
   } else {
-    saveLocal(rec); onSaved(null);
+      // Offline fallback lock
+      var localBound = localStorage.getItem("_at_bound_email");
+      if(localBound && localBound !== empEmail) {
+           btn.disabled = false; btn.innerHTML = "✅ Check In";
+           alert("⛔ Device Lock Active (Offline Mode)\n\nThis device is locked to " + localBound + ".");
+           return;
+      }
+      localStorage.setItem("_at_bound_email", empEmail);
+      performFinalCheckin();
   }
 }
 
-// ── Check-out ──────────────────────────────────────
 function doCheckout() {
   var gps  = GPS.out;
   var sess = getSess();
@@ -1848,7 +1646,6 @@ function doCheckout() {
     toast("👋 Checked out! Have a great day.", "t-ok");
     document.getElementById("sessBadge").style.display = "none";
     document.getElementById("coSection").style.display = "none";
-    // Show any pending leave decisions for this engineer
     setTimeout(function(){ checkApprovedLeaveForEmp(sess.empId); }, 1200);
   }
 
@@ -1888,15 +1685,11 @@ function showResult(type, rec, isLate, isOT) {
 }
 function row(k,v){ return '<div class="res-row"><span class="res-k">'+k+'</span><span class="res-v">'+v+'</span></div>'; }
 
-// ── Admin login ────────────────────────────────────
-// ✅ SECURITY: Login attempt rate limiter (max 5 tries, 60s lockout)
 var _loginAttempts = 0;
 var _loginLockUntil = 0;
 
 function doLogin() {
   var now = Date.now();
-
-  // Check lockout
   if (now < _loginLockUntil) {
     var secs = Math.ceil((_loginLockUntil - now) / 1000);
     document.getElementById("loginErr").textContent = "Too many attempts. Wait " + secs + "s before trying again.";
@@ -1921,7 +1714,6 @@ function doLogin() {
   btn.textContent = "Signing in…";
   document.getElementById("loginErr").textContent = "";
 
-  // ✅ SECURITY: Firebase Authentication — credentials checked server-side
   firebase.auth().signInWithEmailAndPassword(email, pass)
     .then(function() {
       _loginAttempts = 0;
@@ -1935,7 +1727,7 @@ function doLogin() {
       btn.disabled = false;
       btn.textContent = "Access Dashboard →";
       if (_loginAttempts >= 5) {
-        _loginLockUntil = Date.now() + 60000; // 60 second lockout
+        _loginLockUntil = Date.now() + 60000; 
         _loginAttempts = 0;
         document.getElementById("loginErr").textContent = "Too many failed attempts. Locked for 60 seconds.";
       } else {
@@ -1948,13 +1740,13 @@ function doLogin() {
 // ── Dashboard ──────────────────────────────────────
 var allRecs = [];
 var fbUnsub = null;
+var deviceBindingsList = [];
+var fbDevUnsub = null;
 
 function initDash() {
-  // set today's date in filter
   var fd = document.getElementById("fDate");
   if (fd && !fd.value) fd.value = new Date().toISOString().split("T")[0];
 
-  // populate site filter
   var fs = document.getElementById("fSite");
   fs.innerHTML = '<option value="">All Sites</option>';
   WORK_SITES.forEach(function(s){ var o=document.createElement("option"); o.value=s.name; o.textContent=s.name; fs.appendChild(o); });
@@ -1966,7 +1758,15 @@ function initDash() {
         allRecs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
         renderAll();
       });
-    // Pre-load leave pending count for badge
+      
+    // Device bindings listener
+    if (fbDevUnsub) fbDevUnsub();
+    fbDevUnsub = db.collection("deviceBindings").orderBy("registeredAt", "desc")
+      .onSnapshot(function(snap){
+        deviceBindingsList = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+        if(document.getElementById("dTab-device").style.display === "block") renderDeviceAudit();
+      });
+
     db.collection("leaveApplications").where("status","==","pending")
       .onSnapshot(function(snap){
         var count = snap.size;
@@ -1976,7 +1776,6 @@ function initDash() {
   } else {
     allRecs = localRecs.slice().reverse();
     renderAll();
-    // load local leaves for badge
     var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
     var pc = ll.filter(function(r){ return r.status==="pending"; }).length;
     var badge = document.getElementById("leavePendingBadge");
@@ -1984,24 +1783,7 @@ function initDash() {
   }
 }
 
-function renderAll() { renderTable(); renderFeed(); updateStats(); updateDeviceBadge(); }
-
-function updateDeviceBadge() {
-  // Quick pass to see if any suspicious devices exist — updates the tab badge without full render
-  var suspicious = false;
-  var devDateEmps = {}; // "deviceId|date" -> Set of empIds
-  allRecs.forEach(function(r){
-    if (!r.deviceId || !r.checkinDate) return;
-    var key = r.deviceId + "|" + r.checkinDate;
-    if (!devDateEmps[key]) devDateEmps[key] = {};
-    devDateEmps[key][r.empId] = true;
-  });
-  Object.keys(devDateEmps).forEach(function(key){
-    if (Object.keys(devDateEmps[key]).length > 1) suspicious = true;
-  });
-  var badge = document.getElementById("suspiciousBadge");
-  if (badge) badge.style.display = suspicious ? "inline" : "none";
-}
+function renderAll() { renderTable(); renderFeed(); updateStats(); }
 
 function filtered() {
   var q = (document.getElementById("fSearch")||{}).value||"";
@@ -2013,7 +1795,6 @@ function filtered() {
     if (q && !((r.empId||"").toLowerCase().includes(q)||(r.empName||"").toLowerCase().includes(q))) return false;
     if (s && r.site!==s) return false;
     if (st==="in" && r.status!=="in") return false;
-    if (st==="out" && r.status!=="out") return false;
     if (d) { var rd=new Date(r.checkinTimestamp).toISOString().split("T")[0]; if(rd!==d) return false; }
     return true;
   });
@@ -2037,17 +1818,8 @@ function renderTable() {
       ? '<img src="'+r.selfiePhoto+'" class="selfie-thumb" title="Click to enlarge" onclick="showSelfie(\''+r.id+'\')" style="cursor:pointer"/>'
       : '<span style="font-size:.75rem;color:var(--red);font-weight:700">⚠ No photo</span>';
 
-    // Device cell — show short ID + flag if same device used by another engineer same day
-    var devId = r.deviceId || "";
-    var devShort = devId ? devId.slice(-8) : "—";
-    var isSuspicious = devId ? isBuddyPunch(devId, r.empId, r.checkinDate) : false;
-    var devCell = devId
-      ? '<span style="font-family:var(--mono);font-size:.72rem;background:#f3f4f6;padding:2px 6px;border-radius:4px;color:var(--ink2)" title="'+devId+'">…'+devShort+'</span>'
-        + (isSuspicious ? ' <span class="bdg" style="background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;font-size:.68rem" title="Same device used by another engineer on this date">⚠ Flagged</span>' : '')
-      : '<span style="font-size:.75rem;color:var(--ink3)">—</span>';
-
-    return '<tr' + (isSuspicious ? ' style="background:#fff5f5"' : '') + '>'
-      +'<td><div class="ec"><div class="av">'+ini+'</div><div><div class="en">'+(r.empName||"—")+'</div><div class="eid">'+(r.empId||"—")+'</div></div></div></td>'
+    return '<tr>'
+      +'<td><div class="ec"><div class="av">'+ini+'</div><div><div class="en">'+(r.empName||"—")+'</div><div class="eid">'+(r.empId||"—")+'</div><div style="font-size:.72rem;color:var(--ink3)">'+(r.empEmail||"—")+'</div></div></div></td>'
       +'<td>'+selfieCell+'</td>'
       +'<td style="font-size:.82rem;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.site||"—")+'</td>'
       +'<td>'+stat+'</td>'
@@ -2056,7 +1828,6 @@ function renderTable() {
       +'<td><span class="dur">'+(r.duration||"—")+'</span></td>'
       +'<td>'+mapIn+'</td>'
       +'<td>'+mapOut+'</td>'
-      +'<td>'+devCell+'</td>'
       +'<td style="font-size:.78rem;color:var(--ink3)">'+(r.checkinDate||"—")+'</td>'
       +'</tr>';
   }).join("");
@@ -2097,7 +1868,6 @@ function refreshDash() {
   toast("Refreshed","t-ok");
 }
 
-// ── Dashboard tabs ─────────────────────────────────
 function dTab(id, el) {
   ["live","feed","leave","device","setup"].forEach(function(t){
     var p = document.getElementById("dTab-"+t); if(p) p.style.display = t===id?"block":"none";
@@ -2108,12 +1878,11 @@ function dTab(id, el) {
   if (id === "device") renderDeviceAudit();
 }
 
-// ── CSV export ─────────────────────────────────────
 function exportCSV() {
   var rows = filtered();
-  var hdr = ["Engineer ID","Name","Site","Date","Check-In","Check-Out","Duration","Status","Late","Overtime","Lat In","Lng In","Dist In","Lat Out","Lng Out","Dist Out"].join(",");
+  var hdr = ["Engineer ID","Email","Name","Site","Date","Check-In","Check-Out","Duration","Status","Late","Overtime","Lat In","Lng In","Dist In","Lat Out","Lng Out","Dist Out"].join(",");
   var lines = [hdr].concat(rows.map(function(r){
-    return [r.empId,r.empName,'"'+(r.site||"")+'"',r.checkinDate,r.checkinTime,r.checkoutTime||"",r.duration||"",r.status,r.isLate?"Yes":"No",r.isOvertime?"Yes":"No",r.checkinLat,r.checkinLng,r.checkinDist,r.checkoutLat||"",r.checkoutLng||"",r.checkoutDist||""].join(",");
+    return [r.empId,r.empEmail,r.empName,'"'+(r.site||"")+'"',r.checkinDate,r.checkinTime,r.checkoutTime||"",r.duration||"",r.status,r.isLate?"Yes":"No",r.isOvertime?"Yes":"No",r.checkinLat,r.checkinLng,r.checkinDist,r.checkoutLat||"",r.checkoutLng||"",r.checkoutDist||""].join(",");
   }));
   var blob = new Blob([lines.join("\n")],{type:"text/csv"});
   var a = document.createElement("a"); a.href=URL.createObjectURL(blob);
@@ -2121,7 +1890,6 @@ function exportCSV() {
   toast("CSV exported","t-ok");
 }
 
-// ── Toast ──────────────────────────────────────────
 function toast(msg, cls) {
   var t = document.getElementById("toast");
   t.textContent = msg; t.className = "show "+(cls||"");
@@ -2129,15 +1897,10 @@ function toast(msg, cls) {
   window._tt = setTimeout(function(){ t.className = cls||""; }, 3500);
 }
 
-// ── Init ───────────────────────────────────────────
-// ╔══════════════════════════════════════════════════════╗
-// ║  LEAVE MODULE                                        ║
-// ╚══════════════════════════════════════════════════════╝
-
-// ── Leave Configuration (edit these) ───────────────
-var EMAILJS_KEY = "JzcIzX9qDreMEunJ0";     // from emailjs.com → Account → Public Key
-var EMAILJS_SVC = "service_8f50fon";     // EmailJS Service ID
-var EMAILJS_TPL = "template_gds7pf1";    // EmailJS Template ID
+// ── LEAVE MODULE ─────────────────────────────────────────
+var EMAILJS_KEY = "JzcIzX9qDreMEunJ0";     
+var EMAILJS_SVC = "service_8f50fon";     
+var EMAILJS_TPL = "template_gds7pf1";    
 var emailjsReady = false;
 
 var LEAVE_TYPES = [
@@ -2146,13 +1909,11 @@ var LEAVE_TYPES = [
   "Maternity/Paternity Leave","Emergency Leave","Others"
 ];
 
-// ── Leave State ─────────────────────────────────────
 var leaveRecs = [];
 var fbLeaveUnsub = null;
-var leaveAttachment = null; // { name, type, base64 }
+var leaveAttachment = null; 
 var rejectTargetId = null;
 
-// ── Init EmailJS ────────────────────────────────────
 function initEmailJS() {
   if (typeof emailjs !== "undefined" && EMAILJS_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
     emailjs.init({ publicKey: EMAILJS_KEY });
@@ -2160,49 +1921,39 @@ function initEmailJS() {
   }
 }
 
-// ── Engineer: Show/Hide Leave Section ───────────────
 function showLeaveSection(show) {
   var ls = document.getElementById("leaveSection");
   var ab = document.getElementById("applyLeaveBtn");
   var mb = document.getElementById("myLeavesBtn");
 
   if (show) {
-    // Hide attendance, show leave form
     if (ls) ls.style.display = "block";
     if (ab) ab.style.display = "none";
     if (mb) mb.style.display = "none";
     initLeaveForm();
   } else {
-    // Show leave buttons, hide form
     if (ls) ls.style.display = "none";
     if (ab) ab.style.display = "flex";
     if (mb) mb.style.display = "flex";
   }
-  // Clear any error box
   clearLeaveError();
-  // Reset result card
   var rc = document.getElementById("resultCard"); if(rc) rc.style.display = "none";
 }
 
-// ── Init Leave Form ─────────────────────────────────
 function initLeaveForm() {
-  // Populate site dropdown
   var sel = document.getElementById("leaveSite");
   if (sel) {
     sel.innerHTML = '<option value="">— Select your work site —</option>';
     WORK_SITES.forEach(function(s){ var o=document.createElement("option"); o.value=s.name; o.textContent=s.name; sel.appendChild(o); });
   }
-  // Populate leave type dropdown
   var lt = document.getElementById("leaveType");
   if (lt) {
     lt.innerHTML = '<option value="">— Select leave type —</option>';
     LEAVE_TYPES.forEach(function(t){ var o=document.createElement("option"); o.value=t; o.textContent=t; lt.appendChild(o); });
   }
-  // Set today as default min date
   var today = new Date().toISOString().split("T")[0];
   var lf = document.getElementById("leaveFrom"); if(lf) lf.min = today;
   var lt2 = document.getElementById("leaveTo");  if(lt2) lt2.min = today;
-  // Clear state
   leaveAttachment = null;
   var an = document.getElementById("leaveAttName"); if(an) an.textContent = "";
   var nd = document.getElementById("leaveNumDays"); if(nd) nd.value = "";
@@ -2210,17 +1961,15 @@ function initLeaveForm() {
   var ra = document.getElementById("leaveReason"); if(ra) ra.value = "";
   var lf2 = document.getElementById("leaveFrom"); if(lf2) lf2.value = "";
   var lt3 = document.getElementById("leaveTo"); if(lt3) lt3.value = "";
-  // Pre-fill from session — strip "Eng" prefix since input only takes the number
+  
   var sess = getSess();
   var ei = document.getElementById("leaveEmpId"), en = document.getElementById("leaveEmpName");
   if (sess && sess.empId && ei && !ei.value) {
-    // empId stored as "Eng01" → strip prefix → show "01" in the number field
     ei.value = sess.empId.replace(/^[Ee][Nn][Gg]/i, "");
   }
   if (sess && sess.empName && en && !en.value) en.value = sess.empName;
 }
 
-// ── Calculate Leave Days ────────────────────────────
 function calcLeaveDays() {
   var f = (document.getElementById("leaveFrom")||{}).value;
   var t = (document.getElementById("leaveTo")||{}).value;
@@ -2234,10 +1983,9 @@ function calcLeaveDays() {
   nd.style.color = "var(--blue)";
 }
 
-// ── Handle Attachment Upload ────────────────────────
 function handleLeaveAttachment(input) {
   var file = input.files[0]; if (!file) return;
-  var MAX_BYTES = 700 * 1024; // 700 KB raw → ~940 KB base64, safe under Firestore 1MB limit
+  var MAX_BYTES = 700 * 1024; 
   var wrap = document.getElementById("leaveAttWrap");
   if (file.size > MAX_BYTES) {
     var an = document.getElementById("leaveAttName");
@@ -2259,23 +2007,21 @@ function handleLeaveAttachment(input) {
   reader.readAsDataURL(file);
 }
 
-// ── Translate Firebase error codes to plain English ─
 function fbErrMsg(e) {
   var code = (e && e.code) || "";
   var msgs = {
-    "permission-denied": "🔒 Permission denied — Firestore rules are blocking this.\n\nFIX: Go to Firebase Console → Firestore → Rules and add the leaveApplications rules from Setup Guide → Step 10.",
-    "not-found": "🔍 Firestore database not found.\n\nFIX: Confirm your FIREBASE_CONFIG has the correct projectId.",
-    "unavailable": "📡 Firestore is temporarily unavailable.\n\nFIX: Check your internet connection and try again.",
-    "resource-exhausted": "📊 Firestore daily quota exceeded.\n\nFIX: Wait until tomorrow or upgrade your Firebase plan.",
-    "invalid-argument": "📦 Document rejected — attachment is probably too large.\n\nFIX: Use a smaller/compressed image (try tinypng.com) or submit without attachment.",
-    "unauthenticated": "🔐 Firestore rules require authentication for this action.\n\nFIX: Update leaveApplications rules to allow unauthenticated creates (Setup Guide Step 10).",
-    "failed-precondition": "⚠️ Firestore query needs an index that hasn't been created yet.\n\nFIX: Check the browser console (F12) for a link to auto-create the index.",
-    "deadline-exceeded": "⏱️ Request timed out.\n\nFIX: Check your internet connection. If the attachment is large, try compressing it."
+    "permission-denied": "🔒 Permission denied — Firestore rules are blocking this.",
+    "not-found": "🔍 Firestore database not found.",
+    "unavailable": "📡 Firestore is temporarily unavailable.",
+    "resource-exhausted": "📊 Firestore daily quota exceeded.",
+    "invalid-argument": "📦 Document rejected — attachment is probably too large.",
+    "unauthenticated": "🔐 Firestore rules require authentication.",
+    "failed-precondition": "⚠️ Firestore query needs an index.",
+    "deadline-exceeded": "⏱️ Request timed out."
   };
   return msgs[code] || ("Firebase error [" + (code||"unknown") + "]: " + (e&&e.message||String(e)));
 }
 
-// ── Inline error display inside leave form ──────────
 function showLeaveError(msg) {
   var box = document.getElementById("leaveErrorBox");
   if (!box) {
@@ -2293,7 +2039,6 @@ function clearLeaveError() {
   var box = document.getElementById("leaveErrorBox"); if (box) box.remove();
 }
 
-// ── Submit Leave Application ────────────────────────
 function submitLeave() {
   clearLeaveError();
   var empId    = sanitize(getEngId("leaveEmpId"), 20);
@@ -2305,7 +2050,7 @@ function submitLeave() {
   var toDate   = (document.getElementById("leaveTo")||{}).value||"";
   var reason   = sanitize((document.getElementById("leaveReason")||{}).value||"", 500);
 
-  if (!empId || empId === "Eng") { showLeaveError("Engineer ID is required. Enter your number in the Eng__ field (e.g. 01)."); return; }
+  if (!empId || empId === "Eng") { showLeaveError("Engineer ID is required."); return; }
   if (!empName) { showLeaveError("Full Name is required."); return; }
   if (!empEmail){ showLeaveError("Email address is required — the decision will be sent here."); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(empEmail)) { showLeaveError("Email format is invalid. Example: john@company.com"); return; }
@@ -2315,50 +2060,21 @@ function submitLeave() {
   if (!toDate)   { showLeaveError("Please select the To Date."); return; }
   if (toDate < fromDate) { showLeaveError("To Date cannot be earlier than From Date."); return; }
 
-  // ── Attachment is MANDATORY ──────────────────────
   if (!leaveAttachment || !leaveAttachment.base64) {
     var wrap = document.getElementById("leaveAttWrap");
     if (wrap) { wrap.style.borderColor="var(--red)"; wrap.style.background="#fef2f2"; setTimeout(function(){ wrap.style.borderColor=""; wrap.style.background=""; },3000); }
-    showLeaveError("📎 Supporting document is required.\n\nPlease upload your leave form, MC slip, or any supporting document.\n\nTip: You can photograph your physical form with your phone camera.");
+    showLeaveError("📎 Supporting document is required.");
     return;
   }
 
-  // ── Firestore document size pre-check ───────────
   var approxBytes = Math.round(leaveAttachment.base64.length * 0.75);
   if (approxBytes > 900 * 1024) {
-    showLeaveError("📦 Attachment too large after encoding ("
-      + Math.round(approxBytes/1024) + " KB).\n\nFirestore has a 1 MB document limit.\n"
-      + "Fix: Compress at tinypng.com or take a lower-resolution photo.");
+    showLeaveError("📦 Attachment too large after encoding.");
     return;
   }
 
   var numDays = Math.round((new Date(toDate)-new Date(fromDate))/(1000*60*60*24))+1;
   var now = new Date();
-
-  // ── No Firebase: save locally ────────────────────
-  if (!fbOk || !db) {
-    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
-    var localRec = {
-      id:"local_"+Date.now(), empId:empId, empName:empName, empEmail:empEmail, site:site,
-      leaveType:leaveType, fromDate:fromDate, toDate:toDate, numDays:numDays, reason:reason,
-      attachmentName:leaveAttachment.name, attachmentBase64:leaveAttachment.base64,
-      status:"pending", appliedAt:now.getTime(),
-      appliedDate:now.toLocaleDateString("en-SG"), appliedISO:now.toISOString(),
-      decidedAt:null,decidedDate:null,decidedBy:null,rejectReason:null
-    };
-    ll.push(localRec); localStorage.setItem("at_leaves", JSON.stringify(ll));
-    showLeaveSection(false); toast("⚠️ Saved locally (Firebase not connected)", "t-ok");
-    var rc2=document.getElementById("resultCard");
-    if(rc2){
-      rc2.style.display="block";
-      document.getElementById("resultTitle").textContent="📋 Leave Saved Locally";
-      document.getElementById("resultBody").innerHTML=
-        row("Engineer",empName+" · "+empId)+row("Leave Type",leaveType)+
-        row("From",fromDate)+row("To",toDate)+row("Days",numDays+"d")+
-        '<div class="pill pill-warn" style="margin-top:10px">⚠️ Firebase not configured — stored locally only.</div>';
-    }
-    return;
-  }
 
   var leaveRec = {
     empId:empId, empName:empName, empEmail:empEmail, site:site,
@@ -2372,6 +2088,15 @@ function submitLeave() {
 
   var btn = document.getElementById("leaveSubmitBtn");
   if (btn) { btn.disabled=true; btn.innerHTML='<span class="spin"></span> Submitting…'; }
+
+  if (!fbOk || !db) {
+    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
+    leaveRec.id = "local_"+Date.now();
+    ll.push(leaveRec); localStorage.setItem("at_leaves", JSON.stringify(ll));
+    showLeaveSection(false); toast("⚠️ Saved locally (Firebase not connected)", "t-ok");
+    if(btn){btn.disabled=false;btn.innerHTML="📩 Submit Leave Application";}
+    return;
+  }
 
   db.collection("leaveApplications").add(leaveRec)
     .then(function(){
@@ -2400,9 +2125,7 @@ function submitLeave() {
     });
 }
 
-// ── Admin: Load Leave Applications ──────────────────
 function loadLeaves() {
-  // Populate leave type filter
   var llt = document.getElementById("lLeaveType");
   if (llt && llt.options.length <= 1) {
     llt.innerHTML = '<option value="">All Leave Types</option>';
@@ -2411,7 +2134,6 @@ function loadLeaves() {
 
   if (fbOk && db) {
     if (fbLeaveUnsub) fbLeaveUnsub();
-    // No orderBy — avoids requiring a Firestore composite index. Sort client-side.
     fbLeaveUnsub = db.collection("leaveApplications")
       .onSnapshot(function(snap){
         leaveRecs = snap.docs
@@ -2419,8 +2141,7 @@ function loadLeaves() {
           .sort(function(a,b){ return (b.appliedAt||0)-(a.appliedAt||0); });
         renderLeaveTable(); updateLeaveStats();
       }, function(e){
-        console.error("loadLeaves error:", e);
-        toast("❌ Could not load leaves: " + fbErrMsg(e).split("\n")[0], "t-err");
+        toast("❌ Could not load leaves", "t-err");
       });
   } else {
     leaveRecs = JSON.parse(localStorage.getItem("at_leaves")||"[]")
@@ -2429,7 +2150,6 @@ function loadLeaves() {
   }
 }
 
-// ── Leave Table Filter ──────────────────────────────
 function filteredLeaves() {
   var q  = ((document.getElementById("lSearch")||{}).value||"").toLowerCase();
   var s  = (document.getElementById("lStatus")||{}).value||"";
@@ -2442,7 +2162,6 @@ function filteredLeaves() {
   });
 }
 
-// ── Render Leave Table ──────────────────────────────
 function renderLeaveTable() {
   var rows  = filteredLeaves();
   var body  = document.getElementById("leaveTblBody");
@@ -2468,9 +2187,7 @@ function renderLeaveTable() {
       "Annual Leave":"#15803d;border:1px solid #86efac;background:#f0fdf4",
       "Sick Leave":"#c2410c;border:1px solid #fed7aa;background:#fff7ed",
       "Unpaid Leave":"#7e22ce;border:1px solid #e9d5ff;background:#fdf4ff",
-      "Medical Leave":"#0369a1;border:1px solid #bae6fd;background:#f0f9ff",
-      "Compassionate Leave":"#b45309;border:1px solid #fde68a;background:#fffbeb",
-      "Emergency Leave":"#b91c1c;border:1px solid #fca5a5;background:#fef2f2"
+      "Medical Leave":"#0369a1;border:1px solid #bae6fd;background:#f0f9ff"
     }[r.leaveType]||"#374151;border:1px solid #d1d5db;background:#f9fafb";
     var leaveBdg = '<span class="bdg" style="color:'+ltColor+'">'+(r.leaveType||"—")+'</span>';
 
@@ -2492,12 +2209,6 @@ function renderLeaveTable() {
         +'</div>';
     } else {
       var decInfo2 = '<span style="font-size:.73rem;color:var(--ink3);line-height:1.6">Decided by:<br><strong>'+(r.decidedBy||"—")+'</strong><br>'+(r.decidedDate||"—")+'</span>';
-      if (r.status==="rejected" && r.rejectReason) {
-        decInfo2 += '<br><span style="font-size:.73rem;color:var(--red)">Reason: '+r.rejectReason+'</span>';
-      }
-      if (r.status==="cancelled" && r.cancelReason) {
-        decInfo2 += '<br><span style="font-size:.73rem;color:#c2410c">Cancel reason: '+r.cancelReason+'</span>';
-      }
       actions = decInfo2;
     }
 
@@ -2525,7 +2236,6 @@ function renderLeaveTable() {
   }).join("");
 }
 
-// ── Update Leave Stats ──────────────────────────────
 function updateLeaveStats() {
   var pending  = leaveRecs.filter(function(r){return r.status==="pending";}).length;
   var approved = leaveRecs.filter(function(r){return r.status==="approved";}).length;
@@ -2539,7 +2249,6 @@ function updateLeaveStats() {
   if (badge) { badge.textContent=pending; badge.style.display=pending>0?"inline":"none"; }
 }
 
-// ── Admin: Approve Leave ────────────────────────────
 function approveLeave(id) {
   var rec = leaveRecs.find(function(r){return r.id===id;});
   if (!rec) return;
@@ -2561,9 +2270,7 @@ function approveLeave(id) {
   }
 
   if (fbOk && db) {
-    db.collection("leaveApplications").doc(id).update(updates)
-      .then(onDone)
-      .catch(function(e){ console.warn(e); toast("Error updating record", "t-err"); });
+    db.collection("leaveApplications").doc(id).update(updates).then(onDone);
   } else {
     var idx = leaveRecs.findIndex(function(r){return r.id===id;});
     if (idx>-1) Object.assign(leaveRecs[idx], updates);
@@ -2572,7 +2279,6 @@ function approveLeave(id) {
   }
 }
 
-// ── Admin: Prompt Reject ────────────────────────────
 function promptReject(id) {
   var rec = leaveRecs.find(function(r){return r.id===id;});
   if (!rec) return;
@@ -2591,7 +2297,6 @@ function closeRejectModal() {
   rejectTargetId = null;
 }
 
-// ── Admin: Confirm Rejection ────────────────────────
 function confirmReject() {
   var reason = ((document.getElementById("rejectReasonInput")||{}).value||"").trim();
   if (!reason) { toast("Please enter a rejection reason", "t-err"); return; }
@@ -2618,9 +2323,7 @@ function confirmReject() {
   }
 
   if (fbOk && db) {
-    db.collection("leaveApplications").doc(id).update(updates)
-      .then(onDone)
-      .catch(function(e){ console.warn(e); toast("Error updating record", "t-err"); });
+    db.collection("leaveApplications").doc(id).update(updates).then(onDone);
   } else {
     var idx = leaveRecs.findIndex(function(r){return r.id===id;});
     if (idx>-1) Object.assign(leaveRecs[idx], updates);
@@ -2629,7 +2332,6 @@ function confirmReject() {
   }
 }
 
-// ── Send Leave Notification Email ───────────────────
 function sendLeaveEmail(rec, status, rejectReason) {
   var isApproved  = status === "approved";
   var isCancelled = status === "cancelled";
@@ -2642,52 +2344,12 @@ function sendLeaveEmail(rec, status, rejectReason) {
   var body = "Dear " + rec.empName + ",\n\n";
   if (isApproved) {
     body += "We are pleased to inform you that your leave application has been APPROVED.\n\n";
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    body += "LEAVE APPROVAL DETAILS\n";
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    body += "Engineer ID   : " + rec.empId + "\n";
-    body += "Leave Type    : " + rec.leaveType + "\n";
-    body += "From Date     : " + rec.fromDate + "\n";
-    body += "To Date       : " + rec.toDate + "\n";
-    body += "Total Days    : " + rec.numDays + " day" + (rec.numDays!==1?"s":"") + "\n";
-    body += "Approved By   : " + rec.decidedBy + "\n";
-    body += "Approval Date : " + rec.decidedDate + "\n";
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
-    body += "📌 IMPORTANT: You do NOT need to check in to the attendance system during your approved leave period. Your attendance will be automatically recorded as \"" + rec.leaveType + "\" for the approved dates.\n\n";
-    body += "Please ensure you inform your supervisor and handover any pending tasks before your leave begins.\n\n";
   } else if (isCancelled) {
     body += "We wish to inform you that your approved leave has been CANCELLED.\n\n";
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    body += "CANCELLATION DETAILS\n";
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    body += "Engineer ID    : " + rec.empId + "\n";
-    body += "Leave Type     : " + rec.leaveType + "\n";
-    body += "From Date      : " + rec.fromDate + "\n";
-    body += "To Date        : " + rec.toDate + "\n";
-    body += "Total Days     : " + rec.numDays + " day" + (rec.numDays!==1?"s":"") + "\n";
-    body += "Cancelled By   : " + (rec.cancelledBy||rec.decidedBy||"Admin") + "\n";
-    body += "Cancelled Date : " + (rec.cancelledDate||rec.decidedDate||"—") + "\n";
-    body += "Reason         : " + (rejectReason||rec.cancelReason||"—") + "\n";
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
-    body += "📌 IMPORTANT: Please note that your attendance will no longer be auto-marked as leave on the cancelled dates. You are required to check in as normal during this period.\n\n";
-    body += "If you believe this cancellation is in error, please contact your manager or HR immediately.\n\n";
   } else {
     body += "We regret to inform you that your leave application has NOT been approved.\n\n";
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    body += "APPLICATION DETAILS\n";
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    body += "Engineer ID   : " + rec.empId + "\n";
-    body += "Leave Type    : " + rec.leaveType + "\n";
-    body += "From Date     : " + rec.fromDate + "\n";
-    body += "To Date       : " + rec.toDate + "\n";
-    body += "Total Days    : " + rec.numDays + " day" + (rec.numDays!==1?"s":"") + "\n";
-    body += "Rejected By   : " + rec.decidedBy + "\n";
-    body += "Decision Date : " + rec.decidedDate + "\n";
-    body += "Reason        : " + (rejectReason||"—") + "\n";
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
-    body += "If you have any questions, please speak with your manager or HR.\n\n";
   }
-  body += "This is an automated notification from the Attendance System.\n\nBest regards,\nAttendance System";
+  body += "Please contact HR for more information.\n\nAttendance System";
 
   if (emailjsReady) {
     emailjs.send(EMAILJS_SVC, EMAILJS_TPL, {
@@ -2705,7 +2367,6 @@ function sendLeaveEmail(rec, status, rejectReason) {
     }).then(function(){
       toast("📧 Notification email sent to " + rec.empEmail, "t-ok");
     }).catch(function(e){
-      console.warn("EmailJS error:", e);
       showEmailFallback(rec.empEmail, subject, body);
     });
   } else {
@@ -2713,7 +2374,6 @@ function sendLeaveEmail(rec, status, rejectReason) {
   }
 }
 
-// ── Email Fallback Modal ────────────────────────────
 function showEmailFallback(toEmail, subject, body) {
   var modal = document.getElementById("emailFallbackModal");
   document.getElementById("efTo").textContent      = toEmail;
@@ -2730,12 +2390,10 @@ function copyEmailContent() {
     + "\nSubject: " + document.getElementById("efSubject").textContent
     + "\n\n" + document.getElementById("efBody").textContent;
   navigator.clipboard.writeText(txt)
-    .then(function(){ toast("📋 Copied to clipboard", "t-ok"); })
-    .catch(function(){ toast("Could not copy — please copy manually", "t-err"); });
+    .then(function(){ toast("📋 Copied to clipboard", "t-ok"); });
 }
 
-// ── View Leave Attachment (full-screen viewer) ──────
-var _attZoomFit = true; // start in "fit" mode
+var _attZoomFit = true; 
 
 function viewLeaveAtt(id) {
   var rec = leaveRecs.find(function(r){ return r.id===id; });
@@ -2756,12 +2414,9 @@ function viewLeaveAtt(id) {
   if (zoomBtn) zoomBtn.textContent = "🔍 Actual Size";
 
   if (rec.attachmentBase64.startsWith("data:image")) {
-    content.innerHTML = '<img id="attImg" src="'+rec.attachmentBase64+'" style="max-width:100%;max-height:calc(100vh - 120px);object-fit:contain;border-radius:8px;display:block;cursor:zoom-in" onclick="toggleAttZoom()" title="Click to toggle zoom"/>';
-  } else if (rec.attachmentBase64.startsWith("data:application/pdf")) {
-    content.innerHTML = '<iframe src="'+rec.attachmentBase64+'" style="width:min(700px,90vw);height:calc(100vh - 140px);border:none;border-radius:8px;background:#fff"></iframe>';
-    if (zoomBtn) zoomBtn.style.display = "none";
+    content.innerHTML = '<img id="attImg" src="'+rec.attachmentBase64+'" style="max-width:100%;max-height:calc(100vh - 120px);object-fit:contain;border-radius:8px;display:block;cursor:zoom-in" onclick="toggleAttZoom()"/>';
   } else {
-    content.innerHTML = '<div style="color:#fff;text-align:center;padding:40px"><div style="font-size:3rem;margin-bottom:16px">📄</div><div style="margin-bottom:16px">Preview not available for this file type.</div></div>';
+    content.innerHTML = '<iframe src="'+rec.attachmentBase64+'" style="width:min(700px,90vw);height:calc(100vh - 140px);border:none;border-radius:8px;background:#fff"></iframe>';
     if (zoomBtn) zoomBtn.style.display = "none";
   }
 
@@ -2795,171 +2450,70 @@ function closeLeaveAttModal() {
   if (btn) btn.style.display = "";
 }
 
-// ── Device Audit ────────────────────────────────────
-// Returns true if the given deviceId was used by a DIFFERENT empId on the same date
-function isBuddyPunch(deviceId, empId, date) {
-  if (!deviceId || !date) return false;
-  return allRecs.some(function(r){
-    return r.deviceId === deviceId && r.empId !== empId && r.checkinDate === date;
-  });
-}
-
+// ── ADMIN DEVICE BINDING MANAGEMENT ─────────────────────────────────
 function renderDeviceAudit() {
-  // Build a map: deviceId → { engineers: Set, records: [], lastCheckin, lastDate }
-  var devMap = {};
-  allRecs.forEach(function(r){
-    if (!r.deviceId) return;
-    if (!devMap[r.deviceId]) devMap[r.deviceId] = { emps: {}, records: [], lastTs: 0 };
-    var d = devMap[r.deviceId];
-    if (!d.emps[r.empId]) d.emps[r.empId] = { name: r.empName, dates: [] };
-    d.emps[r.empId].dates.push(r.checkinDate);
-    d.records.push(r);
-    if ((r.checkinTimestamp||0) > d.lastTs) { d.lastTs = r.checkinTimestamp||0; d.lastDate = r.checkinDate; d.lastEmp = r.empName; }
-  });
-
-  var devices = Object.keys(devMap);
   var body  = document.getElementById("deviceTblBody");
   var empty = document.getElementById("deviceTblEmpty");
   var cnt   = document.getElementById("deviceCount");
   if (!body) return;
 
-  // Find suspicious devices: same device, different engineers on the SAME date
-  var suspiciousDevices = devices.filter(function(devId){
-    var d = devMap[devId];
-    var empIds = Object.keys(d.emps);
-    if (empIds.length < 2) return false;
-    // Check if any two engineers used this device on the same calendar date
-    var dateToEmps = {};
-    d.records.forEach(function(r){
-      if (!dateToEmps[r.checkinDate]) dateToEmps[r.checkinDate] = new Set ? new Set() : {};
-      if (dateToEmps[r.checkinDate].add) dateToEmps[r.checkinDate].add(r.empId);
-      else dateToEmps[r.checkinDate][r.empId] = true;
-    });
-    return Object.keys(dateToEmps).some(function(date){
-      var s = dateToEmps[date];
-      return (s.size !== undefined ? s.size : Object.keys(s).length) > 1;
-    });
-  });
-
-  // Update suspicious badge in tab
-  var badge = document.getElementById("suspiciousBadge");
-  if (badge) { badge.style.display = suspiciousDevices.length > 0 ? "inline" : "none"; }
-
-  // Render suspicious flags summary
-  var flagsWrap = document.getElementById("deviceFlagsWrap");
-  if (flagsWrap) {
-    if (suspiciousDevices.length > 0) {
-      flagsWrap.innerHTML = '<div style="background:linear-gradient(135deg,#fef2f2,#ffe4e6);border:2px solid #fca5a5;border-radius:var(--r2);padding:18px 20px;margin-bottom:4px">'
-        +'<div style="font-weight:800;color:#b91c1c;font-size:1rem;margin-bottom:10px">⚠️ ' + suspiciousDevices.length + ' Suspected Buddy-Punch Device' + (suspiciousDevices.length>1?"s":"") + ' Detected</div>'
-        + suspiciousDevices.map(function(devId){
-          var d = devMap[devId];
-          var empIds = Object.keys(d.emps);
-          // Find the dates with multiple engineers
-          var dateToEmps = {};
-          d.records.forEach(function(r){
-            if (!dateToEmps[r.checkinDate]) dateToEmps[r.checkinDate] = {};
-            dateToEmps[r.checkinDate][r.empId] = r.empName;
-          });
-          var badDates = Object.keys(dateToEmps).filter(function(date){
-            return Object.keys(dateToEmps[date]).length > 1;
-          });
-          return '<div style="background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid #fca5a5">'
-            +'<div style="font-family:var(--mono);font-size:.75rem;color:#6b7280;margin-bottom:6px">Device: …' + devId.slice(-12) + '</div>'
-            + badDates.map(function(date){
-              var emps = Object.keys(dateToEmps[date]).map(function(eid){
-                return '<strong>' + eid + '</strong> (' + dateToEmps[date][eid] + ')';
-              }).join(' &amp; ');
-              return '<div style="font-size:.84rem;color:#b91c1c;margin-bottom:2px">📅 <strong>' + date + '</strong> — used by ' + emps + '</div>';
-            }).join("")
-            +'</div>';
-        }).join("")
-        +'</div>';
-    } else {
-      flagsWrap.innerHTML = '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:var(--r2);padding:14px 18px;margin-bottom:4px;font-size:.85rem;color:#15803d;font-weight:600">✅ No buddy-punch activity detected across all records.</div>';
-    }
-  }
-
-  if (!devices.length) {
+  if (!deviceBindingsList.length) {
     if (cnt) cnt.textContent = "0 devices";
     body.innerHTML = "";
     if (empty) empty.style.display = "block";
     return;
   }
+  
   if (empty) empty.style.display = "none";
-  if (cnt) cnt.textContent = devices.length + " device" + (devices.length!==1?"s":"") + (suspiciousDevices.length>0 ? " · " + suspiciousDevices.length + " flagged" : "");
+  if (cnt) cnt.textContent = deviceBindingsList.length + " device(s)";
 
-  // Sort: suspicious first, then by last check-in
-  devices.sort(function(a,b){
-    var aSus = suspiciousDevices.indexOf(a)>=0, bSus = suspiciousDevices.indexOf(b)>=0;
-    if (aSus && !bSus) return -1;
-    if (!aSus && bSus) return 1;
-    return (devMap[b].lastTs||0)-(devMap[a].lastTs||0);
-  });
-
-  body.innerHTML = devices.map(function(devId){
-    var d = devMap[devId];
-    var empIds = Object.keys(d.emps);
-    var isSus = suspiciousDevices.indexOf(devId) >= 0;
-
-    var empList = empIds.map(function(eid){
-      var e = d.emps[eid];
-      var uniqueDates = e.dates.filter(function(v,i,a){ return a.indexOf(v)===i; });
-      return '<div style="margin-bottom:3px"><span style="font-family:var(--mono);font-size:.75rem;background:#f3f4f6;padding:1px 6px;border-radius:4px">'
-        +eid+'</span> <span style="font-size:.82rem;color:var(--ink2)">'+e.name+'</span>'
-        +' <span style="font-size:.72rem;color:var(--ink3)">('+uniqueDates.length+' day'+(uniqueDates.length!==1?"s":"")+')</span>'
-        +'</div>';
-    }).join("");
-
-    var flagCell = isSus
-      ? '<span class="bdg" style="background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5">⚠️ Buddy Punch Suspected</span>'
-      : '<span class="bdg" style="background:#f0fdf4;color:#15803d;border:1px solid #86efac">✅ Clean</span>';
-
-    return '<tr' + (isSus ? ' style="background:#fff5f5"':'') + '>'
-      +'<td style="font-family:var(--mono);font-size:.75rem;color:var(--ink3);max-width:120px">…'+devId.slice(-16)
-        +'<br><span style="font-size:.65rem;word-break:break-all;color:#d1d5db">'+devId+'</span></td>'
-      +'<td>'+empList+'</td>'
-      +'<td style="font-size:.78rem;color:var(--ink3)">'+(d.lastDate||"—")+'<br><span style="font-size:.72rem">'+d.lastEmp+'</span></td>'
-      +'<td><span class="days-badge">'+d.records.length+'</span></td>'
-      +'<td>'+flagCell+'</td>'
+  body.innerHTML = deviceBindingsList.map(function(d){
+    var shortId = d.id ? d.id.slice(-12) : "—";
+    var lastUsedStr = d.lastUsed ? new Date(d.lastUsed).toLocaleDateString("en-SG") : "—";
+    
+    return '<tr>'
+      +'<td style="font-family:var(--mono);font-size:.75rem;color:var(--ink3);max-width:120px">…'+shortId
+        +'<br><span style="font-size:.65rem;word-break:break-all;color:#d1d5db">'+d.id+'</span></td>'
+      +'<td style="font-weight:700;color:var(--blue)">'+(d.email||"—")+'</td>'
+      +'<td><div class="en">'+(d.empName||"—")+'</div><div class="eid">'+(d.empId||"—")+'</div></td>'
+      +'<td style="font-size:.8rem;color:var(--ink3)">'+(d.registeredDate||"—")+'</td>'
+      +'<td style="font-size:.8rem">'+lastUsedStr+'</td>'
+      +'<td><button class="tb-btn tb-out" style="border-color:#fca5a5;color:#b91c1c;padding:6px 12px;font-size:.75rem" onclick="unbindDevice(\''+d.id+'\', \''+d.email+'\')">🔓 Unbind Device</button></td>'
       +'</tr>';
   }).join("");
 }
 
-// ── Check ALL Leave Status for Engineer ─────────────
-// Called when engineer types their ID — shows a popup for any
-// approved, rejected, or pending applications so they know instantly.
+function unbindDevice(deviceId, email) {
+    if(!confirm("🔓 Unbind device for " + email + "?\n\nThis will permanently delete the lock and allow the engineer to register a new phone, or allow a different engineer to use this phone.")) return;
+
+    if(fbOk && db) {
+        db.collection("deviceBindings").doc(deviceId).delete().then(function() {
+            toast("✅ Device unbound successfully", "t-ok");
+        }).catch(function(e) { toast("Error unbinding: " + e.message, "t-err"); });
+    } else {
+         toast("Firebase not connected", "t-err");
+    }
+}
+
+
 function checkApprovedLeaveForEmp(empId) {
   if (!empId) return;
   var today = new Date().toISOString().split("T")[0];
 
   function processLeaves(recs) {
-    // Sort: most recently applied first
     recs.sort(function(a,b){ return (b.appliedAt||0)-(a.appliedAt||0); });
 
-    // Check if on approved leave TODAY → show banner + block check-in
     var onLeaveToday = recs.find(function(r){
       return r.status==="approved" && today>=r.fromDate && today<=r.toDate;
     });
     if (onLeaveToday) showLeaveBanner(onLeaveToday);
 
-    // Show popup only for leaves that are still relevant:
-    // - pending / cancel_requested: always show (engineer is waiting for a decision)
-    // - approved: only if leave is today or in the future (not expired)
-    // - rejected / cancelled: only if decided within last 7 days AND leave end date is not past
-    //   (so the engineer sees the rejection once, but it won't pop forever)
     var sevenDaysAgo = Date.now() - 7*24*60*60*1000;
     var notable = recs.filter(function(r){
-      // Never pop expired leaves — toDate is in the past
       var isExpired = r.toDate && r.toDate < today;
-
-      if (r.status === "pending" || r.status === "cancel_requested") {
-        return true; // Always show — engineer needs to know it's waiting
-      }
-      if (r.status === "approved") {
-        return !isExpired; // Only show if leave hasn't ended yet
-      }
+      if (r.status === "pending" || r.status === "cancel_requested") return true; 
+      if (r.status === "approved") return !isExpired; 
       if (r.status === "rejected" || r.status === "cancelled") {
-        // Show only if decision was recent (last 7 days) — once seen, stop showing
         var decidedRecently = (r.decidedAt||r.cancelledAt||0) > sevenDaysAgo;
         return decidedRecently && !isExpired;
       }
@@ -2975,39 +2529,28 @@ function checkApprovedLeaveForEmp(empId) {
   }
 
   if (fbOk && db) {
-    db.collection("leaveApplications")
-      .where("empId","==",empId)
-      .get()
-      .then(function(snap){
+    db.collection("leaveApplications").where("empId","==",empId).get().then(function(snap){
         var recs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
         processLeaves(recs);
-      })
-      .catch(function(e){ console.warn("Leave status check:", e); });
+    });
   } else {
     var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
     processLeaves(ll.filter(function(r){ return r.empId===empId; }));
   }
 }
 
-// ── Leave active banner (on-leave today, blocks check-in) ─
 function showLeaveBanner(r) {
   var banner = document.getElementById("leaveActiveBanner");
   if (!banner) return;
   var title  = document.getElementById("leaveBannerTitle");
   var detail = document.getElementById("leaveBannerDetail");
   if (title) title.textContent = "🌴 You are on " + r.leaveType + " today";
-  if (detail) detail.innerHTML =
-    "Your <strong>" + r.leaveType + "</strong> from <strong>" + r.fromDate
-    + "</strong> to <strong>" + r.toDate + "</strong> (" + r.numDays
-    + " day" + (r.numDays!==1?"s":"") + ") has been <strong>approved</strong>.<br>"
-    + "You do <strong>not</strong> need to check in. Your attendance is automatically recorded as <strong>"
-    + r.leaveType + "</strong>.";
+  if (detail) detail.innerHTML = "Your <strong>" + r.leaveType + "</strong> from <strong>" + r.fromDate + "</strong> to <strong>" + r.toDate + "</strong> is <strong>approved</strong>.<br>You do <strong>not</strong> need to check in.";
   banner.style.display = "block";
   var ci = document.getElementById("ciForm"); if(ci) ci.style.display="none";
   var ab = document.getElementById("applyLeaveBtn"); if(ab) ab.style.display="none";
 }
 
-// ── Leave Status Popup — single application ─────────
 function showLsnSingle(r, today) {
   var popup = document.getElementById("leaveStatusPopup");
   var box   = document.getElementById("lsnBox");
@@ -3016,11 +2559,7 @@ function showLsnSingle(r, today) {
   var skin, icon, title, sub;
   if (r.status==="approved") {
     skin = "lsn-approved"; icon = "✅"; title = "Leave Approved!";
-    var isCurrent = today>=r.fromDate && today<=r.toDate;
-    var isUpcoming = r.fromDate > today;
-    sub  = isCurrent  ? "You are currently on approved leave — no check-in needed today."
-         : isUpcoming ? "Your upcoming leave has been approved."
-         : "Your leave application was approved.";
+    sub  = "Your leave application was approved.";
   } else if (r.status==="rejected") {
     skin = "lsn-rejected"; icon = "❌"; title = "Leave Not Approved";
     sub  = "Your leave application was not approved. Please check in as normal.";
@@ -3035,38 +2574,15 @@ function showLsnSingle(r, today) {
     sub  = "Your leave application is waiting for admin approval.";
   }
 
-  var bodyRows = lsnRow("Leave Type", r.leaveType)
-    + lsnRow("Period", r.fromDate + " → " + r.toDate)
-    + lsnRow("Days", r.numDays + " day" + (r.numDays!==1?"s":""))
-    + lsnRow("Applied", r.appliedDate||"—");
-  if (r.decidedBy) bodyRows += lsnRow("Decided By", r.decidedBy);
-  if (r.decidedDate) bodyRows += lsnRow("Decision Date", r.decidedDate);
-
+  var bodyRows = lsnRow("Leave Type", r.leaveType) + lsnRow("Period", r.fromDate + " → " + r.toDate) + lsnRow("Days", r.numDays) + lsnRow("Applied", r.appliedDate||"—");
   var extraHtml = "";
-  if (r.status==="rejected" && r.rejectReason) {
-    extraHtml = '<div class="lsn-reason"><strong>📋 Reason:</strong> ' + r.rejectReason + '</div>';
-  }
-
-  var primaryLabel = r.status==="approved" ? "✅ Got it, thank you!"
-                   : r.status==="rejected" ? "❌ Understood, I'll check in"
-                   : "⏳ OK, I'll wait for the decision";
+  if (r.status==="rejected" && r.rejectReason) extraHtml = '<div class="lsn-reason"><strong>📋 Reason:</strong> ' + r.rejectReason + '</div>';
 
   box.className = "lsn-box " + skin;
-  box.innerHTML =
-    '<div class="lsn-header">'
-    + '<div class="lsn-icon">' + icon + '</div>'
-    + '<div class="lsn-title">' + title + '</div>'
-    + '<div class="lsn-sub">' + sub + '</div>'
-    + '</div>'
-    + '<div class="lsn-body">' + bodyRows + extraHtml + '</div>'
-    + '<div class="lsn-footer">'
-    + '<button class="lsn-btn-primary" onclick="closeLsnPopup()">' + primaryLabel + '</button>'
-    + '</div>';
-
+  box.innerHTML = '<div class="lsn-header"><div class="lsn-icon">' + icon + '</div><div class="lsn-title">' + title + '</div><div class="lsn-sub">' + sub + '</div></div><div class="lsn-body">' + bodyRows + extraHtml + '</div><div class="lsn-footer"><button class="lsn-btn-primary" onclick="closeLsnPopup()">OK</button></div>';
   popup.classList.add("open");
 }
 
-// ── Leave Status Popup — multiple applications ───────
 function showLsnMultiple(recs, today) {
   var popup = document.getElementById("leaveStatusPopup");
   var box   = document.getElementById("lsnBox");
@@ -3075,157 +2591,54 @@ function showLsnMultiple(recs, today) {
   var items = recs.map(function(r){
     var icon = r.status==="approved"?"✅":r.status==="rejected"?"❌":"⏳";
     var label= r.status==="approved"?"Approved":r.status==="rejected"?"Not Approved":"Pending";
-    var isCurrent = r.status==="approved" && today>=r.fromDate && today<=r.toDate;
-    return '<div class="lsn-list-item ' + r.status + '" onclick="showLsnDetailFrom(this,\'' + r.id + '\')">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center">'
-      + '<div style="font-weight:700;font-size:.9rem">' + icon + ' ' + r.leaveType + '</div>'
-      + '<span class="bdg bdg-' + (r.status==="approved"?"approved":r.status==="rejected"?"rejected":"pending") + '">' + label + '</span>'
-      + '</div>'
-      + '<div style="font-size:.8rem;color:#6b7280;margin-top:4px">' + r.fromDate + ' → ' + r.toDate + ' · ' + r.numDays + ' day' + (r.numDays!==1?"s":"") + '</div>'
-      + (isCurrent ? '<div style="font-size:.78rem;font-weight:700;color:#15803d;margin-top:4px">📌 You are on leave today — no check-in needed</div>' : '')
-      + (r.status==="rejected"&&r.rejectReason ? '<div style="font-size:.78rem;color:#b91c1c;margin-top:4px">Reason: ' + r.rejectReason + '</div>' : '')
-      + '</div>';
+    return '<div class="lsn-list-item ' + r.status + '" onclick="showLsnDetailFrom(this,\'' + r.id + '\')"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700;font-size:.9rem">' + icon + ' ' + r.leaveType + '</div><span class="bdg bdg-' + (r.status==="approved"?"approved":r.status==="rejected"?"rejected":"pending") + '">' + label + '</span></div><div style="font-size:.8rem;color:#6b7280;margin-top:4px">' + r.fromDate + ' → ' + r.toDate + '</div></div>';
   }).join("");
 
-  // Store recs in window for detail drill-down
   window._lsnRecs = recs;
 
   box.className = "lsn-box lsn-pending";
-  box.innerHTML =
-    '<div class="lsn-header" style="background:linear-gradient(145deg,#1a2233,#0d1117)">'
-    + '<div class="lsn-icon">📋</div>'
-    + '<div class="lsn-title" style="color:#fff">Your Leave Applications</div>'
-    + '<div class="lsn-sub" style="color:#9ca3af">Tap any item to view details</div>'
-    + '</div>'
-    + '<div class="lsn-body" style="max-height:55vh;overflow-y:auto;padding-top:16px">' + items + '</div>'
-    + '<div class="lsn-footer">'
-    + '<button class="lsn-btn-primary" style="background:linear-gradient(135deg,#1a2233,#0d1117);color:#fff" onclick="closeLsnPopup()">Close</button>'
-    + '</div>';
-
+  box.innerHTML = '<div class="lsn-header" style="background:linear-gradient(145deg,#1a2233,#0d1117)"><div class="lsn-icon">📋</div><div class="lsn-title" style="color:#fff">Your Leave Applications</div></div><div class="lsn-body" style="max-height:55vh;overflow-y:auto;padding-top:16px">' + items + '</div><div class="lsn-footer"><button class="lsn-btn-primary" style="background:linear-gradient(135deg,#1a2233,#0d1117);color:#fff" onclick="closeLsnPopup()">Close</button></div>';
   popup.classList.add("open");
 }
 
 function showLsnDetailFrom(el, id) {
   var today = new Date().toISOString().split("T")[0];
-  var recs = window._lsnRecs || [];
-  var r = recs.find(function(x){ return x.id===id; });
+  var r = (window._lsnRecs || []).find(function(x){ return x.id===id; });
   if (r) showLsnSingle(r, today);
 }
+function closeLsnPopup() { var popup = document.getElementById("leaveStatusPopup"); if (popup) popup.classList.remove("open"); }
+function lsnRow(k, v) { return '<div class="lsn-row"><span class="lsn-k">' + k + '</span><span class="lsn-v">' + v + '</span></div>'; }
 
-function closeLsnPopup() {
-  var popup = document.getElementById("leaveStatusPopup");
-  if (popup) popup.classList.remove("open");
-}
-
-function lsnRow(k, v) {
-  return '<div class="lsn-row"><span class="lsn-k">' + k + '</span><span class="lsn-v">' + v + '</span></div>';
-}
-
-// ── Export Leave CSV ────────────────────────────────
 function exportLeaveCSV() {
   var rows = filteredLeaves();
-  if (!rows.length) { toast("No leave records to export", "t-err"); return; }
-  var hdr = ["Engineer ID","Engineer Name","Email","Site","Leave Type","From Date","To Date","Total Days","Reason","Status","Applied Date","Decided By","Decided Date","Reject Reason","Cancelled By","Cancelled Date","Cancel Reason"].join(",");
-  var lines = [hdr].concat(rows.map(function(r){
-    return [
-      '"'+(r.empId||"")+'"',
-      '"'+(r.empName||"")+'"',
-      '"'+(r.empEmail||"")+'"',
-      '"'+(r.site||"")+'"',
-      '"'+(r.leaveType||"")+'"',
-      '"'+(r.fromDate||"")+'"',
-      '"'+(r.toDate||"")+'"',
-      r.numDays||"",
-      '"'+(r.reason||"")+'"',
-      '"'+(r.status||"")+'"',
-      '"'+(r.appliedDate||"")+'"',
-      '"'+(r.decidedBy||"")+'"',
-      '"'+(r.decidedDate||"")+'"',
-      '"'+(r.rejectReason||"")+'"',
-      '"'+(r.cancelledBy||"")+'"',
-      '"'+(r.cancelledDate||"")+'"',
-      '"'+(r.cancelReason||"")+'"'
-    ].join(",");
-  }));
+  if (!rows.length) { toast("No records to export", "t-err"); return; }
+  var hdr = ["Engineer ID","Engineer Name","Email","Leave Type","From Date","To Date","Status"].join(",");
+  var lines = [hdr].concat(rows.map(function(r){ return ['"'+(r.empId||"")+'"','"'+(r.empName||"")+'"','"'+(r.empEmail||"")+'"','"'+(r.leaveType||"")+'"','"'+(r.fromDate||"")+'"','"'+(r.toDate||"")+'"','"'+(r.status||"")+'"'].join(","); }));
   var blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "leave_applications_" + new Date().toISOString().split("T")[0] + ".csv";
-  a.click();
-  toast("📋 Leave CSV exported (" + rows.length + " records)", "t-ok");
+  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "leave_applications.csv"; a.click();
+  toast("📋 Leave CSV exported", "t-ok");
 }
 
-// ── Export Combined (Attendance + Approved Leaves) ─
 function exportCombinedCSV() {
-  var attHdr = ["Type","Engineer ID","Name","Site","Date","Check-In","Check-Out","Duration","Status","Leave Type","Decided By","Late","Overtime","GPS In","GPS Out"];
+  var attHdr = ["Type","Engineer ID","Name","Site","Date","Check-In","Check-Out","Status","Leave Type"];
   var lines = [attHdr.join(",")];
-
-  // Attendance records
-  allRecs.forEach(function(r){
-    lines.push([
-      '"Attendance"',
-      '"'+(r.empId||"")+'"',
-      '"'+(r.empName||"")+'"',
-      '"'+(r.site||"")+'"',
-      '"'+(r.checkinDate||"")+'"',
-      '"'+(r.checkinTime||"")+'"',
-      '"'+(r.checkoutTime||"")+'"',
-      '"'+(r.duration||"")+'"',
-      '"'+(r.status||"")+'"',
-      '""','"—"',
-      r.isLate?"Yes":"No",
-      r.isOvertime?"Yes":"No",
-      '"'+(r.checkinDist?r.checkinDist+"m":"")+'"',
-      '"'+(r.checkoutDist?r.checkoutDist+"m":"")+'"'
-    ].join(","));
-  });
-
-  // Approved (non-cancelled) leave records — one row per leave day
+  allRecs.forEach(function(r){ lines.push(['"Attendance"','"'+(r.empId||"")+'"','"'+(r.empName||"")+'"','"'+(r.site||"")+'"','"'+(r.checkinDate||"")+'"','"'+(r.checkinTime||"")+'"','"'+(r.checkoutTime||"")+'"','"'+(r.status||"")+'"','""'].join(",")); });
   leaveRecs.filter(function(r){return r.status==="approved";}).forEach(function(r){
     var from = new Date(r.fromDate), to = new Date(r.toDate);
     for (var d = new Date(from); d <= to; d.setDate(d.getDate()+1)) {
-      var dateStr = d.toISOString().split("T")[0];
-      lines.push([
-        '"Leave"',
-        '"'+(r.empId||"")+'"',
-        '"'+(r.empName||"")+'"',
-        '"'+(r.site||"")+'"',
-        '"'+dateStr+'"',
-        '"—"','"—"','"—"',
-        '"on leave"',
-        '"'+(r.leaveType||"")+'"',
-        '"'+(r.decidedBy||"")+'"',
-        "No","No","—","—"
-      ].join(","));
+      lines.push(['"Leave"','"'+(r.empId||"")+'"','"'+(r.empName||"")+'"','"'+(r.site||"")+'"','"'+d.toISOString().split("T")[0]+'"','"—"','"—"','"on leave"','"'+(r.leaveType||"")+'"'].join(","));
     }
   });
-
   var blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "full_attendance_leave_" + new Date().toISOString().split("T")[0] + ".csv";
-  a.click();
+  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "full_report.csv"; a.click();
   toast("📋 Full report exported", "t-ok");
 }
 
-// ╔══════════════════════════════════════════════════════╗
-// ║  END LEAVE MODULE                                    ║
-// ╚══════════════════════════════════════════════════════╝
-
-// ╔══════════════════════════════════════════════════════╗
-// ║  MY LEAVES / EDIT / CANCEL MODULE                   ║
-// ╚══════════════════════════════════════════════════════╝
-
-// ── My Leaves Modal (engineer) ──────────────────────
 function showMyLeaves() {
   var modal = document.getElementById("myLeavesModal");
-  if (!modal) return;
-  // Pre-fill with session empId — strip "Eng" prefix for number-only input
   var sess = getSess();
   var inp = document.getElementById("myLeavesEmpId");
-  if (sess && sess.empId && inp) {
-    inp.value = sess.empId.replace(/^[Ee][Nn][Gg]/i, "");
-  }
+  if (sess && sess.empId && inp) { inp.value = sess.empId.replace(/^[Ee][Nn][Gg]/i, ""); }
   modal.classList.add("open");
   if (inp && inp.value) loadMyLeaves();
 }
@@ -3234,283 +2647,115 @@ function loadMyLeaves() {
   var empId = getEngId("myLeavesEmpId");
   var list  = document.getElementById("myLeavesList");
   var info  = document.getElementById("myLeavesEmpInfo");
-  if (!empId || empId === "Eng" || !list) {
-    if (list) list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--red);font-size:.88rem">Please enter your Engineer number (e.g. type <strong>01</strong> for Eng01).</div>';
-    return;
-  }
-
+  if (!empId || empId === "Eng" || !list) { if (list) list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--red);font-size:.88rem">Please enter your Engineer number.</div>'; return; }
   list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink3)"><span class="spin" style="border-color:rgba(0,0,0,.15);border-top-color:var(--blue)"></span> Loading…</div>';
 
   function renderMyList(recs) {
     recs.sort(function(a,b){ return (b.appliedAt||0)-(a.appliedAt||0); });
-    if (info) info.textContent = "Showing " + recs.length + " application" + (recs.length!==1?"s":"") + " for " + empId;
-    if (!recs.length) {
-      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3);font-size:.88rem">No leave applications found for this Engineer ID.</div>';
-      return;
-    }
+    if (info) info.textContent = "Showing " + recs.length + " application(s) for " + empId;
+    if (!recs.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ink3);font-size:.88rem">No leave applications found.</div>'; return; }
     list.innerHTML = recs.map(function(r){
-      var statusColor = {
-        pending:"#92400e", approved:"#15803d", rejected:"#b91c1c",
-        cancelled:"#6b7280", cancel_requested:"#c2410c"
-      }[r.status]||"#374151";
-      var statusLabel = {
-        pending:"⏳ Pending", approved:"✅ Approved", rejected:"❌ Rejected",
-        cancelled:"🚫 Cancelled", cancel_requested:"⚠️ Cancel Requested"
-      }[r.status]||r.status;
-
+      var statusLabel = { pending:"⏳ Pending", approved:"✅ Approved", rejected:"❌ Rejected", cancelled:"🚫 Cancelled", cancel_requested:"⚠️ Cancel Requested" }[r.status]||r.status;
       var btns = "";
       if (r.status === "pending") {
-        btns = '<div style="display:flex;gap:8px;margin-top:10px">'
-          +'<button class="leave-act-btn leave-edit" style="flex:1;padding:8px;font-size:.82rem" onclick="openEditLeave(\''+r.id+'\')">✏️ Edit</button>'
-          +'<button class="leave-act-btn leave-cancel" style="flex:1;padding:8px;font-size:.82rem" onclick="empCancelLeave(\''+r.id+'\',false)">🗑️ Cancel Application</button>'
-          +'</div>';
+        btns = '<div style="display:flex;gap:8px;margin-top:10px"><button class="leave-act-btn leave-edit" style="flex:1" onclick="openEditLeave(\''+r.id+'\')">✏️ Edit</button><button class="leave-act-btn leave-cancel" style="flex:1" onclick="empCancelLeave(\''+r.id+'\',false)">🗑️ Cancel Application</button></div>';
       } else if (r.status === "approved") {
-        btns = '<div style="margin-top:10px">'
-          +'<button class="leave-act-btn leave-cancel" style="width:100%;padding:8px;font-size:.82rem" onclick="empCancelLeave(\''+r.id+'\',true)">⚠️ Request Cancellation</button>'
-          +'</div>';
-      } else if (r.status === "cancel_requested") {
-        btns = '<div style="margin-top:8px;font-size:.78rem;color:#c2410c;background:#fff7ed;padding:8px 10px;border-radius:8px">⏳ Cancellation request sent — waiting for admin to confirm.</div>';
+        btns = '<div style="margin-top:10px"><button class="leave-act-btn leave-cancel" style="width:100%" onclick="empCancelLeave(\''+r.id+'\',true)">⚠️ Request Cancellation</button></div>';
       }
-
-      var decisionHtml = "";
-      if (r.decidedBy) decisionHtml += '<div style="font-size:.75rem;color:var(--ink3);margin-top:2px">Decision by: <strong>'+r.decidedBy+'</strong> · '+r.decidedDate+'</div>';
-      if (r.rejectReason) decisionHtml += '<div style="font-size:.75rem;color:var(--red);margin-top:2px">Reason: '+r.rejectReason+'</div>';
-      if (r.cancelReason) decisionHtml += '<div style="font-size:.75rem;color:#c2410c;margin-top:2px">Cancel reason: '+r.cancelReason+'</div>';
-
-      return '<div style="border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
-        +'<div style="font-weight:800;font-size:.95rem">'+r.leaveType+'</div>'
-        +'<span style="font-size:.75rem;font-weight:700;color:'+statusColor+'">'+statusLabel+'</span>'
-        +'</div>'
-        +'<div style="font-size:.82rem;color:var(--ink2)">📅 '+r.fromDate+' → '+r.toDate+' <span style="background:#f3f4f6;padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:.74rem">'+r.numDays+' day'+(r.numDays!==1?'s':'')+'</span></div>'
-        +'<div style="font-size:.75rem;color:var(--ink3);margin-top:4px">Applied: '+r.appliedDate+'</div>'
-        + decisionHtml
-        + btns
-        +'</div>';
+      return '<div style="border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div style="font-weight:800;font-size:.95rem">'+r.leaveType+'</div><span style="font-size:.75rem;font-weight:700">'+statusLabel+'</span></div><div style="font-size:.82rem;color:var(--ink2)">📅 '+r.fromDate+' → '+r.toDate+'</div>'+btns+'</div>';
     }).join("");
   }
 
   if (fbOk && db) {
-    db.collection("leaveApplications").where("empId","==",empId).get()
-      .then(function(snap){
+    db.collection("leaveApplications").where("empId","==",empId).get().then(function(snap){
         var recs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
         renderMyList(recs);
-      }).catch(function(e){
-        list.innerHTML = '<div style="color:var(--red);font-size:.85rem;padding:16px">Error: '+fbErrMsg(e).split("\n")[0]+'</div>';
-      });
+    });
   } else {
     var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
     renderMyList(ll.filter(function(r){ return r.empId===empId; }));
   }
 }
 
-// ── Engineer: Cancel a leave ────────────────────────
 var _cancelLeaveId = null;
 var _cancelIsApproved = false;
 
 function empCancelLeave(id, isApproved) {
-  _cancelLeaveId = id;
-  _cancelIsApproved = isApproved;
-
-  // Find the record to show info
+  _cancelLeaveId = id; _cancelIsApproved = isApproved;
   function doShow(recs) {
-    var r = recs.find(function(x){ return x.id===id; });
-    if (!r) return;
-    var info = document.getElementById("cancelLeaveInfo");
-    if (info) info.textContent = r.leaveType + " · " + r.fromDate + " → " + r.toDate + " (" + r.numDays + " day" + (r.numDays!==1?"s":"") + ")";
-
-    var title = document.getElementById("cancelLeaveTitle");
-    var sub   = document.getElementById("cancelLeaveSub");
-    var reasonWrap = document.getElementById("cancelReasonWrap");
-    var confirmBtn = document.getElementById("cancelLeaveConfirmBtn");
-
-    if (isApproved) {
-      if (title) title.textContent = "⚠️ Request Leave Cancellation";
-      if (sub) sub.textContent = "This leave is already approved. A cancellation request will be sent to admin for confirmation. Please provide a reason.";
-      if (reasonWrap) reasonWrap.style.display = "block";
-      if (confirmBtn) confirmBtn.textContent = "⚠️ Send Cancellation Request";
-    } else {
-      if (title) title.textContent = "🗑️ Cancel Leave Application";
-      if (sub) sub.textContent = "Are you sure you want to cancel this leave application? This cannot be undone.";
-      if (reasonWrap) reasonWrap.style.display = "none";
-      if (confirmBtn) confirmBtn.textContent = "🗑️ Yes, Cancel Application";
-    }
-    // Clear reason field
-    var rf = document.getElementById("cancelLeaveReason"); if (rf) rf.value = "";
+    var r = recs.find(function(x){ return x.id===id; }); if (!r) return;
+    document.getElementById("cancelLeaveTitle").textContent = isApproved ? "⚠️ Request Leave Cancellation" : "🗑️ Cancel Leave Application";
+    document.getElementById("cancelLeaveConfirmBtn").textContent = isApproved ? "⚠️ Send Cancellation Request" : "🗑️ Yes, Cancel Application";
+    document.getElementById("cancelReasonWrap").style.display = isApproved ? "block" : "none";
     document.getElementById("cancelLeaveModal").classList.add("open");
   }
-
-  // Close the My Leaves modal temporarily
-  // Find record in leaveRecs (admin) or fetch
-  if (leaveRecs.length) {
-    doShow(leaveRecs);
-  } else if (fbOk && db) {
-    db.collection("leaveApplications").doc(id).get().then(function(d){
-      if (d.exists) doShow([Object.assign({id:d.id},d.data())]);
-    });
-  } else {
-    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
-    doShow(ll);
-  }
+  if (leaveRecs.length) { doShow(leaveRecs); }
+  else if (fbOk && db) { db.collection("leaveApplications").doc(id).get().then(function(d){ if (d.exists) doShow([Object.assign({id:d.id},d.data())]); }); }
 }
 
 function confirmCancelLeave() {
-  var id = _cancelLeaveId;
-  var isApproved = _cancelIsApproved;
-
+  var id = _cancelLeaveId, isApproved = _cancelIsApproved;
   if (isApproved) {
-    // Need a reason
     var reason = ((document.getElementById("cancelLeaveReason")||{}).value||"").trim();
     if (!reason) { toast("Please enter a reason for cancellation", "t-err"); return; }
-
     var updates = { status: "cancel_requested", cancelRequestReason: reason, cancelRequestedAt: Date.now() };
-    function onDone() {
-      document.getElementById("cancelLeaveModal").classList.remove("open");
-      toast("⚠️ Cancellation request sent to admin", "t-ok");
-      // Refresh my leaves list
-      loadMyLeaves();
-    }
-    if (fbOk && db) {
-      db.collection("leaveApplications").doc(id).update(updates).then(onDone)
-        .catch(function(e){ toast("Error: " + fbErrMsg(e).split("\n")[0], "t-err"); });
-    } else {
-      var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
-      var idx = ll.findIndex(function(r){ return r.id===id; });
-      if (idx>-1) Object.assign(ll[idx], updates);
-      localStorage.setItem("at_leaves", JSON.stringify(ll));
-      onDone();
-    }
+    function onDone() { document.getElementById("cancelLeaveModal").classList.remove("open"); toast("⚠️ Request sent", "t-ok"); loadMyLeaves(); }
+    if (fbOk && db) { db.collection("leaveApplications").doc(id).update(updates).then(onDone); }
   } else {
-    // Pending — just delete/cancel
     var updates2 = { status: "cancelled", cancelledAt: Date.now(), cancelledBy: "Engineer" };
-    function onDone2() {
-      document.getElementById("cancelLeaveModal").classList.remove("open");
-      toast("✅ Leave application cancelled", "t-ok");
-      loadMyLeaves();
-    }
-    if (fbOk && db) {
-      db.collection("leaveApplications").doc(id).update(updates2).then(onDone2)
-        .catch(function(e){ toast("Error: " + fbErrMsg(e).split("\n")[0], "t-err"); });
-    } else {
-      var ll2 = JSON.parse(localStorage.getItem("at_leaves")||"[]");
-      var idx2 = ll2.findIndex(function(r){ return r.id===id; });
-      if (idx2>-1) Object.assign(ll2[idx2], updates2);
-      localStorage.setItem("at_leaves", JSON.stringify(ll2));
-      onDone2();
-    }
+    function onDone2() { document.getElementById("cancelLeaveModal").classList.remove("open"); toast("✅ Application cancelled", "t-ok"); loadMyLeaves(); }
+    if (fbOk && db) { db.collection("leaveApplications").doc(id).update(updates2).then(onDone2); }
   }
 }
 
-// ── Admin: Cancel an approved leave ────────────────
 function adminCancelLeave(id) {
-  var rec = leaveRecs.find(function(r){ return r.id===id; });
-  if (!rec) return;
-  var info = document.getElementById("cancelLeaveInfo");
-  if (info) info.textContent = (rec.empName||"—") + " (" + (rec.empId||"—") + ") · " + rec.leaveType + " · " + rec.fromDate + " → " + rec.toDate;
-
-  var title = document.getElementById("cancelLeaveTitle");
-  var sub   = document.getElementById("cancelLeaveSub");
-  var reasonWrap = document.getElementById("cancelReasonWrap");
+  _cancelLeaveId = id; _cancelIsApproved = false; 
+  document.getElementById("cancelLeaveTitle").textContent = "🚫 Cancel Approved Leave";
+  document.getElementById("cancelReasonWrap").style.display = "block";
   var confirmBtn = document.getElementById("cancelLeaveConfirmBtn");
-  var rf = document.getElementById("cancelLeaveReason"); if (rf) rf.value = "";
-
-  if (title) title.textContent = "🚫 Cancel Approved Leave";
-  if (sub) sub.textContent = "This will cancel the approved leave and notify the engineer by email. Provide a reason below.";
-  if (reasonWrap) reasonWrap.style.display = "block";
-  if (confirmBtn) confirmBtn.textContent = "🚫 Confirm Cancellation";
-
-  _cancelLeaveId = id;
-  _cancelIsApproved = false; // use a flag to know this is admin cancel
-  // Override the confirm button to call adminConfirmCancel
-  if (confirmBtn) confirmBtn.onclick = adminConfirmCancel;
+  if (confirmBtn) { confirmBtn.textContent = "🚫 Confirm Cancellation"; confirmBtn.onclick = adminConfirmCancel; }
   document.getElementById("cancelLeaveModal").classList.add("open");
 }
 
 function adminConfirmCancel() {
   var id = _cancelLeaveId;
-  var rec = leaveRecs.find(function(r){ return r.id===id; });
-  if (!rec) return;
+  var rec = leaveRecs.find(function(r){ return r.id===id; }); if (!rec) return;
   var reason = ((document.getElementById("cancelLeaveReason")||{}).value||"").trim();
   if (!reason) { toast("Please enter a cancellation reason", "t-err"); return; }
 
   var user = (fbOk && firebase.auth().currentUser) ? firebase.auth().currentUser : null;
-  var adminEmail = user ? user.email : "Admin";
-  var now = new Date();
-  var updates = {
-    status: "cancelled",
-    cancelledAt: now.getTime(),
-    cancelledDate: now.toLocaleDateString("en-SG"),
-    cancelledBy: adminEmail,
-    cancelReason: reason
-  };
+  var updates = { status: "cancelled", cancelledAt: Date.now(), cancelledDate: new Date().toLocaleDateString("en-SG"), cancelledBy: user ? user.email : "Admin", cancelReason: reason };
 
   document.getElementById("cancelLeaveModal").classList.remove("open");
-  // Reset confirm button onclick back to default
   var confirmBtn = document.getElementById("cancelLeaveConfirmBtn");
   if (confirmBtn) confirmBtn.onclick = confirmCancelLeave;
 
-  function onDone() {
-    toast("🚫 Leave cancelled — notifying engineer…", "t-ok");
-    sendLeaveEmail(Object.assign({}, rec, updates), "cancelled", reason);
-  }
-
   if (fbOk && db) {
-    db.collection("leaveApplications").doc(id).update(updates).then(onDone)
-      .catch(function(e){ toast("Error: " + fbErrMsg(e).split("\n")[0], "t-err"); });
-  } else {
-    var idx = leaveRecs.findIndex(function(r){ return r.id===id; });
-    if (idx>-1) Object.assign(leaveRecs[idx], updates);
-    renderLeaveTable(); updateLeaveStats();
-    onDone();
+    db.collection("leaveApplications").doc(id).update(updates).then(function() {
+      toast("🚫 Leave cancelled — notifying engineer…", "t-ok");
+      sendLeaveEmail(Object.assign({}, rec, updates), "cancelled", reason);
+    });
   }
 }
 
 function adminKeepLeave(id) {
-  // Admin decides to keep the approved leave despite engineer's cancel request
-  var now = new Date();
-  var updates = { status: "approved", cancelRequestReason: null, cancelRequestedAt: null, keepNote: "Admin kept leave approved on " + now.toLocaleDateString("en-SG") };
-  if (fbOk && db) {
-    db.collection("leaveApplications").doc(id).update(updates)
-      .then(function(){ toast("✅ Leave kept as approved", "t-ok"); })
-      .catch(function(e){ toast("Error: " + e.message, "t-err"); });
-  } else {
-    var idx = leaveRecs.findIndex(function(r){ return r.id===id; });
-    if (idx>-1) Object.assign(leaveRecs[idx], updates);
-    renderLeaveTable(); toast("✅ Leave kept as approved", "t-ok");
-  }
+  var updates = { status: "approved", cancelRequestReason: null, cancelRequestedAt: null };
+  if (fbOk && db) { db.collection("leaveApplications").doc(id).update(updates).then(function(){ toast("✅ Leave kept", "t-ok"); }); }
 }
 
-// ── Edit Leave (engineer, pending only) ─────────────
-var _editLeaveOrigRec = null;
-
 function openEditLeave(id) {
-  // Fetch the record
   function doOpen(rec) {
-    if (!rec || rec.status !== "pending") { toast("Only pending applications can be edited", "t-err"); return; }
-    _editLeaveOrigRec = rec;
-
+    if (!rec || rec.status !== "pending") return;
     var lt = document.getElementById("editLeaveType");
-    if (lt) {
-      lt.innerHTML = "";
-      LEAVE_TYPES.forEach(function(t){ var o=document.createElement("option"); o.value=t; o.textContent=t; if(t===rec.leaveType)o.selected=true; lt.appendChild(o); });
-    }
-    var ef = document.getElementById("editLeaveFrom"); if(ef) ef.value = rec.fromDate||"";
-    var et = document.getElementById("editLeaveTo");   if(et) et.value = rec.toDate||"";
-    var er = document.getElementById("editLeaveReason"); if(er) er.value = rec.reason||"";
+    if (lt) { lt.innerHTML = ""; LEAVE_TYPES.forEach(function(t){ var o=document.createElement("option"); o.value=t; o.textContent=t; if(t===rec.leaveType)o.selected=true; lt.appendChild(o); }); }
+    document.getElementById("editLeaveFrom").value = rec.fromDate||"";
+    document.getElementById("editLeaveTo").value = rec.toDate||"";
+    document.getElementById("editLeaveReason").value = rec.reason||"";
     document.getElementById("editLeaveId").value = id;
     calcEditLeaveDays();
     document.getElementById("editLeaveModal").classList.add("open");
   }
-
-  if (leaveRecs.length) {
-    doOpen(leaveRecs.find(function(r){ return r.id===id; }));
-  } else if (fbOk && db) {
-    db.collection("leaveApplications").doc(id).get()
-      .then(function(d){ if(d.exists) doOpen(Object.assign({id:d.id},d.data())); });
-  } else {
-    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
-    doOpen(ll.find(function(r){ return r.id===id; }));
-  }
+  if (fbOk && db) { db.collection("leaveApplications").doc(id).get().then(function(d){ if(d.exists) doOpen(Object.assign({id:d.id},d.data())); }); }
 }
 
 function calcEditLeaveDays() {
@@ -3519,13 +2764,11 @@ function calcEditLeaveDays() {
   var nd = document.getElementById("editLeaveNumDays");
   if (!nd || !f || !t) return;
   var diff = Math.round((new Date(t)-new Date(f))/(1000*60*60*24))+1;
-  nd.value = diff>0 ? diff+" day"+(diff!==1?"s":"") : "❌";
+  nd.value = diff>0 ? diff+" day" : "❌";
   nd.style.color = diff>0 ? "var(--blue)" : "var(--red)";
 }
 
-function closeEditLeaveModal() {
-  document.getElementById("editLeaveModal").classList.remove("open");
-}
+function closeEditLeaveModal() { document.getElementById("editLeaveModal").classList.remove("open"); }
 
 function saveEditLeave() {
   var id = (document.getElementById("editLeaveId")||{}).value;
@@ -3535,31 +2778,15 @@ function saveEditLeave() {
   var reason    = ((document.getElementById("editLeaveReason")||{}).value||"").trim();
 
   if (!leaveType||!fromDate||!toDate) { toast("Please fill all fields", "t-err"); return; }
-  if (toDate < fromDate) { toast("To date must be after from date", "t-err"); return; }
   var numDays = Math.round((new Date(toDate)-new Date(fromDate))/(1000*60*60*24))+1;
-
   var updates = { leaveType:leaveType, fromDate:fromDate, toDate:toDate, numDays:numDays, reason:reason, editedAt:Date.now() };
 
-  function onDone() {
-    closeEditLeaveModal();
-    toast("✅ Leave application updated", "t-ok");
-    loadMyLeaves();
-  }
   if (fbOk && db) {
-    db.collection("leaveApplications").doc(id).update(updates).then(onDone)
-      .catch(function(e){ toast("Error: "+fbErrMsg(e).split("\n")[0],"t-err"); });
-  } else {
-    var ll = JSON.parse(localStorage.getItem("at_leaves")||"[]");
-    var idx = ll.findIndex(function(r){ return r.id===id; });
-    if (idx>-1) Object.assign(ll[idx], updates);
-    localStorage.setItem("at_leaves",JSON.stringify(ll));
-    onDone();
+    db.collection("leaveApplications").doc(id).update(updates).then(function() {
+      closeEditLeaveModal(); toast("✅ Application updated", "t-ok"); loadMyLeaves();
+    });
   }
 }
-
-// ╔══════════════════════════════════════════════════════╗
-// ║  END MY LEAVES / EDIT / CANCEL MODULE               ║
-// ╚══════════════════════════════════════════════════════╝
 
 initFirebase();
 initEmailJS();
