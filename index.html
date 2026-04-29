@@ -1902,11 +1902,9 @@ function doCheckin() {
     return;
   }
 
-  // ✅ EMAIL–DEVICE BINDING: check & record
+  // ✅ EMAIL–DEVICE BINDING: check & record (never blocks check-in, just flags it)
   var devId = getDeviceId();
   var emailConflict = checkAndRecordEmailBinding(devId, empEmail, empId, empName);
-    return;
-  }
 
   var site    = WORK_SITES[parseInt(siteIdx)];
   var gps     = GPS.in;
