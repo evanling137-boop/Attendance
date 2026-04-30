@@ -1205,20 +1205,73 @@ service cloud.firestore {
         </div>
 
         <div class="guide-step" style="border-left:4px solid #f59e0b">
-          <div class="gs-title">Step 11 — Configure Email Notifications (Optional)</div>
+          <div class="gs-title">Step 11 — Configure Email Notifications</div>
           <div class="gs-body">
             <p>To enable automatic email notifications when leaves are approved/rejected:</p>
             <ol>
               <li>Sign up for free at <strong>emailjs.com</strong></li>
-              <li>Create an <strong>Email Service</strong> (connect your Gmail)</li>
-              <li>Create an <strong>Email Template</strong> with variables: <code>{{to_email}}</code>, <code>{{to_name}}</code>, <code>{{message}}</code>, <code>{{leave_type}}</code>, <code>{{status}}</code></li>
-              <li>Get your <strong>Public Key</strong>, <strong>Service ID</strong>, and <strong>Template ID</strong></li>
-              <li>In this file, find <code>var EMAILJS_KEY</code> near the top of the script and replace the placeholder values</li>
+              <li>Go to <strong>Email Services</strong> → Add New Service → connect your Gmail account</li>
+              <li>Go to <strong>Email Templates</strong> → Create New Template</li>
+              <li>In your template, use <strong>exactly</strong> these variable names (copy-paste them):<br>
+                <div style="background:#1e293b;border-radius:8px;padding:12px 14px;margin:10px 0;font-family:monospace;font-size:.82rem;color:#e2e8f0;line-height:2">
+                  <span style="color:#94a3b8">To Email field:</span> <code style="color:#fbbf24">{{to_email}}</code><br>
+                  <span style="color:#94a3b8">Subject field :</span> <code style="color:#fbbf24">{{subject}}</code><br>
+                  <span style="color:#94a3b8">Body (use any/all of these):</span><br>
+                  &nbsp;&nbsp;<code style="color:#6ee7b7">{{to_name}}</code> — Engineer name<br>
+                  &nbsp;&nbsp;<code style="color:#6ee7b7">{{status}}</code> — APPROVED ✅ or REJECTED ❌<br>
+                  &nbsp;&nbsp;<code style="color:#6ee7b7">{{leave_type}}</code> — e.g. Annual Leave<br>
+                  &nbsp;&nbsp;<code style="color:#6ee7b7">{{from_date}}</code> / <code style="color:#6ee7b7">{{to_date}}</code><br>
+                  &nbsp;&nbsp;<code style="color:#6ee7b7">{{num_days}}</code> — number of days<br>
+                  &nbsp;&nbsp;<code style="color:#6ee7b7">{{decided_by}}</code> — approver name<br>
+                  &nbsp;&nbsp;<code style="color:#6ee7b7">{{reject_reason}}</code> — rejection reason<br>
+                  &nbsp;&nbsp;<code style="color:#6ee7b7">{{message}}</code> — full pre-formatted message (use this alone for simplest setup)
+                </div>
+              </li>
+              <li>Go to <strong>Account → General</strong> to copy your <strong>Public Key</strong></li>
+              <li>Your <strong>Service ID</strong> is under Email Services (starts with <code>service_</code>)</li>
+              <li>Your <strong>Template ID</strong> is under Email Templates (starts with <code>template_</code>)</li>
+              <li>Go to <strong>Account → Security</strong> → add your website domain to <strong>"Allowed Origins"</strong> (e.g. <code>https://yourname.github.io</code> or <code>http://localhost</code> for local testing). <span style="color:#b91c1c;font-weight:700">This is the #1 reason emails appear sent but nothing arrives — EmailJS silently rejects requests from unregistered domains.</span></li>
             </ol>
-            <p style="margin-top:8px">If EmailJS is not configured, the system will show a <strong>"Send via Email Client"</strong> fallback button that opens your email app with the notification pre-filled.</p>
+          </div>
+        </div>
+
+        <!-- ── EMAILJS LIVE DIAGNOSTICS ── -->
+        <div class="guide-step" style="border-left:4px solid #10b981;margin-top:4px">
+          <div class="gs-title">🔬 EmailJS Live Diagnostics</div>
+          <div class="gs-body">
+            <p style="margin-bottom:12px">Use this to verify your setup <strong>right now</strong> — without approving a real leave.</p>
+            <div id="ejDiagPanel" style="background:#0d1117;border-radius:10px;padding:16px;font-family:monospace;font-size:.8rem;line-height:1.9;margin-bottom:14px;min-height:60px">
+              <span style="color:#6b7280">Click "Run Diagnostics" to check your EmailJS configuration…</span>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+              <button class="tb-btn" style="background:var(--blue);color:#fff;font-size:.83rem" onclick="runEmailJSDiag()">🔬 Run Diagnostics</button>
+              <button class="tb-btn" style="background:#10b981;color:#fff;font-size:.83rem" onclick="showEmailTestModal()">📤 Send Test Email</button>
+            </div>
+            <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;font-size:.8rem;color:#78350f">
+              <strong>⚠️ Why my template changes aren't showing?</strong><br>
+              EmailJS <strong>caches</strong> templates on their CDN. After editing your template, wait 2–5 minutes then send a test email. If it still shows the old format, open your EmailJS dashboard → Email Templates → click your template → click <strong>Save</strong> again to force a cache refresh.
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EMAILJS TEST MODAL ════════════════════════════ -->
+<div id="emailTestModal" class="modal-overlay">
+  <div class="modal-box" style="max-width:460px">
+    <button class="modal-close" onclick="document.getElementById('emailTestModal').classList.remove('open')">✕</button>
+    <div class="modal-title">📤 Send Test Email</div>
+    <div class="modal-sub">This sends a real email through your EmailJS account so you can verify the template looks correct.</div>
+    <div class="field" style="margin-top:14px">
+      <label>Send test to (email address)</label>
+      <input type="email" id="ejTestEmail" placeholder="your@email.com" style="font-size:.9rem"/>
+    </div>
+    <div id="ejTestResult" style="margin:10px 0;font-size:.82rem;min-height:20px"></div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="document.getElementById('emailTestModal').classList.remove('open')">Cancel</button>
+      <button class="modal-btn-confirm" onclick="sendTestEmail()">📤 Send Test</button>
     </div>
   </div>
 </div>
@@ -2299,9 +2352,20 @@ var rejectTargetId = null;
 
 // ── Init EmailJS ────────────────────────────────────
 function initEmailJS() {
-  if (typeof emailjs !== "undefined" && EMAILJS_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
+  if (typeof emailjs === "undefined") {
+    console.warn("EmailJS SDK not loaded — check internet connection or CDN block");
+    return;
+  }
+  if (!EMAILJS_KEY || EMAILJS_KEY === "YOUR_EMAILJS_PUBLIC_KEY") {
+    console.warn("EmailJS: Public key not set");
+    return;
+  }
+  try {
     emailjs.init({ publicKey: EMAILJS_KEY });
     emailjsReady = true;
+    console.log("✅ EmailJS initialised. Service:", EMAILJS_SVC, "Template:", EMAILJS_TPL);
+  } catch(e) {
+    console.error("EmailJS init failed:", e);
   }
 }
 
@@ -2847,10 +2911,28 @@ function sendLeaveEmail(rec, status, rejectReason) {
       num_days: rec.numDays,
       decided_by: rec.decidedBy,
       reject_reason: rejectReason||"N/A"
-    }).then(function(){
+    }).then(function(res){
+      console.log("✅ EmailJS sent OK:", res.status, res.text);
       toast("📧 Notification email sent to " + rec.empEmail, "t-ok");
     }).catch(function(e){
-      console.warn("EmailJS error:", e);
+      // Surface the real error so admin knows what went wrong
+      var errMsg = "Unknown error";
+      if (e && e.text)   errMsg = e.text;
+      else if (e && e.status) errMsg = "HTTP " + e.status;
+      else if (e && e.message) errMsg = e.message;
+      console.error("EmailJS send failed:", e);
+
+      // Show specific guidance for common errors
+      var hint = "";
+      if (errMsg.indexOf("origin") !== -1 || errMsg.indexOf("403") !== -1 || (e && e.status === 403)) {
+        hint = "\n\n👉 FIX: Go to emailjs.com → Account → Security → add '" + location.origin + "' to Allowed Origins.";
+      } else if (errMsg.indexOf("template") !== -1 || (e && e.status === 404)) {
+        hint = "\n\n👉 FIX: Check your Template ID '" + EMAILJS_SVC + "' exists in your EmailJS dashboard.";
+      } else if (errMsg.indexOf("service") !== -1) {
+        hint = "\n\n👉 FIX: Check your Service ID '" + EMAILJS_SVC + "' and make sure Gmail is still connected in EmailJS.";
+      }
+
+      alert("❌ EmailJS Error: " + errMsg + hint + "\n\nOpening email fallback so you can send manually.");
       showEmailFallback(rec.empEmail, subject, body);
     });
   } else {
@@ -3948,6 +4030,110 @@ function saveEditLeave() {
 // ╔══════════════════════════════════════════════════════╗
 // ║  END MY LEAVES / EDIT / CANCEL MODULE               ║
 // ╚══════════════════════════════════════════════════════╝
+
+// ══════════════════════════════════════════════════════
+// EMAILJS DIAGNOSTICS & TEST
+// ══════════════════════════════════════════════════════
+function runEmailJSDiag() {
+  var panel = document.getElementById("ejDiagPanel");
+  if (!panel) return;
+
+  var lines = [];
+  var ok  = function(msg){ lines.push('<span style="color:#6ee7b7">✅ ' + msg + '</span>'); };
+  var err = function(msg){ lines.push('<span style="color:#f87171">❌ ' + msg + '</span>'); };
+  var inf = function(msg){ lines.push('<span style="color:#93c5fd">ℹ️  ' + msg + '</span>'); };
+  var wrn = function(msg){ lines.push('<span style="color:#fbbf24">⚠️  ' + msg + '</span>'); };
+
+  // 1. SDK loaded?
+  if (typeof emailjs !== "undefined") ok("EmailJS SDK loaded");
+  else { err("EmailJS SDK NOT loaded — check internet / CDN"); panel.innerHTML = lines.join("<br>"); return; }
+
+  // 2. Keys set?
+  if (EMAILJS_KEY && EMAILJS_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") ok("Public Key set: " + EMAILJS_KEY.slice(0,4) + "…" + EMAILJS_KEY.slice(-4));
+  else err("Public Key is a placeholder — open the file and set EMAILJS_KEY");
+
+  if (EMAILJS_SVC && EMAILJS_SVC !== "YOUR_SERVICE_ID") ok("Service ID set: " + EMAILJS_SVC);
+  else err("Service ID is a placeholder — set EMAILJS_SVC");
+
+  if (EMAILJS_TPL && EMAILJS_TPL !== "YOUR_TEMPLATE_ID") ok("Template ID set: " + EMAILJS_TPL);
+  else err("Template ID is a placeholder — set EMAILJS_TPL");
+
+  // 3. emailjsReady flag?
+  if (emailjsReady) ok("EmailJS initialised (emailjsReady = true)");
+  else { err("emailjsReady = false — init failed. Check public key is correct"); }
+
+  // 4. Domain check
+  inf("Current origin: " + location.origin);
+  if (location.protocol === "file:") {
+    wrn("You are running from a local file (file://). EmailJS rejects file:// — host it on a server or localhost.");
+  } else if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    wrn("Running on localhost — make sure 'http://localhost' is in EmailJS Allowed Origins.");
+  } else {
+    inf("Make sure '" + location.origin + "' is in EmailJS → Account → Security → Allowed Origins.");
+  }
+
+  // 5. Network check (try reaching emailjs CDN)
+  inf("Checking network access to EmailJS API…");
+  panel.innerHTML = lines.join("<br>") + "<br><span style='color:#6b7280'>Pinging EmailJS…</span>";
+
+  fetch("https://api.emailjs.com/api/v1.0/email/send", { method:"OPTIONS" })
+    .then(function(r){
+      ok("Network can reach api.emailjs.com (status " + r.status + ")");
+      panel.innerHTML = lines.join("<br>");
+    })
+    .catch(function(){
+      wrn("Could not reach api.emailjs.com — check firewall / internet connection");
+      panel.innerHTML = lines.join("<br>");
+    });
+}
+
+function showEmailTestModal() {
+  var prev = document.getElementById("ejTestEmail");
+  if (prev) prev.value = "";
+  var res = document.getElementById("ejTestResult");
+  if (res) res.innerHTML = "";
+  document.getElementById("emailTestModal").classList.add("open");
+}
+
+function sendTestEmail() {
+  var emailEl = document.getElementById("ejTestEmail");
+  var resEl   = document.getElementById("ejTestResult");
+  var toEmail = (emailEl ? emailEl.value.trim() : "");
+
+  if (!toEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail)) {
+    if (resEl) resEl.innerHTML = '<span style="color:var(--red)">Please enter a valid email address.</span>';
+    return;
+  }
+  if (!emailjsReady) {
+    if (resEl) resEl.innerHTML = '<span style="color:var(--red)">❌ EmailJS not initialised. Run diagnostics first.</span>';
+    return;
+  }
+
+  if (resEl) resEl.innerHTML = '<span style="color:#6b7280">⏳ Sending…</span>';
+
+  emailjs.send(EMAILJS_SVC, EMAILJS_TPL, {
+    to_email:      toEmail,
+    to_name:       "Test Engineer",
+    subject:       "✅ EmailJS Test — Attendance System",
+    message:       "This is a test email from your Attendance System.\n\nIf you can read this, EmailJS is working correctly!\n\nConfig used:\n  Service ID : " + EMAILJS_SVC + "\n  Template ID: " + EMAILJS_TPL + "\n  Origin     : " + location.origin,
+    leave_type:    "Annual Leave",
+    status:        "APPROVED ✅",
+    from_date:     "01/01/2025",
+    to_date:       "03/01/2025",
+    num_days:      "3",
+    decided_by:    "Admin",
+    reject_reason: "N/A"
+  }).then(function(r){
+    if (resEl) resEl.innerHTML = '<span style="color:#15803d;font-weight:700">✅ Email sent! Check your inbox (and spam folder). Status: ' + r.status + ' ' + r.text + '</span>';
+  }).catch(function(e){
+    var errMsg = (e && e.text) ? e.text : (e && e.status ? "HTTP " + e.status : JSON.stringify(e));
+    var hint = "";
+    if (e && e.status === 403) hint = ' — Your domain <strong>' + location.origin + '</strong> is not in EmailJS Allowed Origins. Go to emailjs.com → Account → Security → add it.';
+    else if (e && e.status === 404) hint = ' — Template ID or Service ID not found. Double-check them in your EmailJS dashboard.';
+    else if (e && e.status === 422) hint = ' — Template variable mismatch. Make sure your template uses <code>{{to_email}}</code> in the "To Email" field.';
+    if (resEl) resEl.innerHTML = '<span style="color:var(--red);font-weight:700">❌ Failed: ' + errMsg + hint + '</span>';
+  });
+}
 
 initFirebase();
 initEmailJS();
