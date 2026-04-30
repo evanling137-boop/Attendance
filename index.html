@@ -23,7 +23,23 @@
 <!-- ✅ SECURITY: Firebase Authentication SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <!-- EmailJS for leave notification emails -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" onerror="loadEmailJSFallback()"></script>
+<script>
+function loadEmailJSFallback() {
+  console.warn("EmailJS: jsdelivr failed, trying unpkg fallback…");
+  var s = document.createElement("script");
+  s.src = "https://unpkg.com/@emailjs/browser@4/dist/email.min.js";
+  s.onerror = function() {
+    console.error("EmailJS: both CDNs failed. Check internet connection.");
+  };
+  s.onload = function() {
+    console.log("EmailJS: loaded via unpkg fallback");
+    // Re-init after fallback load
+    if (typeof initEmailJS === "function") initEmailJS();
+  };
+  document.head.appendChild(s);
+}
+</script>
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -4045,8 +4061,15 @@ function runEmailJSDiag() {
   var wrn = function(msg){ lines.push('<span style="color:#fbbf24">⚠️  ' + msg + '</span>'); };
 
   // 1. SDK loaded?
-  if (typeof emailjs !== "undefined") ok("EmailJS SDK loaded");
-  else { err("EmailJS SDK NOT loaded — check internet / CDN"); panel.innerHTML = lines.join("<br>"); return; }
+  if (typeof emailjs !== "undefined") ok("EmailJS SDK loaded successfully");
+  else {
+    err("EmailJS SDK NOT loaded — the script from cdn.jsdelivr.net failed to download");
+    wrn("This usually means: (1) No internet, (2) jsdelivr.net is blocked in your network, or (3) you opened the file as file:// without a local server");
+    inf("A fallback to unpkg.com was attempted automatically. If both failed, try opening the browser Console (F12) to see the exact network error.");
+    inf("Quick fix: open the file via a local server (e.g. VS Code Live Server) instead of double-clicking the file");
+    panel.innerHTML = lines.join("<br>");
+    return;
+  }
 
   // 2. Keys set?
   if (EMAILJS_KEY && EMAILJS_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") ok("Public Key set: " + EMAILJS_KEY.slice(0,4) + "…" + EMAILJS_KEY.slice(-4));
